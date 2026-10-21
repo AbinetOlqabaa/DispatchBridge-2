@@ -1,0 +1,6 @@
+{
+  "name": "DispatchBridge - Delivery & Reconciliation Engine",
+  "description": "Secure full-stack business dispatch management, delivery receipt tracking, and inventory reconciliation system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
