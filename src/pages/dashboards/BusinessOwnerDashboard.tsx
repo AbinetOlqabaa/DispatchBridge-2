@@ -12,6 +12,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { Dispatch, Partner } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { StatusBadge } from '../../components/common/StatusBadge.js';
@@ -29,6 +30,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
   onCreateDispatch,
 }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [dispatches, setDispatches] = useState<Dispatch[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
       <div className="p-8 text-center">
         <p className="text-rose-400 mb-3">{error}</p>
         <button onClick={loadData} className="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm">
-          Retry
+          {t('action.retry')}
         </button>
       </div>
     );
@@ -90,13 +92,13 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
-              Business Owner Dashboard
+              {t('role.business_owner')}
             </span>
             <span className="text-xs text-slate-400">Company ID: {user?.businessId}</span>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">{user?.businessName}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Real-time supply chain dispatch oversight, partner delivery rates, and loss reconciliation.
+            {t('app.enterprise')}
           </p>
         </div>
 
@@ -106,7 +108,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
             className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
           >
             <Truck className="w-4 h-4" />
-            <span>Create Dispatch</span>
+            <span>{t('action.create_dispatch')}</span>
           </button>
         </div>
       </div>
@@ -115,16 +117,16 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">In Transit / Active</span>
+            <span className="text-xs font-medium">{t('metric.in_transit')}</span>
             <Truck className="w-4 h-4 text-sky-400" />
           </div>
           <div className="text-2xl font-bold text-white">{activeDispatches}</div>
-          <div className="text-[11px] text-slate-500 mt-1">Out of {totalDispatches} total dispatches</div>
+          <div className="text-[11px] text-slate-500 mt-1">Out of {totalDispatches} {t('metric.total_dispatches')}</div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Units Dispatched</span>
+            <span className="text-xs font-medium">{t('metric.units_dispatched')}</span>
             <Package className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-2xl font-bold text-white">{totalItemsSent.toLocaleString()}</div>
@@ -133,7 +135,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
 
         <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Recorded Losses / Shortfalls</span>
+            <span className="text-xs font-medium">{t('metric.recorded_losses')}</span>
             <AlertTriangle className="w-4 h-4 text-rose-400" />
           </div>
           <div className="text-2xl font-bold text-rose-400">{totalItemsLost.toLocaleString()}</div>
@@ -142,7 +144,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
 
         <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Reconciliation Rate</span>
+            <span className="text-xs font-medium">{t('metric.reconciliation_rate')}</span>
             <TrendingUp className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-emerald-400">{reconciliationRate}%</div>

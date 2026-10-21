@@ -12,6 +12,7 @@ import {
   ArrowUpDown,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { Dispatch, DispatchStatus } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { StatusBadge } from '../../components/common/StatusBadge.js';
@@ -29,6 +30,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
   onOpenPublicLink,
 }) => {
   const { user, quickLoginDemoRole } = useAuth();
+  const { t } = useTranslation();
   const [dispatches, setDispatches] = useState<Dispatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -80,13 +82,13 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-semibold uppercase tracking-wider text-sky-400 bg-sky-950 px-2.5 py-0.5 rounded-full border border-sky-800">
-              Delivery Operations
+              {t('app.subtitle')}
             </span>
-            <span className="text-xs text-slate-400">{filteredDispatches.length} manifests active</span>
+            <span className="text-xs text-slate-400">{filteredDispatches.length} {t('metric.manifests_active')}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Dispatch Registry & Delivery Lists</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">{t('nav.dispatches')}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Track dispatches sent to partners, monitor when manifests are opened, and reconcile receipts.
+            {t('app.enterprise')}
           </p>
         </div>
 
@@ -96,7 +98,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
             className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Sign In to Create Dispatch</span>
+            <span>{t('nav.signin')}</span>
           </button>
         ) : canCreate ? (
           <button
@@ -104,7 +106,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
             className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Create Dispatch</span>
+            <span>{t('action.create_dispatch')}</span>
           </button>
         ) : null}
       </div>
@@ -115,12 +117,12 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">
-                Public Exploration Mode
+                {t('banner.public_exploration')}
               </span>
-              <span className="text-xs text-slate-300 font-medium">Viewing Sandbox Dispatches</span>
+              <span className="text-xs text-slate-300 font-medium">{t('banner.viewing_sandbox')}</span>
             </div>
             <p className="text-xs text-slate-400">
-              Select any shipment below to inspect manifest details and reconciliation logs. Or switch to a demo role to test full actions:
+              {t('banner.sandbox_mode')}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -128,19 +130,19 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
               onClick={() => quickLoginDemoRole('BUSINESS_OWNER')}
               className="px-3 py-1.5 rounded-xl bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 border border-emerald-700/50 text-xs font-semibold cursor-pointer transition-colors"
             >
-              Owner Demo
+              {t('banner.demo_owner')}
             </button>
             <button
               onClick={() => quickLoginDemoRole('SENDER')}
               className="px-3 py-1.5 rounded-xl bg-blue-900/60 hover:bg-blue-800 text-blue-300 border border-blue-700/50 text-xs font-semibold cursor-pointer transition-colors"
             >
-              Sender Demo
+              {t('banner.demo_sender')}
             </button>
             <button
               onClick={() => quickLoginDemoRole('RECEIVER')}
               className="px-3 py-1.5 rounded-xl bg-amber-900/60 hover:bg-amber-800 text-amber-300 border border-amber-700/50 text-xs font-semibold cursor-pointer transition-colors"
             >
-              Receiver Demo
+              {t('banner.demo_receiver')}
             </button>
           </div>
         </div>
@@ -157,7 +159,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
             onClick={() => loadDispatches()}
             className="px-2.5 py-1 bg-red-900/50 hover:bg-red-800 rounded-lg text-[11px] font-semibold text-red-200 cursor-pointer"
           >
-            Retry
+            {t('action.retry')}
           </button>
         </div>
       )}
@@ -168,12 +170,12 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
           {/* Status Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none">
             {[
-              { id: 'ALL', label: 'All Dispatches' },
-              { id: 'DISPATCHED', label: 'Dispatched' },
-              { id: 'VIEWED', label: 'Viewed by Partner' },
-              { id: 'PARTIALLY_RECEIVED', label: 'Shortfall / Damage' },
-              { id: 'RECEIVED', label: 'Received Complete' },
-              { id: 'RECONCILED', label: 'Reconciled' },
+              { id: 'ALL', label: t('status.all') },
+              { id: 'DISPATCHED', label: t('status.dispatched') },
+              { id: 'VIEWED', label: t('status.viewed') },
+              { id: 'PARTIALLY_RECEIVED', label: t('status.shortfall_damage') },
+              { id: 'RECEIVED', label: t('status.received_complete') },
+              { id: 'RECONCILED', label: t('status.reconciled') },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -196,7 +198,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search number, partner, driver..."
+              placeholder={`${t('action.search')}...`}
               className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
             />
           </div>
@@ -211,7 +213,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
             <div className="text-sm font-semibold text-slate-300">No dispatches match this filter</div>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               {statusFilter !== 'ALL'
-                ? `No shipments found with status "${statusFilter}". Try selecting "All Dispatches".`
+                ? `No shipments found with status "${statusFilter}". Try selecting "${t('status.all')}".`
                 : 'No delivery manifests registered yet. Click "Create Dispatch" to send your first shipment.'}
             </p>
           </div>
@@ -220,14 +222,14 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
             <table className="w-full text-left text-xs">
               <thead className="text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
                 <tr>
-                  <th className="pb-3 font-semibold">Dispatch Number</th>
-                  <th className="pb-3 font-semibold">Sender / Supplier</th>
-                  <th className="pb-3 font-semibold">Destination Partner</th>
-                  <th className="pb-3 font-semibold">Status</th>
-                  <th className="pb-3 font-semibold">View Tracking</th>
-                  <th className="pb-3 font-semibold">Quantity / Loss</th>
-                  <th className="pb-3 font-semibold text-right">Share Link</th>
-                  <th className="pb-3 font-semibold text-right">Action</th>
+                  <th className="pb-3 font-semibold">{t('table.dispatch_number')}</th>
+                  <th className="pb-3 font-semibold">{t('table.sender_supplier')}</th>
+                  <th className="pb-3 font-semibold">{t('table.destination_partner')}</th>
+                  <th className="pb-3 font-semibold">{t('table.status')}</th>
+                  <th className="pb-3 font-semibold">{t('table.view_tracking')}</th>
+                  <th className="pb-3 font-semibold">{t('table.quantity_loss')}</th>
+                  <th className="pb-3 font-semibold text-right">{t('table.share_link')}</th>
+                  <th className="pb-3 font-semibold text-right">{t('table.action')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
@@ -312,7 +314,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                         onClick={() => onSelectDispatch(d.id)}
                         className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium cursor-pointer"
                       >
-                        Inspect
+                        {t('action.inspect')}
                       </button>
                     </td>
                   </tr>

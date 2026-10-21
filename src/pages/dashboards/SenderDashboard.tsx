@@ -12,6 +12,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { Dispatch } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { StatusBadge } from '../../components/common/StatusBadge.js';
@@ -29,6 +30,7 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
   onOpenPublicLink,
 }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [dispatches, setDispatches] = useState<Dispatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -75,13 +77,13 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-950 px-2.5 py-0.5 rounded-full border border-blue-800">
-              Dispatcher Station
+              {t('role.sender')}
             </span>
             <span className="text-xs text-slate-400">Dispatcher: {user?.name}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Outbound Shipments & Live Tracking</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">{t('nav.dispatches')}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Create itemized delivery manifests, share unguessable access links, and verify partner receipt.
+            {t('app.enterprise')}
           </p>
         </div>
 
@@ -90,7 +92,7 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
           className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
         >
           <PlusCircle className="w-4 h-4" />
-          <span>New Dispatch Manifest</span>
+          <span>{t('action.create_dispatch')}</span>
         </button>
       </div>
 

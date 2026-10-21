@@ -5,6 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
+import { ThemeProvider } from './context/ThemeContext.js';
+import { LanguageProvider } from './context/LanguageContext.js';
 import { Navbar } from './components/layout/Navbar.js';
 import { BottomNav } from './components/layout/BottomNav.js';
 import { NotificationBanner } from './components/common/NotificationBanner.js';
@@ -117,7 +119,7 @@ function MainApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white pb-20 md:pb-8">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white pb-20 md:pb-8 w-full max-w-full overflow-x-hidden">
       {/* Top Navigation */}
       <Navbar
         currentTab={currentTab}
@@ -144,8 +146,8 @@ function MainApp() {
         }}
       />
 
-      {/* Main View Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Main View Area - With max-w-full and overflow containment */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 max-w-full overflow-x-hidden">
         {selectedDispatchId ? (
           <DispatchDetailPage
             dispatchId={selectedDispatchId}
@@ -216,8 +218,12 @@ function MainApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MainApp />
-    </AuthProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <MainApp />
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }

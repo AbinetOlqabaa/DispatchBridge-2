@@ -114,11 +114,30 @@ $ npm test
 ---
 
 ## 5. Changes Made in This Session
-- Cleaned up obsolete turn-1 temporary draft files (`src/components/views/*`, `src/services/authContext.tsx`, `src/components/layout/Shell.tsx`, `src/types/index.ts`) that conflicted with the uploaded project's type declarations.
-- Verified that `npm run lint` (`tsc --noEmit`) passes with 0 errors.
-- Verified that `npm test` (`tsx test/runTests.ts`) passes 14/14 acceptance & integration tests with 0 failures.
-- Verified applet compilation with `compile_applet` (succeeded).
-- Validated desktop (1440x900) and mobile (390x844) layouts using headless Chromium via `playwright-cli`, confirming zero console errors, full role switcher operation, and responsive layout.
+- **Removed "B2B KERNEL" card / badge** from the navigation bar header and logo across all dashboards for the main application development phase.
+- **Fixed horizontal layout expansion**:
+  - Constrained root layout containers with `w-full max-w-full overflow-x-hidden`.
+  - Added CSS rule `html, body, #root { max-width: 100vw; overflow-x: hidden; }`.
+  - Formatted dashboard and navigation tab rows with `overflow-x-auto scrollbar-none flex-nowrap shrink` and constrained max widths so buttons never push page elements past viewport boundaries.
+  - Verified with `playwright-cli eval`: `scrollWidth <= innerWidth` is `true` (`overflow: false`) on both desktop (1440x900) and mobile (390x844).
+- **End-to-End Dark / Light Mode Selector Dropdown**:
+  - Implemented `ThemeContext` supporting `'dark' | 'light' | 'system'`.
+  - Added dropdown selector with active indicators and system default preference detection via `window.matchMedia('(prefers-color-scheme: dark)')`.
+  - Persisted setting in `localStorage` under `dispatchbridge_theme`.
+  - Implemented clean, high-contrast light theme CSS overrides in `src/index.css` for slate surfaces, card backgrounds, borders, and text.
+- **End-to-End Local Language Selector Dropdown (5 Languages)**:
+  - Added dictionary supporting:
+    1. **English (`en`)**
+    2. **Amharic (`am` / `አማርኛ`)**
+    3. **Afan Oromo (`om` / `Afaan Oromoo`)**
+    4. **Tigrigna (`ti` / `ትግርኛ`)**
+    5. **Somali (`so` / `Soomaali`)**
+  - Implemented `LanguageContext` with `t(key, fallback)` hook, persisting language preference in `localStorage` under `dispatchbridge_lang` and updating `document.documentElement.lang`.
+  - Wired translations across all core pages, navigation links, banners, role simulation badges, filter tabs, tables, and actions.
+  - Verified live interactive switching in browser with `playwright-cli` across all 5 languages.
+- Verified test suite: `npm test` -> 14/14 tests passing.
+- Verified type safety: `npm run lint` (`tsc --noEmit`) -> 0 errors.
+- Verified build: `compile_applet` -> SUCCESS.
 
 ---
 

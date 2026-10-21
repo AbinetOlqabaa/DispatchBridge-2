@@ -1,6 +1,7 @@
 import React from 'react';
 import { Truck, Activity, Users, FileText, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 
 interface BottomNavProps {
   currentTab: string;
@@ -9,15 +10,16 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const items = [
-    { id: 'dispatches', label: 'Dispatches', icon: Truck },
-    ...(user ? [{ id: 'dashboard', label: 'Dashboard', icon: Activity }] : []),
-    ...(user && user.role !== 'RECEIVER' ? [{ id: 'partners', label: 'Partners', icon: Users }] : []),
+    { id: 'dispatches', label: t('nav.dispatches'), icon: Truck },
+    ...(user ? [{ id: 'dashboard', label: t('nav.dashboard'), icon: Activity }] : []),
+    ...(user && user.role !== 'RECEIVER' ? [{ id: 'partners', label: t('nav.partners'), icon: Users }] : []),
     ...(user && (user.role === 'SUPER_ADMIN' || user.role === 'BUSINESS_OWNER')
-      ? [{ id: 'audit', label: 'Audit', icon: FileText }]
+      ? [{ id: 'audit', label: t('nav.audit'), icon: FileText }]
       : []),
-    { id: 'status', label: 'Status', icon: Shield },
+    { id: 'status', label: t('nav.systemStatus'), icon: Shield },
   ];
 
   return (

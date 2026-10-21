@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { Dispatch } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { StatusBadge } from '../../components/common/StatusBadge.js';
@@ -22,6 +23,7 @@ interface ReceiverDashboardProps {
 
 export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDispatch }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [inboundDispatches, setInboundDispatches] = useState<Dispatch[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,13 +54,13 @@ export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDi
       <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-semibold uppercase tracking-wider text-amber-400 bg-amber-950 px-2.5 py-0.5 rounded-full border border-amber-800">
-            Partner Receiving Station
+            {t('role.receiver')}
           </span>
           <span className="text-xs text-slate-400">Station Lead: {user?.name}</span>
         </div>
         <h1 className="text-2xl font-bold text-white tracking-tight">{user?.businessName}</h1>
         <p className="text-xs text-slate-400 mt-0.5">
-          Verify cargo shipments, confirm item quantities, log damaged goods, and submit verified sign-offs.
+          {t('app.enterprise')}
         </p>
       </div>
 

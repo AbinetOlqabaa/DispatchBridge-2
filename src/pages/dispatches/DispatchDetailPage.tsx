@@ -21,6 +21,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { DiscrepancyCase, DiscrepancyType, Dispatch, ItemCondition } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { StatusBadge } from '../../components/common/StatusBadge.js';
@@ -38,6 +39,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
   onOpenPublicLink,
 }) => {
   const { user, quickLoginDemoRole } = useAuth();
+  const { t } = useTranslation();
   const [dispatch, setDispatch] = useState<Dispatch | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -241,7 +243,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
           className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white cursor-pointer transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Dispatches</span>
+          <span>{t('nav.dispatches')}</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -250,7 +252,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 text-xs font-semibold cursor-pointer"
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            <span>Open Partner View</span>
+            <span>{t('table.view_tracking')}</span>
           </button>
         </div>
       </div>
