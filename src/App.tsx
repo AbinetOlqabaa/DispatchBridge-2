@@ -1,277 +1,223 @@
 /**
- * DispatchBridge - Enterprise Business Delivery & Reconciliation Kernel
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 import React, { useState, useEffect } from 'react';
-import { AuthProvider, useAuth } from './services/authContext.tsx';
-import { api } from './services/api.ts';
-import { Dispatch, Partner, AuditEntry, PartnerRole } from './types/index.ts';
-import { Shell, ActiveTab } from './components/layout/Shell.tsx';
-import { DashboardView } from './components/views/DashboardView.tsx';
-import { DispatchesView } from './components/views/DispatchesView.tsx';
-import { DispatchDetailModal } from './components/views/DispatchDetailModal.tsx';
-import { CreateDispatchModal } from './components/views/CreateDispatchModal.tsx';
-import { PartnersView } from './components/views/PartnersView.tsx';
-import { AuditView } from './components/views/AuditView.tsx';
-import { SystemStatusView } from './components/views/SystemStatusView.tsx';
-import { AuthModal } from './components/views/AuthModal.tsx';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { AuthProvider, useAuth } from './context/AuthContext.js';
+import { Navbar } from './components/layout/Navbar.js';
+import { BottomNav } from './components/layout/BottomNav.js';
+import { NotificationBanner } from './components/common/NotificationBanner.js';
+import { AuthModal } from './pages/auth/AuthModal.js';
+import { BusinessOwnerDashboard } from './pages/dashboards/BusinessOwnerDashboard.js';
+import { SenderDashboard } from './pages/dashboards/SenderDashboard.js';
+import { ReceiverDashboard } from './pages/dashboards/ReceiverDashboard.js';
+import { SuperAdminDashboard } from './pages/dashboards/SuperAdminDashboard.js';
+import { DispatchListPage } from './pages/dispatches/DispatchListPage.js';
+import { DispatchDetailPage } from './pages/dispatches/DispatchDetailPage.js';
+import { CreateDispatchModal } from './pages/dispatches/CreateDispatchModal.js';
+import { PublicPartnerView } from './pages/dispatches/PublicPartnerView.js';
+import { PartnersPage } from './pages/partners/PartnersPage.js';
+import { LocationsPage } from './pages/locations/LocationsPage.js';
+import { AuditPage } from './pages/audit/AuditPage.js';
+import { SystemStatusPage } from './pages/system/SystemStatusPage.js';
+import { NotificationDrawer } from './components/notifications/NotificationDrawer.js';
 
-function DispatchBridgeApp() {
-  const { currentRole, currentUser } = useAuth();
+function MainApp() {
+  const { user } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
-  const [dispatches, setDispatches] = useState<Dispatch[]>([]);
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [auditLogs, setAuditLogs] = useState<AuditEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Navigation State
+  const [currentTab, setCurrentTab] = useState<string>('dispatches');
+  const [selectedDispatchId, setSelectedDispatchId] = useState<string | null>(null);
+  const [publicShareToken, setPublicShareToken] = useState<string | null>(null);
 
-  // Modals
-  const [selectedDispatch, setSelectedDispatch] = useState<Dispatch | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authDefaultTab, setAuthDefaultTab] = useState<'login' | 'register' | 'bootstrap'>('login');
+  // Modal & Drawer State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'register' | 'forgot' | 'verifyPhone'>('signin');
+  const [isCreateDispatchOpen, setIsCreateDispatchOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
-  // Feedback Notification Toast
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-
-  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => {
-      setToast(null);
-    }, 4000);
-  };
-
-  // Register PWA service worker
+  // Check URL search params for public delivery share token (?token=...)
   useEffect(() => {
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-      navigator.serviceWorker.register('/sw.js').catch((err) => {
-        console.warn('Service worker registration skipped:', err);
-      });
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      setPublicShareToken(token);
     }
   }, []);
 
-  const loadAllData = async () => {
-    setIsLoading(true);
-    try {
-      const [dispatchesData, partnersData, auditData] = await Promise.all([
-        api.getDispatches({ role: currentRole }),
-        api.getPartners(),
-        api.getAuditLogs(),
-      ]);
-      setDispatches(dispatchesData);
-      setPartners(partnersData);
-      setAuditLogs(auditData);
-    } catch (err: any) {
-      console.error('Failed to load application data:', err);
-      showToast('Error loading application data from server', 'error');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // When user logs in and is on dispatches, gently pivot to their dashboard
   useEffect(() => {
-    loadAllData();
-  }, [currentRole]);
+    if (user && currentTab === 'dispatches' && !selectedDispatchId && !publicShareToken) {
+      setCurrentTab('dashboard');
+    }
+  }, [user]);
 
-  // Handle viewing dispatch (records read-receipt if receiver)
-  const handleSelectDispatch = async (dispatch: Dispatch) => {
-    try {
-      const viewer = currentUser
-        ? { role: currentRole, id: currentUser.id, name: currentUser.fullName }
-        : undefined;
+  // If public token is active, show the partner delivery manifest
+  if (publicShareToken) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 antialiased pb-12">
+        <PublicPartnerView
+          shareToken={publicShareToken}
+          onExit={() => {
+            setPublicShareToken(null);
+            window.history.replaceState({}, '', window.location.pathname);
+          }}
+        />
+      </div>
+    );
+  }
 
-      const freshDispatch = await api.getDispatchById(dispatch.id, viewer);
-      setSelectedDispatch(freshDispatch);
-
-      // Update in local dispatches list if status or viewed time changed
-      setDispatches((prev) =>
-        prev.map((d) => (d.id === freshDispatch.id ? freshDispatch : d))
+  // Render role-specific dashboard
+  const renderDashboard = () => {
+    if (!user) {
+      return (
+        <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl max-w-lg mx-auto my-12 space-y-3">
+          <h2 className="text-lg font-bold text-white">Sign In Required</h2>
+          <p className="text-xs text-slate-400">
+            Please sign in to access your role-specific dashboard, or explore the public Dispatches and System Status pages.
+          </p>
+          <button
+            onClick={() => {
+              setAuthModalMode('signin');
+              setIsAuthModalOpen(true);
+            }}
+            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl cursor-pointer"
+          >
+            Sign In to Dashboard
+          </button>
+        </div>
       );
-    } catch (err: any) {
-      setSelectedDispatch(dispatch);
     }
-  };
 
-  // Handle creating new dispatch
-  const handleCreateDispatch = async (
-    payload: {
-      originLocation: string;
-      partnerId: string;
-      destinationLocation: string;
-      driverName: string;
-      driverPhone: string;
-      vehiclePlate: string;
-      items: Array<{
-        name: string;
-        sku: string;
-        dispatchedQty: number;
-        unit: string;
-        unitPrice: number;
-      }>;
-    },
-    idempotencyKey: string
-  ) => {
-    const actor = {
-      id: currentUser?.id || 'usr_sender_demo',
-      name: currentUser?.fullName || 'Authorized Dispatcher',
-      role: currentRole,
-    };
-
-    const newDispatch = await api.createDispatch({ ...payload, actor }, idempotencyKey);
-    setDispatches((prev) => [newDispatch, ...prev]);
-    setShowCreateModal(false);
-    showToast(`Dispatch ${newDispatch.trackingCode} created successfully!`);
-    loadAllData();
-  };
-
-  // Handle reconciling dispatch
-  const handleReconcileDispatch = async (
-    dispatchId: string,
-    payload: {
-      receivedItems: Array<{
-        id: string;
-        receivedQty: number;
-        damagedQty: number;
-        missingQty: number;
-        itemNotes?: string;
-      }>;
-      recipientSignature: string;
-      reconciliationNotes: string;
+    switch (user.role) {
+      case 'SUPER_ADMIN':
+        return <SuperAdminDashboard onNavigateStatus={() => setCurrentTab('status')} />;
+      case 'BUSINESS_OWNER':
+        return (
+          <BusinessOwnerDashboard
+            onSelectDispatch={(id) => setSelectedDispatchId(id)}
+            onNavigateTab={(tab) => setCurrentTab(tab)}
+            onCreateDispatch={() => setIsCreateDispatchOpen(true)}
+          />
+        );
+      case 'SENDER':
+        return (
+          <SenderDashboard
+            onSelectDispatch={(id) => setSelectedDispatchId(id)}
+            onCreateDispatch={() => setIsCreateDispatchOpen(true)}
+            onOpenPublicLink={(token) => setPublicShareToken(token)}
+          />
+        );
+      case 'RECEIVER':
+        return <ReceiverDashboard onSelectDispatch={(id) => setSelectedDispatchId(id)} />;
+      default:
+        return <DispatchListPage onSelectDispatch={(id) => setSelectedDispatchId(id)} onCreateDispatch={() => setIsCreateDispatchOpen(true)} onOpenPublicLink={(t) => setPublicShareToken(t)} />;
     }
-  ) => {
-    const actor = {
-      id: currentUser?.id || 'usr_receiver_demo',
-      name: currentUser?.fullName || 'Dock Supervisor',
-      role: currentRole,
-    };
-
-    const updated = await api.reconcileDispatch(dispatchId, { ...payload, actor });
-    setDispatches((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
-    setSelectedDispatch(updated);
-    showToast(`Reconciliation submitted for ${updated.trackingCode}!`);
-    loadAllData();
-  };
-
-  // Handle adding partner
-  const handleAddPartner = async (payload: {
-    name: string;
-    code: string;
-    role: PartnerRole;
-    contactPerson: string;
-    email: string;
-    phone: string;
-    locationAddress: string;
-  }) => {
-    const actor = {
-      id: currentUser?.id || 'usr_owner_demo',
-      name: currentUser?.fullName || 'Business Manager',
-      role: currentRole,
-    };
-
-    const created = await api.createPartner({ ...payload, actor });
-    setPartners((prev) => [...prev, created]);
-    showToast(`Trading partner "${created.name}" registered successfully!`);
-    loadAllData();
   };
 
   return (
-    <Shell
-      activeTab={activeTab}
-      onSelectTab={(tab) => setActiveTab(tab)}
-      onOpenAuth={() => {
-        setAuthDefaultTab('login');
-        setShowAuthModal(true);
-      }}
-      onOpenNewDispatch={() => setShowCreateModal(true)}
-    >
-      {/* Toast Notification Banner */}
-      {toast && (
-        <div className="fixed top-18 right-4 z-50 animate-bounce">
-          <div
-            className={`px-4 py-2.5 rounded-xl shadow-xl border flex items-center gap-2 text-xs font-semibold ${
-              toast.type === 'success'
-                ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200'
-                : 'bg-rose-950/90 border-rose-500/50 text-rose-200'
-            }`}
-          >
-            {toast.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            ) : (
-              <AlertCircle className="w-4 h-4 text-rose-400" />
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white pb-20 md:pb-8">
+      {/* Top Navigation */}
+      <Navbar
+        currentTab={currentTab}
+        onSelectTab={(tab) => {
+          setSelectedDispatchId(null);
+          setCurrentTab(tab);
+        }}
+        onOpenAuth={() => {
+          setAuthModalMode('signin');
+          setIsAuthModalOpen(true);
+        }}
+        onOpenNotifications={() => setIsNotificationsOpen(true)}
+      />
+
+      {/* Sandbox Isolation & Notification Banners */}
+      <NotificationBanner
+        onOpenPhoneVerify={() => {
+          setAuthModalMode('verifyPhone');
+          setIsAuthModalOpen(true);
+        }}
+        onNavigateStatus={() => {
+          setSelectedDispatchId(null);
+          setCurrentTab('status');
+        }}
+      />
+
+      {/* Main View Area */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {selectedDispatchId ? (
+          <DispatchDetailPage
+            dispatchId={selectedDispatchId}
+            onBack={() => setSelectedDispatchId(null)}
+            onOpenPublicLink={(token) => setPublicShareToken(token)}
+          />
+        ) : (
+          <>
+            {currentTab === 'dashboard' && renderDashboard()}
+            {currentTab === 'dispatches' && (
+              <DispatchListPage
+                onSelectDispatch={(id) => setSelectedDispatchId(id)}
+                onCreateDispatch={() => setIsCreateDispatchOpen(true)}
+                onOpenPublicLink={(token) => setPublicShareToken(token)}
+              />
             )}
-            <span>{toast.message}</span>
-          </div>
-        </div>
-      )}
+            {currentTab === 'locations' && <LocationsPage />}
+            {currentTab === 'partners' && (
+              <PartnersPage
+                onCreateDispatchWithPartner={(partnerId) => {
+                  setIsCreateDispatchOpen(true);
+                }}
+              />
+            )}
+            {currentTab === 'audit' && <AuditPage />}
+            {currentTab === 'status' && <SystemStatusPage />}
+          </>
+        )}
+      </main>
 
-      {/* Primary Tab Content */}
-      {activeTab === 'dashboard' && (
-        <DashboardView
-          dispatches={dispatches}
-          partners={partners}
-          isLoading={isLoading}
-          onRefresh={loadAllData}
-          onOpenNewDispatch={() => setShowCreateModal(true)}
-          onSelectDispatch={handleSelectDispatch}
-          onGoToDispatches={() => setActiveTab('dispatches')}
-          onGoToPartners={() => setActiveTab('partners')}
-          onGoToStatus={() => setActiveTab('status')}
-          onOpenBootstrapAdmin={() => {
-            setAuthDefaultTab('bootstrap');
-            setShowAuthModal(true);
-          }}
-        />
-      )}
-
-      {activeTab === 'dispatches' && (
-        <DispatchesView
-          dispatches={dispatches}
-          isLoading={isLoading}
-          onRefresh={loadAllData}
-          onOpenNewDispatch={() => setShowCreateModal(true)}
-          onSelectDispatch={handleSelectDispatch}
-        />
-      )}
-
-      {activeTab === 'partners' && (
-        <PartnersView partners={partners} onAddPartner={handleAddPartner} />
-      )}
-
-      {activeTab === 'audit' && (
-        <AuditView logs={auditLogs} isLoading={isLoading} onRefresh={loadAllData} />
-      )}
-
-      {activeTab === 'status' && <SystemStatusView />}
-
-      {/* Modals */}
-      <DispatchDetailModal
-        dispatch={selectedDispatch}
-        onClose={() => setSelectedDispatch(null)}
-        onReconcile={handleReconcileDispatch}
+      {/* Mobile Bottom Navigation */}
+      <BottomNav
+        currentTab={currentTab}
+        onSelectTab={(tab) => {
+          setSelectedDispatchId(null);
+          setCurrentTab(tab);
+        }}
       />
 
-      {showCreateModal && (
-        <CreateDispatchModal
-          partners={partners}
-          onClose={() => setShowCreateModal(false)}
-          onCreate={handleCreateDispatch}
-        />
-      )}
+      {/* In-app Notification Alerts Drawer */}
+      <NotificationDrawer
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+        onSelectDispatch={(id) => {
+          setSelectedDispatchId(id);
+          setIsNotificationsOpen(false);
+        }}
+      />
 
+      {/* Authentication Modal */}
       <AuthModal
-        isOpen={showAuthModal}
-        defaultTab={authDefaultTab}
-        onClose={() => setShowAuthModal(false)}
+        isOpen={isAuthModalOpen}
+        initialMode={authModalMode}
+        onClose={() => setIsAuthModalOpen(false)}
       />
-    </Shell>
+
+      {/* Create Dispatch Manifest Modal */}
+      <CreateDispatchModal
+        isOpen={isCreateDispatchOpen}
+        onClose={() => setIsCreateDispatchOpen(false)}
+        onSuccess={(createdId) => {
+          setSelectedDispatchId(createdId);
+        }}
+      />
+    </div>
   );
 }
 
 export default function App() {
   return (
     <AuthProvider>
-      <DispatchBridgeApp />
+      <MainApp />
     </AuthProvider>
   );
 }
