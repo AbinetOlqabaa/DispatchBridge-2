@@ -17,6 +17,7 @@ import { Dispatch, Partner } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { StatusBadge } from '../../components/common/StatusBadge.js';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner.js';
+import { ExecutiveAnalyticsCharts } from '../../components/dashboards/ExecutiveAnalyticsCharts.js';
 
 interface BusinessOwnerDashboardProps {
   onSelectDispatch: (id: string) => void;
@@ -151,6 +152,9 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
           <div className="text-[11px] text-emerald-400/80 mt-1">Fulfilled to receiving partner</div>
         </div>
       </div>
+
+      {/* Visual Analytics & Summary Charts */}
+      <ExecutiveAnalyticsCharts dispatches={dispatches} />
 
       {/* Middle Section: Loss Breakdown & Partner Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

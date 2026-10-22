@@ -121,6 +121,35 @@ router.post(
   }
 );
 
+// Bulk Create Dispatches (CSV import)
+router.post(
+  '/bulk',
+  authenticate,
+  requireRole('SENDER', 'BUSINESS_OWNER', 'SUPER_ADMIN'),
+  async (req: AuthenticatedRequest, res) => {
+    try {
+      const user = req.user!;
+      const dispatchesList = req.body.dispatches;
+      const result = await sandboxStore.bulkCreateDispatches(dispatchesList, user);
+      res.status(201).json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || 'Failed to bulk-create dispatches.' });
+    }
+  }
+);
+
+// Record Driver Transit Package Scan & Milestone Verification
+router.post('/:id/transit-scan', optionalAuthenticate, async (req: AuthenticatedRequest, res) => {
+  try {
+    const { id } = req.params;
+    const user = req.user;
+    const updated = await sandboxStore.recordTransitScan(id, req.body, user);
+    res.json(updated);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Failed to record transit scan.' });
+  }
+});
+
 // Record delivery receipt & reconcile quantities (Receivers, Owners, SuperAdmins)
 router.post(
   '/:id/reconcile',

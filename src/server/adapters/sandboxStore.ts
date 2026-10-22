@@ -1680,8 +1680,160 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
     console.log(`[NOTIFICATION DISCREPANCY] Case ${discrepancyCase.id} updated to ${discrepancyCase.status}.`);
   }
 
-  async notifyReconciliationCompleted(dispatch: Dispatch): Promise<void> {
-    console.log(`[NOTIFICATION RECONCILED] Finalized summary sent for ${dispatch.dispatchNumber}.`);
+  async recordTransitScan(
+    dispatchId: string,
+    payload: {
+      barcode: string;
+      statusUpdate?: DispatchStatus;
+      checkpointLocation?: string;
+      driverNotes?: string;
+      scannedLineIds?: string[];
+      actorName?: string;
+    },
+    actor?: User
+  ): Promise<Dispatch> {
+    const dispatch = dispatches.find((d) => d.id === dispatchId);
+    if (!dispatch) throw new Error('Dispatch not found.');
+
+    const now = new Date().toISOString();
+    if (payload.statusUpdate) {
+      dispatch.status = payload.statusUpdate;
+    } else if (dispatch.status === 'DISPATCHED' || dispatch.status === 'VIEWED') {
+      dispatch.status = 'IN_TRANSIT';
+    }
+
+    // Update scanned lines notes if provided
+    if (payload.scannedLineIds && payload.scannedLineIds.length > 0) {
+      dispatch.lines.forEach((l) => {
+        if (payload.scannedLineIds?.includes(l.id)) {
+          l.notes = (l.notes ? `${l.notes} | ` : '') + `Verified package barcode: ${payload.barcode} at ${now}`;
+        }
+      });
+    }
+
+    dispatch.version += 1;
+    dispatch.updatedAt = now;
+
+    const actorId = actor ? actor.id : 'carrier_driver';
+    const actorName = actor ? actor.name : (payload.actorName || dispatch.driverName || 'Courier Driver');
+    const actorRole = actor ? actor.role : 'SENDER';
+
+    await this.recordAudit({
+      actorId,
+      actorName,
+      actorRole,
+      businessId: dispatch.senderBusinessId,
+      action: 'TRANSIT_PACKAGE_SCANNED',
+      entityType: 'DISPATCH',
+      entityId: dispatch.id,
+      details: `Package transit barcode scanned: "${payload.barcode}". Checkpoint: "${payload.checkpointLocation || 'Dock en route'}". Status: ${dispatch.status}.`,
+      metadata: {
+        barcode: payload.barcode,
+        checkpointLocation: payload.checkpointLocation,
+        driverNotes: payload.driverNotes,
+        status: dispatch.status,
+      },
+    });
+
+    return JSON.parse(JSON.stringify(dispatch));
+  }
+
+  async bulkCreateDispatches(
+    dispatchesPayload: Array<{
+      partnerId?: string;
+      partnerName?: string;
+      originLocationId?: string;
+      originLocationLabel?: string;
+      originAddress?: string;
+      destinationAddress?: string;
+      driverName?: string;
+      driverPhone?: string;
+      vehicleReg?: string;
+      notes?: string;
+      lines: Array<{
+        sku: string;
+        itemName: string;
+        unit: string;
+        unitPrice?: number;
+        quantitySent: number;
+        notes?: string;
+      }>;
+    }>,
+    actor: User
+  ): Promise<{ createdCount: number; dispatches: Dispatch[]; errors?: string[] }> {
+    if (!dispatchesPayload || !Array.isArray(dispatchesPayload) || dispatchesPayload.length === 0) {
+      throw new Error('No dispatch data provided for bulk creation.');
+    }
+
+    const created: Dispatch[] = [];
+    const errors: string[] = [];
+
+    const defaultLocation =
+      locations.find((l) => l.businessId === actor.businessId && l.isDefault) ||
+      locations.find((l) => l.businessId === actor.businessId) ||
+      locations[0];
+
+    for (let i = 0; i < dispatchesPayload.length; i++) {
+      const entry = dispatchesPayload[i];
+      try {
+        let partner = partners.find(
+          (p) =>
+            p.businessId === actor.businessId &&
+            (p.id === entry.partnerId ||
+              p.name.toLowerCase() === entry.partnerName?.toLowerCase().trim())
+        );
+
+        if (!partner && entry.partnerName) {
+          partner = {
+            id: 'part_' + crypto.randomBytes(4).toString('hex'),
+            businessId: actor.businessId,
+            name: entry.partnerName.trim(),
+            type: 'RETAILER',
+            contactPerson: 'Receiving Team',
+            email: `receiving@${entry.partnerName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'partner'}.com`,
+            phone: '+1-555-000-0000',
+            countryCode: 'US',
+            region: 'Default',
+            city: 'Primary City',
+            deliveryAddress: entry.destinationAddress || 'Standard Partner Delivery Dock',
+            status: 'ACTIVE',
+            verificationStatus: 'UNVERIFIED',
+            createdAt: new Date().toISOString(),
+          };
+          partners.push(partner);
+        }
+
+        if (!partner) {
+          throw new Error(`Row #${i + 1}: Partner "${entry.partnerName || entry.partnerId}" could not be resolved.`);
+        }
+
+        const dispatch = await this.createDispatch(
+          {
+            originLocationId: entry.originLocationId || defaultLocation?.id,
+            originLocationLabel: entry.originLocationLabel || defaultLocation?.label || 'Primary Loading Bay',
+            originAddress: entry.originAddress || defaultLocation?.addressLines || 'Warehouse Center',
+            partnerId: partner.id,
+            destinationAddress: entry.destinationAddress || partner.deliveryAddress,
+            driverName: entry.driverName,
+            driverPhone: entry.driverPhone,
+            vehicleReg: entry.vehicleReg,
+            notes: entry.notes,
+            lines: entry.lines,
+          },
+          actor
+        );
+
+        created.push(dispatch);
+      } catch (err: any) {
+        errors.push(`Manifest #${i + 1}: ${err.message}`);
+      }
+    }
+
+    return {
+      createdCount: created.length,
+      dispatches: created,
+      errors: errors.length > 0 ? errors : undefined,
+    };
   }
 }
 

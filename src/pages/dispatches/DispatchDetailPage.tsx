@@ -19,6 +19,8 @@ import {
   Warehouse,
   MessageSquare,
   ShieldCheck,
+  QrCode,
+  Download,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
 import { useTranslation } from '../../context/LanguageContext.js';
@@ -26,6 +28,8 @@ import { DiscrepancyCase, DiscrepancyType, Dispatch, ItemCondition } from '../..
 import { api } from '../../services/api.js';
 import { StatusBadge } from '../../components/common/StatusBadge.js';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner.js';
+import { exportDispatchManifestPdf } from '../../utils/pdfExport.js';
+import { QrScannerModal } from '../../components/dispatches/QrScannerModal.js';
 
 interface DispatchDetailPageProps {
   dispatchId: string;
@@ -73,6 +77,30 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+
+  // QR Scanner & PDF Export state
+  const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+  const handleExportPdf = () => {
+    if (!dispatch) return;
+    setIsExportingPdf(true);
+    try {
+      exportDispatchManifestPdf(dispatch);
+      setActionSuccess('Dispatch manifest PDF exported successfully for offline record-keeping.');
+      setTimeout(() => setActionSuccess(null), 3500);
+    } catch (err: any) {
+      setActionError(`PDF generation error: ${err.message}`);
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
+
+  const handleScanSuccess = (updated: Dispatch) => {
+    setDispatch(updated);
+    setActionSuccess(`Transit status updated to ${updated.status.replace(/_/g, ' ')} via driver QR verification.`);
+    setTimeout(() => setActionSuccess(null), 4000);
+  };
 
   useEffect(() => {
     loadDetail();
@@ -246,7 +274,28 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
           <span>{t('nav.dispatches')}</span>
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Driver QR Scanner Button */}
+          <button
+            onClick={() => setIsQrScannerOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors"
+            title="Scan QR barcode to verify transit checkpoints"
+          >
+            <QrCode className="w-3.5 h-3.5" />
+            <span>Scan QR / Transit</span>
+          </button>
+
+          {/* Export PDF Manifest Button */}
+          <button
+            onClick={handleExportPdf}
+            disabled={isExportingPdf}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors"
+            title="Export official manifest to PDF for offline records"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>{isExportingPdf ? 'Exporting...' : 'Export PDF Manifest'}</span>
+          </button>
+
           <button
             onClick={() => onOpenPublicLink(dispatch.shareToken)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 text-xs font-semibold cursor-pointer"
@@ -843,6 +892,16 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
             </div>
           </form>
         </div>
+      )}
+
+      {/* Driver Package & QR Scanner Modal */}
+      {dispatch && (
+        <QrScannerModal
+          dispatch={dispatch}
+          isOpen={isQrScannerOpen}
+          onClose={() => setIsQrScannerOpen(false)}
+          onScanSuccess={handleScanSuccess}
+        />
       )}
     </div>
   );

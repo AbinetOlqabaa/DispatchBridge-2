@@ -206,6 +206,30 @@ class ApiService {
     });
   }
 
+  async bulkCreateDispatches(dispatches: any[]): Promise<{ createdCount: number; dispatches: Dispatch[]; errors?: string[] }> {
+    return this.request('/api/dispatches/bulk', {
+      method: 'POST',
+      body: JSON.stringify({ dispatches }),
+    });
+  }
+
+  async recordTransitScan(
+    id: string,
+    payload: {
+      barcode: string;
+      statusUpdate?: string;
+      checkpointLocation?: string;
+      driverNotes?: string;
+      scannedLineIds?: string[];
+      actorName?: string;
+    }
+  ): Promise<Dispatch> {
+    return this.request(`/api/dispatches/${id}/transit-scan`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   async recordReceipt(
     id: string,
     payload: {
