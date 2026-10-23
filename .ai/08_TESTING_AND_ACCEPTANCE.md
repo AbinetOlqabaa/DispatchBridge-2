@@ -1,55 +1,24 @@
-# Testing strategy and acceptance tests
+# Phase 8 — Testing and Acceptance
+
+## Rules
+Inspect existing test tooling first. Reuse it. Never claim a command passed unless it was run in the current workspace. If a tool is unavailable, say so and give a manual alternative.
 
 ## Test layers
-Use the test tools available in the chosen stack. Prefer unit tests for domain rules, integration tests for APIs/database rules, and end-to-end tests for critical user journeys. If emulator/browser/device testing is unavailable, say so and give exact manual steps.
+- Unit: validation, quantity arithmetic/decimal precision, state transitions, permission helpers, locale formatting.
+- Integration: auth/session, membership authorization, dispatch creation, idempotency, view receipt, receipt submission, discrepancy review, notification outbox and audit.
+- Security: cross-tenant IDOR, unauthorized role actions, forged business IDs, mass assignment, expired/replayed invitation/share tokens, file access, export access, duplicate/replayed writes.
+- UI/component: validation feedback, loading/empty/error/retry states, navigation and responsive components.
+- End-to-end: registration/sign-in → onboarding/business selection → partner/location → dispatch with multiple lines → submit/share → recipient authenticated detail view → proof-of-view → receipt report → sender review/resolution → audit and notifications.
+- Regression: all previously working features, including map/telemetry, scanner/checkpoints, PDF manifest, CSV import/export, analytics, languages and theme if they still exist.
 
-## Unit tests
-- Quantity validation and decimal precision.
-- Reconciliation calculation for exact match, shortage, overage, damaged, lost, not received and unreported.
-- Dispatch state transition validity.
-- Role/membership permission decisions.
-- Timezone display conversion.
-- Notification status mapping.
-- Idempotency behavior.
+## Responsive test matrix
+At minimum check 390x844, 768x1024, 820x1180, 1024x768 and 1440x900. Prefer also 360x800, 1180x820 and 1280x800. Test every major route for both tablet orientations. Record routes, viewports, methods and results.
 
-## Security tests
-- Sender from Business A cannot read/update Business B's dispatch.
-- Receiver from unrelated Business C cannot read a dispatch.
-- Receiver cannot change original sent quantities or sender identity.
-- Sender cannot forge receiver view receipt.
-- Public user cannot grant self a role or make self super-admin.
-- Client cannot write audit events or privileged fields.
-- Expired/replayed invitation and reset tokens fail.
-- Unauthorized export and attachment access fail.
-
-## Integration tests
-- Registration/sign-in/reset flow using provider emulator or configured test account.
-- Business membership and role assignment.
-- Create dispatch with multiple lines.
-- Notification failure does not corrupt dispatch.
-- Recipient opens detail and view receipt is recorded once correctly.
-- Receiver submits report; server calculates discrepancies.
-- Sender disputes/acknowledges and resolves.
-- Retry after timeout does not duplicate records.
-- Pagination and filters return only authorized data.
-
-## End-to-end acceptance scenarios
-A. Owner creates business, adds partner and location, adds sender/receiver membership.
-B. Sender creates dispatch with two or more item lines, reviews and submits.
-C. Receiver gets in-app notification, opens detail; system records a genuine view timestamp.
-D. Receiver reports one exact line and one shortage/damaged line.
-E. Sender sees discrepancy and responds; parties reach a recorded resolution.
-F. Admin suspends a test user and action is audited; user cannot continue privileged actions.
-G. Unauthorized users attempting cross-tenant IDs receive safe denial.
-H. Network failure and duplicate taps do not create duplicate dispatches/reports.
-I. Mobile layout works at narrow viewport, with bounded scroll and pagination.
-J. Password reset and sign-out/session expiration work with configured auth provider.
-
-## Verification reporting
-For each test group record:
-- exact command or manual steps;
-- environment (unit/emulator/browser/device);
-- result: PASS, FAIL, BLOCKED, or NOT RUN;
-- failure details and fixes;
-- limitations.
-Never label a test PASS based solely on code inspection.
+## Release gates
+- Lint/typecheck/build passes.
+- Relevant tests pass with test count and failures reported accurately.
+- No known critical security issue left unacknowledged.
+- All required flows work with real configured persistence, or sandbox-only limitations are clearly documented.
+- No false provider delivery claims.
+- Tablet layouts pass the viewport matrix or remaining failures are listed as blockers.
+- No critical flow is implemented as a fake success.

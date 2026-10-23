@@ -1,49 +1,26 @@
-# Authentication, onboarding, roles and authorization
+# Phase 3 — Authentication, Registration and Authorization
 
-## Authentication UX
-Implement supported options honestly:
-- Email/password registration and sign-in.
-- Password reset via verified provider flow.
-- Show/hide password toggle.
-- Confirm password on registration and change-password forms; do not store confirmation.
-- Password strength and clear validation; never log passwords or tokens.
-- Phone number in E.164 format with country selector; verification only if SMS provider is configured.
-- Optional Google sign-in only if OAuth is correctly configured in the environment.
-- Safe sign-out and session expiration handling.
-- Generic login/reset messages where needed to reduce account enumeration.
-- Rate limiting and abuse protection where supported.
-- Accessible errors, focus states and loading indicators.
+## Objective
+Audit and complete authentication and membership-scoped authorization without replacing working systems unnecessarily.
 
-## Registration
-- Do not allow public users to self-assign Super Administrator.
-- Default new users to pending/no business privileges until a verified business/membership workflow grants access.
-- Business owner creation should follow a documented safe flow.
-- Email/phone verification status must be distinct from merely entering an address/number.
-- Validate and normalize server-side as well as client-side.
+## Required user journeys
+- Registration with name, email, password, confirm-password validation, password visibility toggle, phone capture, terms/privacy acknowledgement where configured, and clear validation.
+- Sign in, sign out, session expiry/refresh behavior, password reset, and useful invalid-credential/rate-limit messages that do not leak account existence.
+- Google/OAuth only if actually configured. Phone verification only if a real SMS provider is configured. Never fake a successful verification.
+- Explicit onboarding: create a business or accept an invitation; handle a user who belongs to multiple businesses and make active business context visible.
+- Role-aware dashboards/navigation for Super Administrator, Business Owner, Sender, Receiver.
+- A controlled, documented, one-time super-admin provisioning flow; no default password, public backdoor, or client-side privilege escalation.
 
-## Authorization
-Authorization must be enforced on server/API/database rules for every read and write. Client-side route guards are only UX.
-- Super Administrator: platform-level administration only, with privileged actions audited and preferably step-up authentication.
-- Business Owner: manage own business and memberships; cannot access unrelated businesses.
-- Sender: create and manage dispatches only within assigned business and permitted workflow states.
-- Receiver: view dispatches addressed to an authorized receiving business and submit receipt reports; cannot alter sender's original item quantities.
-- Enforce membership status and tenant boundaries on every request.
-- Avoid trusting role/business IDs sent by client without checking them against server-side membership records.
-- Protect mass assignment: accept explicit fields, not arbitrary objects.
-- Use least privilege and deny by default.
+## Authorization rules
+- Treat UI route guards as usability, not security. Enforce authorization in server routes/functions and database rules.
+- Resolve permissions from authenticated identity + active business membership + resource relationships. Never trust role/business IDs supplied by client without checking them.
+- A user may hold different roles in different businesses. Do not rely on one global role string.
+- Deny by default and test IDOR/cross-tenant attempts for reads, writes, exports, uploads and nested resources.
+- Protect invitation tokens: store hashes where appropriate, use expiry, single-use semantics, anti-replay and safe error handling.
+- Rate-limit sensitive endpoints when supported; use secure cookies/session settings appropriate to the deployed architecture; avoid logging secrets or credentials.
 
-## Super-admin bootstrap
-Provide a documented one-time server-side provisioning procedure:
-1. Deploy/configure trusted backend.
-2. Verify the intended operator identity using a secure deployment/admin process.
-3. Create the platform admin claim/record using an administrative SDK or protected server command.
-4. Require MFA/step-up authentication where supported.
-5. Record an audit event.
-6. Remove/disable temporary bootstrap capability.
-Never embed a hardcoded master password, public bootstrap token, or universal admin backdoor in the client or source repository.
-
-## Account recovery
-- Use provider-issued, expiring, single-use reset links/codes.
-- Do not reveal whether arbitrary email addresses exist.
-- Avoid custom password-reset implementation unless securely supported.
-- Revoke or refresh sessions appropriately after sensitive credential changes.
+## Deliverables
+- Implement/fix applicable auth and onboarding pages and server-side checks.
+- Document provider setup and environment variables in `.env.example` without real secrets.
+- Add tests for authentication state, membership switching, role permission boundaries, invitation expiry/replay, reset flows and unauthorized resource IDs.
+- Update `.ai/BUILD_STATE.md`; identify which flows are real, mocked, or blocked by provider configuration.
