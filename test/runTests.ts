@@ -16,6 +16,15 @@ import {
 } from '../src/server/security.js';
 import { DispatchStatus, ItemCondition, User } from '../src/types/dispatch.js';
 import { recommendationEngine } from '../src/services/recommendationEngine.js';
+import {
+  saveMapCache,
+  getMapCache,
+  isMapCached,
+  clearMapCache,
+  queueOfflineTelemetry,
+  getOfflineTelemetryQueue,
+  clearOfflineTelemetryQueue,
+} from '../src/utils/mapCache.js';
 
 interface TestResult {
   group: string;
@@ -757,6 +766,108 @@ async function runTestSuite() {
     assertEqual(updated.currentCoordinates?.speedKmh, 82, 'Speed updated');
     assertEqual(updated.currentCoordinates?.checkpointName, 'I-90 Mile Marker 290 Waypoint', 'Checkpoint updated');
     assertEqual(updated.status, 'IN_TRANSIT', 'Status transitioned to IN_TRANSIT');
+  });
+
+  await test('Geospatial & Telemetry', 'Map Offline Caching: Pre-caching coordinate data, tile grid bounds, and offline telemetry queuing', async () => {
+    const dsp = await sandboxStore.getDispatchById('dsp_001');
+    assert(Boolean(dsp), 'Dispatch dsp_001 exists');
+    if (!dsp) throw new Error('Dispatch dsp_001 not found');
+
+    // 1. Save dispatch map data to local offline cache
+    const cachedRecord = saveMapCache(dsp);
+    assert(Boolean(cachedRecord), 'Cached map record created');
+    assertEqual(cachedRecord.dispatchId, dsp.id, 'Cached dispatch ID matches');
+    assertEqual(cachedRecord.dispatchNumber, dsp.dispatchNumber, 'Cached dispatch number matches');
+    assert(cachedRecord.sizeBytes > 0, 'Cached size in bytes calculated');
+    assert(Boolean(cachedRecord.offlineTileGrid), 'Offline tile grid configuration stored');
+    assert(cachedRecord.offlineTileGrid.tilesAvailable, 'Offline tile grid flag active');
+    assert(cachedRecord.plannedWaypoints.length > 0, 'Planned waypoints stored in offline cache');
+    assert(cachedRecord.actualWaypoints.length > 0, 'Actual route waypoints stored in offline cache');
+
+    // 2. Query cache availability
+    const isCached = isMapCached(dsp.id);
+    assert(isCached, 'isMapCached returns true after saveMapCache');
+
+    // 3. Retrieve cached data
+    const retrieved = getMapCache(dsp.id);
+    assert(Boolean(retrieved), 'getMapCache retrieves cached record');
+    assertEqual(retrieved?.dispatchNumber, dsp.dispatchNumber, 'Retrieved cache matches dispatch number');
+    assertEqual(retrieved?.origin.latitude, dsp.originLocationSnapshot.latitude, 'Retrieved cache origin lat matches');
+    assertEqual(retrieved?.destination.latitude, dsp.destinationSnapshot.latitude, 'Retrieved cache destination lat matches');
+
+    // 4. Test offline telemetry queueing when connection is unstable
+    queueOfflineTelemetry(dsp.id, {
+      latitude: 43.8500,
+      longitude: -91.2500,
+      speedKmh: 78,
+      heading: 305,
+      checkpointName: 'La Crosse Offline Checkpoint',
+    });
+    queueOfflineTelemetry(dsp.id, {
+      latitude: 44.0500,
+      longitude: -91.6500,
+      speedKmh: 85,
+      heading: 310,
+      checkpointName: 'Winona Offline Checkpoint',
+    });
+
+    const pendingQueue = getOfflineTelemetryQueue(dsp.id);
+    assertEqual(pendingQueue.length, 2, 'Two offline telemetry entries queued');
+    assertEqual(pendingQueue[0].checkpointName, 'La Crosse Offline Checkpoint', 'First offline checkpoint queued');
+    assert(Boolean(pendingQueue[0].queuedAt), 'queuedAt timestamp populated on offline entry');
+
+    // 5. Test queue flush & cache clear
+    clearOfflineTelemetryQueue(dsp.id);
+    assertEqual(getOfflineTelemetryQueue(dsp.id).length, 0, 'Offline telemetry queue emptied after sync');
+
+    clearMapCache(dsp.id);
+    assert(!isMapCached(dsp.id), 'isMapCached returns false after clearMapCache');
+  });
+
+  await test('Geospatial & Telemetry', 'Route Polylines & History: Planned corridor vs. actual transit waypoint polyline overlay data', async () => {
+    // 1. Fetch dispatch dsp_001 with pre-seeded route history
+    const dsp = await sandboxStore.getDispatchById('dsp_001');
+    assert(Boolean(dsp), 'Dispatch dsp_001 exists');
+    if (!dsp) throw new Error('Dispatch dsp_001 not found');
+
+    assert(Boolean(dsp.pathHistory), 'pathHistory exists on dispatch record');
+    const pathHistory = dsp.pathHistory!;
+
+    // 2. Verify planned route corridor waypoints
+    assert(Array.isArray(pathHistory.plannedWaypoints), 'plannedWaypoints is an array');
+    assert(pathHistory.plannedWaypoints.length >= 8, 'Planned route contains >= 8 corridor waypoints along I-90/I-94');
+
+    const firstPlanned = pathHistory.plannedWaypoints[0];
+    const lastPlanned = pathHistory.plannedWaypoints[pathHistory.plannedWaypoints.length - 1];
+    assertEqual(firstPlanned.latitude, 41.8781, 'First planned waypoint is origin dock in Chicago');
+    assertEqual(lastPlanned.latitude, 44.9866, 'Last planned waypoint is destination hub in Minneapolis');
+
+    // 3. Verify actual historical breadcrumb waypoints
+    assert(Array.isArray(pathHistory.actualWaypoints), 'actualWaypoints is an array');
+    assert(pathHistory.actualWaypoints.length >= 5, 'Actual route history contains >= 5 GPS breadcrumb waypoints');
+
+    const firstActual = pathHistory.actualWaypoints[0];
+    assert(Boolean(firstActual.timestamp), 'Actual waypoint contains timestamp');
+    assert(Boolean(firstActual.passed), 'Actual waypoint marked passed');
+
+    // 4. Verify telemetry update appends new waypoint to actual route polyline
+    const initialActualCount = pathHistory.actualWaypoints.length;
+    const updatedDsp = await sandboxStore.updateDispatchTelemetry('dsp_001', {
+      latitude: 44.3500,
+      longitude: -92.2000,
+      speedKmh: 86,
+      heading: 312,
+      checkpointName: 'Wabasha County Corridor Waypoint',
+      source: 'GPS',
+    });
+
+    const updatedActualCount = updatedDsp.pathHistory?.actualWaypoints.length || 0;
+    assertEqual(updatedActualCount, initialActualCount + 1, 'New GPS waypoint appended to actual route polyline history');
+
+    const latestWp = updatedDsp.pathHistory?.actualWaypoints[updatedActualCount - 1];
+    assertEqual(latestWp?.latitude, 44.3500, 'Latest actual waypoint latitude matches telemetry update');
+    assertEqual(latestWp?.longitude, -92.2000, 'Latest actual waypoint longitude matches telemetry update');
+    assertEqual(latestWp?.label, 'Wabasha County Corridor Waypoint', 'Latest actual waypoint label preserved');
   });
 
   // -------------------------------------------------------------------------

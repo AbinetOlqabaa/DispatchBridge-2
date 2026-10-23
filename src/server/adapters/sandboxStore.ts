@@ -351,6 +351,27 @@ const dispatches: Dispatch[] = [
       checkpointName: 'I-90 Westbound Mile Marker 274 (La Crosse Waypoint)',
       source: 'GPS',
     },
+    pathHistory: {
+      plannedWaypoints: [
+        { id: 'wp_p0', latitude: 41.8781, longitude: -87.6298, label: 'Chicago Central Dock 4 (Origin)', passed: true },
+        { id: 'wp_p1', latitude: 42.2711, longitude: -89.0940, label: 'Rockford Gateway I-90', passed: true },
+        { id: 'wp_p2', latitude: 43.0731, longitude: -89.4012, label: 'Madison Freight Interchange', passed: true },
+        { id: 'wp_p3', latitude: 43.6275, longitude: -89.7709, label: 'Wisconsin Dells Weigh Station', passed: true },
+        { id: 'wp_p4', latitude: 43.9844, longitude: -90.5043, label: 'Tomah I-90/I-94 Split', passed: true },
+        { id: 'wp_p5', latitude: 43.8014, longitude: -91.2396, label: 'La Crosse Mississippi Checkpoint', passed: true },
+        { id: 'wp_p6', latitude: 44.0121, longitude: -92.4802, label: 'Rochester US-52 Corridor', passed: false },
+        { id: 'wp_p7', latitude: 44.7500, longitude: -92.9500, label: 'Hastings River Crossing', passed: false },
+        { id: 'wp_p8', latitude: 44.9866, longitude: -93.2581, label: 'Metro Retail North Dock 12 (Destination)', passed: false },
+      ],
+      actualWaypoints: [
+        { id: 'wp_a0', latitude: 41.8781, longitude: -87.6298, label: 'Chicago Dock Departure', timestamp: '2026-10-21T07:30:00.000Z', speedKmh: 0, passed: true },
+        { id: 'wp_a1', latitude: 42.2680, longitude: -89.0880, label: 'Rockford Tollway Pass', timestamp: '2026-10-21T08:15:00.000Z', speedKmh: 88, passed: true },
+        { id: 'wp_a2', latitude: 43.0780, longitude: -89.3950, label: 'Madison Rest Area Telemetry', timestamp: '2026-10-21T08:50:00.000Z', speedKmh: 82, passed: true },
+        { id: 'wp_a3', latitude: 43.9800, longitude: -90.5100, label: 'Tomah Scale Passed', timestamp: '2026-10-21T09:12:00.000Z', speedKmh: 79, passed: true },
+        { id: 'wp_a4', latitude: 43.8014, longitude: -91.2396, label: 'La Crosse Mile 274 Waypoint', timestamp: '2026-10-21T09:30:00.000Z', speedKmh: 84, passed: true },
+      ],
+      lastCachedAt: '2026-10-21T09:30:00.000Z',
+    },
     status: 'VIEWED',
     shareToken: 'sh_a91b2c4d8e7f',
     driverName: 'Robert Lang',
@@ -2159,6 +2180,23 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
       checkpointName: telemetry.checkpointName || 'En route waypoint',
       source: telemetry.source || 'GPS',
     };
+
+    if (!dispatch.pathHistory) {
+      dispatch.pathHistory = {
+        plannedWaypoints: [],
+        actualWaypoints: [],
+      };
+    }
+    dispatch.pathHistory.actualWaypoints.push({
+      id: `wp_a_${Date.now()}`,
+      latitude: Number(telemetry.latitude),
+      longitude: Number(telemetry.longitude),
+      label: telemetry.checkpointName || 'Waypoint Telemetry Ping',
+      timestamp: now,
+      speedKmh: telemetry.speedKmh !== undefined ? Number(telemetry.speedKmh) : 75,
+      passed: true,
+    });
+    dispatch.pathHistory.lastCachedAt = now;
 
     if (dispatch.status === 'DISPATCHED' || dispatch.status === 'VIEWED') {
       dispatch.status = 'IN_TRANSIT';

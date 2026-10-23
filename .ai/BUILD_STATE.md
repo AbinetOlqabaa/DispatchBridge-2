@@ -102,8 +102,10 @@ $ npm test
 #   [PASS] Photo Damage Claims: Cargo damage photos with SHA-256 hashes are attached to discrepancy cases
 #   [PASS] Notification Outbox Gateway: Outbound SMS, Email, and Webhook queuing with delivery retries
 #   [PASS] Staging Readiness Diagnostics Engine: Automated evaluation against 4 release checklist domains
-#   [PASS] Dispatch Geo-Coordinates & Live Map Telemetry: Origin, Destination, and Current GPS coordinates are stored and updated
-# TEST RESULTS: 21/21 PASSED (0 failed)
+- [PASS] Dispatch Geo-Coordinates & Live Map Telemetry: Origin, Destination, and Current GPS coordinates are stored and updated
+#   [PASS] Map Offline Caching: Pre-caching coordinate data, tile grid bounds, and offline telemetry queuing
+#   [PASS] Route Polylines & History: Planned corridor vs. actual transit waypoint polyline overlay data
+# TEST RESULTS: 23/23 PASSED (0 failed)
 # ALL ACCEPTANCE TESTS PASSED SUCCESSFULLY!
 
 # 3. Applet Compilation Check:
@@ -115,7 +117,7 @@ $ npm test
 ## 4. Release Checklist Assessment (`.ai/09_RELEASE_CHECKLIST.md`)
 
 - [x] Build/type-check/lint passes in actual project environment (`npm run lint` -> 0 errors).
-- [x] Relevant unit, security, and integration tests pass (`npm test` -> 21/21 PASS).
+- [x] Relevant unit, security, and integration tests pass (`npm test` -> 23/23 PASS).
 - [x] Critical end-to-end flows verified (Dispatch creation -> Manifest view tracking -> Dock receipt reporting -> Discrepancy resolution).
 - [x] No hardcoded production secrets or test credentials; random 24-byte bootstrap tokens.
 - [x] Dependencies reviewed and locked in `package.json`.
@@ -131,30 +133,34 @@ $ npm test
 ---
 
 ## 5. Changes Made in This Session
-- **Integrated Live Delivery Tracking Map in `DispatchDetailPage`**:
-  - Created `src/components/dispatches/DispatchTrackingMap.tsx`.
-  - Displays real-time geo-coordinates stored in the dispatch record (`dispatch.currentCoordinates`, `originLocationSnapshot`, `destinationSnapshot`).
-  - Interactive SVG map canvas projecting origin terminal, destination dock, and current vehicle beacon.
-  - Live animated radar pulse rings on vehicle pin with active truck badge.
-  - Dynamic vector corridor rendering: solid sky glow covered route + dashed amber remaining route.
-  - Telemetry HUD with latitude/longitude in formatted degrees (`44.09770° N, 91.74423° W`), speed (`80 km/h`), heading (`310° NW`), distance covered (416 km), remaining distance (155 km), and progress percentage (73% completed).
-  - Map controls: Zoom in/out, fit corridor bounds, 1-click coordinate copy, direct external Google Maps integration (`https://www.google.com/maps?q=lat,lng`).
-  - Added "Simulate GPS Ping" button calling `POST /api/dispatches/:id/telemetry` to advance waypoints and update coordinates dynamically in runtime.
-- **Backend & Types Infrastructure**:
-  - Added `GeoTelemetry` interface and coordinate fields to `Dispatch` in `src/types/dispatch.ts`.
-  - Added `updateDispatchTelemetry` method with audit logging in `src/server/adapters/sandboxStore.ts`.
-  - Added `POST /api/dispatches/:id/telemetry` route in `src/server/routes/dispatchRoutes.ts`.
-  - Added `updateDispatchTelemetry` method in `src/services/api.ts`.
-- **Browser Acceptance Testing via `playwright-cli`**:
-  - Opened `http://localhost:3000` with 0 console errors and 0 warnings.
-  - Navigated to `DispatchDetailPage` for `DSP-2026-0081`.
-  - Verified live map rendering, origin pin, destination pin, and pulsing vehicle beacon.
-  - Clicked "Simulate GPS Ping": verified live coordinate update to `(44.09770° N, 91.74423° W)`, status transition to `IN_TRANSIT`, progress update to 73%, and 0 console errors.
-  - Verified mobile responsive layout at 390x844 with clean reflow and zero overflow.
-- Verified test suite: `npm test` -> 21/21 tests passing (0 failed).
-- Verified build and type check: `npm run lint` (`tsc --noEmit`) -> 0 errors; `compile_applet` -> SUCCESS.
+- **Local Map Caching Strategy for Unstable Network Conditions**:
+  - Implemented `src/utils/mapCache.ts` with universal storage (browser `localStorage` + in-memory store fallback).
+  - Serializes and stores route waypoints, origin/destination coordinates, current telemetry, and bounding grid metadata for offline retrieval.
+  - Automatically caches route on component mount, with a manual "Pre-cache Route" action reporting live cache size (`Cached Offline (2.5 KB)`).
+  - Built-in offline detection (`window.addEventListener('online'/'offline')`) plus an interactive "Simulate Offline Mode" toggle button.
+  - When offline, renders an amber transit notification banner: *"Operating in Offline Transit Mode • Using Cached Coordinate Data & Offline Map Canvas (Cache Hit: 2.5 KB)"*.
+  - Offline telemetry queueing functions (`queueOfflineTelemetry`, `getOfflineTelemetryQueue`, `clearOfflineTelemetryQueue`) to store telemetry points locally when network is unstable and flush them on reconnection.
+- **Polyline Route Overlays (Planned Corridor vs. Actual Delivery Route)**:
+  - Extended domain types in `src/types/dispatch.ts` with `RouteWaypoint`, `DispatchPathHistory`, and `pathHistory` property on `Dispatch`.
+  - Seeded realistic corridor path history in `dsp_001` with 9 planned waypoints along the I-90/I-94 route and 5 actual historical GPS breadcrumbs.
+  - Rendered planned route polyline in dashed indigo/purple (`stroke="#818cf8" strokeDasharray="6,6"`) with planned waypoint diamond markers.
+  - Rendered actual transit polyline in solid glowing cyan (`stroke="#06b6d4"`) tracing recorded GPS pings.
+  - Numbered breadcrumb dots (`#1`, `#2`, `#3`, `#4`) with interactive click-to-inspect popover cards showing waypoint label, coordinates, speed, and timestamp.
+  - Real-time corridor adherence and variance HUD (`Corridor Variance: 0.0 km • 98.4% Adherence`).
+  - Interactive layer toggle buttons for Planned Corridor, Actual Route, and Waypoints.
+  - Live appending: telemetry updates (`updateDispatchTelemetry`) automatically append newly recorded coordinates to `actualWaypoints`.
+- **Automated Test Suite Expansion (`test/runTests.ts`)**:
+  - Added `Map Offline Caching: Pre-caching coordinate data, tile grid bounds, and offline telemetry queuing` test.
+  - Added `Route Polylines & History: Planned corridor vs. actual transit waypoint polyline overlay data` test.
+  - All 23 tests pass with 0 failures.
+- **Visual Browser Verification via `playwright-cli`**:
+  - Desktop capture (1440x900) verified polyline layers, breadcrumbs, and live telemetry HUD.
+  - Toggled offline mode simulation: verified amber offline transit banner and cache indicators.
+  - Clicked waypoint `#3`: verified interactive inspection popover card with coordinates and speed.
+  - Mobile capture (390x844) verified responsive reflow without horizontal scroll.
+  - Type-check (`npm run lint`), build (`compile_applet`), and tests (`npm test`) verified clean.
 
 ---
 
 ## 6. Exact Next Action for a New Session
-The application is fully operational, verified in a real headless Chromium browser session, and passed 21/21 unit/integration tests with zero TypeScript or console errors. When moving to a cloud staging or production deployment, configure external PostgreSQL/Cloud SQL credentials, persistent object storage for photo claims, and real SMS/WhatsApp webhook gateway secrets.
+The application is fully operational and verified end-to-end in real browser and automated testing. All requested features—including local map caching strategy for unstable network connections and planned vs. actual delivery route polyline overlays with interactive breadcrumbs—are complete and passing all 23 acceptance tests. For staging deployment, connect external Cloud SQL / Firestore credentials and production SMS/Email gateways.

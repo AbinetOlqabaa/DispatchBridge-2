@@ -188,6 +188,22 @@ export interface GeoTelemetry {
   source?: 'GPS' | 'DRIVER_SCAN' | 'CHECKPOINT' | 'SIMULATION';
 }
 
+export interface RouteWaypoint {
+  id: string;
+  latitude: number;
+  longitude: number;
+  label?: string;
+  timestamp?: string;
+  speedKmh?: number;
+  passed?: boolean;
+}
+
+export interface DispatchPathHistory {
+  plannedWaypoints: RouteWaypoint[];
+  actualWaypoints: RouteWaypoint[];
+  lastCachedAt?: string;
+}
+
 export interface Dispatch {
   id: string;
   dispatchNumber: string; // Unique human-readable code: DSP-2026-XXXX
@@ -213,6 +229,7 @@ export interface Dispatch {
     longitude?: number;
   };
   currentCoordinates?: GeoTelemetry;
+  pathHistory?: DispatchPathHistory;
   status: DispatchStatus;
   lines: DispatchLine[];
   totalQuantityDispatched: number;
