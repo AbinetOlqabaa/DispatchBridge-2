@@ -18,6 +18,13 @@ interface AuthContextType {
   markAllNotificationsAsRead: () => Promise<void>;
   switchBusiness: (businessId: string) => Promise<void>;
   quickLoginDemoRole: (role: UserRole) => Promise<void>;
+  signIn: (emailOrPayload: any, maybePassword?: string) => Promise<void>;
+  signUp: (payload: any) => Promise<void>;
+  signOut: () => void;
+  switchDemoRole: (role: any) => Promise<void>;
+  verifyPhoneOtp: (code: string) => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<{ success: boolean; resetTokenPreview?: string }>;
+  bootstrapSuperAdmin: (secret: string, payload: any) => Promise<{ success: boolean; user: User }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,8 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const res = await api.login(email, password);
+  const login = async (emailOrPayload: any, maybePassword?: string) => {
+    let email = emailOrPayload;
+    let password = maybePassword;
+    if (typeof emailOrPayload === 'object' && emailOrPayload !== null) {
+      email = emailOrPayload.email;
+      password = emailOrPayload.password;
+    }
+    const res = await api.login(email, password || '');
     setUser(res.user);
     setToken(res.token);
     await fetchNotifs();
@@ -137,6 +150,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const unreadNotifsCount = notifications.filter((n) => !n.isRead).length;
 
+  const requestPasswordReset = async (email: string) => {
+    return api.requestPasswordReset(email);
+  };
+
+  const bootstrapSuperAdmin = async (secret: string, payload: any) => {
+    return api.bootstrapSuperAdmin({ bootstrapSecret: secret, ...payload });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -155,6 +176,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         markAllNotificationsAsRead,
         switchBusiness,
         quickLoginDemoRole,
+        signIn: login,
+        signUp: register,
+        signOut: logout,
+        switchDemoRole: quickLoginDemoRole,
+        verifyPhoneOtp: verifyPhone,
+        requestPasswordReset,
+        bootstrapSuperAdmin,
       }}
     >
       {children}

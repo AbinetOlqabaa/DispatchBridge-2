@@ -150,6 +150,26 @@ router.post('/:id/transit-scan', optionalAuthenticate, async (req: Authenticated
   }
 });
 
+// Update Live Telemetry Geo-Coordinates
+router.post('/:id/telemetry', optionalAuthenticate, async (req: AuthenticatedRequest, res) => {
+  try {
+    const { id } = req.params;
+    const user = req.user;
+    const { latitude, longitude, speedKmh, heading, checkpointName, source } = req.body;
+    if (latitude === undefined || longitude === undefined) {
+      return res.status(400).json({ error: 'Latitude and longitude are required.' });
+    }
+    const updated = await sandboxStore.updateDispatchTelemetry(
+      id,
+      { latitude, longitude, speedKmh, heading, checkpointName, source },
+      user
+    );
+    res.json(updated);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Failed to update delivery telemetry.' });
+  }
+});
+
 // Record delivery receipt & reconcile quantities (Receivers, Owners, SuperAdmins)
 router.post(
   '/:id/reconcile',

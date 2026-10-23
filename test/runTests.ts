@@ -15,6 +15,7 @@ import {
   verifySessionToken,
 } from '../src/server/security.js';
 import { DispatchStatus, ItemCondition, User } from '../src/types/dispatch.js';
+import { recommendationEngine } from '../src/services/recommendationEngine.js';
 
 interface TestResult {
   group: string;
@@ -501,6 +502,261 @@ async function runTestSuite() {
     const notifsAfter = await sandboxStore.getNotifications('usr_sender_dispatcher');
     const unreadAfter = notifsAfter.filter((n) => !n.isRead).length;
     assertEqual(unreadAfter, 0, 'All notifications marked as read');
+  });
+
+  // -------------------------------------------------------------------------
+  // Layer 4: Feature Enhancements Acceptance Tests (Requirements 7 & 10)
+  // -------------------------------------------------------------------------
+  await test('Enhancements', 'Geospatial: Origin docks and delivery partners have valid coordinates', async () => {
+    const locs = await sandboxStore.getLocations('biz_apex_supply');
+    assert(locs.length > 0, 'Registered origin locations found');
+    const mainHub = locs.find((l) => l.id === 'loc_apex_main');
+    assert(Boolean(mainHub), 'Chicago main terminal dock exists');
+    assert(mainHub?.latitude !== undefined && mainHub?.longitude !== undefined, 'Coordinates defined on origin dock');
+    assertEqual(mainHub?.latitude, 41.8781, 'Chicago latitude matches expected GPS');
+    assertEqual(mainHub?.longitude, -87.6298, 'Chicago longitude matches expected GPS');
+
+    const parts = await sandboxStore.getPartners('biz_apex_supply');
+    const metro = parts.find((p) => p.id === 'part_metro_north');
+    assert(Boolean(metro), 'Metro retail partner exists');
+    assert(metro?.latitude !== undefined && metro?.longitude !== undefined, 'Coordinates defined on partner destination');
+  });
+
+  await test('Enhancements', 'Recommendation Engine: Collaborative filtering computes affinities from dispatch history', async () => {
+    const existingDispatches = await sandboxStore.getDispatches({ businessId: 'biz_apex_supply' });
+    assert(existingDispatches.length > 0, 'Dispatches exist for analysis');
+
+    // Run engine with default preferences
+    const recs = recommendationEngine.generateRecommendations(
+      existingDispatches,
+      {
+        preferredCategories: ['FOOD_BEVERAGE', 'COLD_CHAIN'],
+        temperatureControl: 'ANY',
+        priorityLevel: 'STANDARD',
+        budgetTier: 'BALANCED',
+      },
+      [
+        { sku: 'SKU-GLS-101', category: 'FOOD_BEVERAGE', action: 'VIEW_MANIFEST', timestamp: new Date().toISOString() },
+      ]
+    );
+
+    assert(recs.length > 0, 'Recommendations returned by engine');
+    assert(recs[0].confidencePercent >= 50 && recs[0].confidencePercent <= 99, 'Confidence percent bounded between 50% and 99%');
+    assert(Boolean(recs[0].primaryReason), 'Recommendation includes transparent human-readable explanation');
+    assert(Boolean(recs[0].collaborativeExplanation), 'Collaborative filtering explanation present');
+
+    // Verify ordering by score descending
+    for (let i = 0; i < recs.length - 1; i++) {
+      assert(recs[i].score >= recs[i + 1].score, `Item ${i} score (${recs[i].score}) >= item ${i+1} score (${recs[i+1].score})`);
+    }
+
+    // Verify future architecture roadmap contains required technical milestones
+    const roadmap = recommendationEngine.getFutureImprovementsRoadmap();
+    assertEqual(roadmap.length, 4, 'Future improvements roadmap contains 4 detailed phases');
+    const titles = roadmap.map((r) => r.title);
+    assert(titles.some((t) => t.includes('Matrix Factorization')), 'Roadmap includes Matrix Factorization');
+    assert(titles.some((t) => t.includes('Two-Tower')), 'Roadmap includes Two-Tower Neural Retrieval');
+    assert(titles.some((t) => t.includes('Bandits')), 'Roadmap includes Multi-Armed Bandits');
+    assert(titles.some((t) => t.includes('Graph Neural Networks')), 'Roadmap includes Graph Neural Networks');
+  });
+
+  // -------------------------------------------------------------------------
+  // Layer 5: Extension Roadmap (Master Plan Staging) Acceptance Tests
+  // -------------------------------------------------------------------------
+  await test('Master Plan Staging', 'Digital Glass Signature: Receiver dock signature is captured and locked into sign-off record', async () => {
+    // Create new dispatch to reconcile with digital signature
+    const newDispatch = await sandboxStore.createDispatch(
+      {
+        originLocationLabel: 'Chicago Main Dock',
+        originAddress: '104 Logistics Blvd, Chicago, IL',
+        partnerId: 'part_metro_north',
+        lines: [
+          { sku: 'SKU-SIG-01', itemName: 'High-Value Solar Micro-Inverter 400W', unit: 'units', quantitySent: 15 },
+        ],
+      },
+      senderUser
+    );
+
+    const testSignatureDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+    const reconciled = await sandboxStore.recordReceiptReport(
+      newDispatch.id,
+      {
+        lines: [
+          { id: newDispatch.lines[0].id, quantityReceived: 15, condition: 'GOOD', discrepancyType: 'NONE' },
+        ],
+        signoff: {
+          signerName: 'Marcus Wright',
+          signerRole: 'Senior Receiving Inspector',
+          comments: 'Seals verified; 15 units intact.',
+          signatureSvgOrBase64: testSignatureDataUrl,
+        },
+      },
+      receiverUser
+    );
+
+    assert(Boolean(reconciled.receiverSignoff), 'Sign-off record exists');
+    assertEqual(reconciled.receiverSignoff?.signerName, 'Marcus Wright', 'Signer name recorded');
+    assertEqual(reconciled.receiverSignoff?.signerRole, 'Senior Receiving Inspector', 'Signer role recorded');
+    assert(Boolean(reconciled.receiverSignoff?.signatureSvgOrBase64), 'Digital signature data URL recorded');
+    assertEqual(reconciled.receiverSignoff?.signatureSvgOrBase64, testSignatureDataUrl, 'Exact signature payload preserved');
+    assertEqual(reconciled.status, 'RECEIVED', 'Status transitioned to RECEIVED');
+  });
+
+  await test('Master Plan Staging', 'Photo Damage Claims: Cargo damage photos with SHA-256 hashes are attached to discrepancy cases', async () => {
+    const newDispatch = await sandboxStore.createDispatch(
+      {
+        originLocationLabel: 'Chicago Main Dock',
+        originAddress: '104 Logistics Blvd, Chicago, IL',
+        partnerId: 'part_metro_north',
+        lines: [
+          { sku: 'SKU-GLS-99', itemName: 'Fragile Ceramic Laboratory Flasks (Set of 12)', unit: 'boxes', quantitySent: 20 },
+        ],
+      },
+      senderUser
+    );
+
+    const testEvidence = [
+      {
+        id: 'ev_test_101',
+        fileName: 'shattered_crate_tailgate.png',
+        mimeType: 'image/png',
+        fileSize: 1048576,
+        sha256Hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+        dataUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        uploadedAt: new Date().toISOString(),
+        notes: 'Crushed corner pallet with shattered glassware on tailgate arrival',
+      },
+    ];
+
+    const reconciled = await sandboxStore.recordReceiptReport(
+      newDispatch.id,
+      {
+        lines: [
+          {
+            id: newDispatch.lines[0].id,
+            quantityReceived: 14,
+            condition: 'DAMAGED',
+            discrepancyType: 'DAMAGED',
+            notes: '6 boxes destroyed in transit.',
+            evidence: testEvidence,
+          },
+        ],
+        signoff: {
+          signerName: 'Marcus Wright',
+          signerRole: 'Senior Receiving Inspector',
+          comments: 'Damage photos attached to claim.',
+        },
+      },
+      receiverUser
+    );
+
+    assertEqual(reconciled.status, 'PARTIALLY_RECEIVED', 'Status transitioned to PARTIALLY_RECEIVED');
+    assertEqual(reconciled.totalQuantityLost, 6, 'Shortfall quantity calculated correctly');
+    assert(Boolean(reconciled.discrepancyCases && reconciled.discrepancyCases.length > 0), 'Discrepancy case created');
+
+    const discCase = reconciled.discrepancyCases![0];
+    assertEqual(discCase.type, 'DAMAGED', 'Discrepancy case type DAMAGED');
+    assert(Boolean(discCase.evidence && discCase.evidence.length > 0), 'Evidence attached to discrepancy case');
+    assertEqual(discCase.evidence![0].fileName, 'shattered_crate_tailgate.png', 'Evidence filename matches');
+    assertEqual(discCase.evidence![0].sha256Hash, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'Tamper-evident SHA-256 hash verified');
+  });
+
+  await test('Master Plan Staging', 'Notification Outbox Gateway: Outbound SMS, Email, and Webhook queuing with delivery retries', async () => {
+    // Test dispatching an outbound SMS alert
+    const smsNotice = await sandboxStore.sendOutboundNotification({
+      channel: 'SMS',
+      recipient: '+1-555-014-4411',
+      title: 'Outbound Manifest Test SMS',
+      message: 'Shipment DSP-TEST-001 has been dispatched.',
+    });
+
+    assert(Boolean(smsNotice.id), 'Outbound notification generated');
+    assertEqual(smsNotice.channel, 'SMS', 'Channel matches SMS');
+    assertEqual(smsNotice.providerDeliveryStatus, 'DELIVERED', 'Status marked DELIVERED');
+
+    // Retrieve from outbox
+    const outbox = await sandboxStore.getOutboxNotifications();
+    assert(outbox.length > 0, 'Outbox notifications retrieved');
+    assert(outbox.some((n) => n.id === smsNotice.id), 'Created notification exists in outbox');
+
+    // Test delivery retry
+    const retried = await sandboxStore.retryNotificationDelivery(smsNotice.id);
+    assertEqual(retried.id, smsNotice.id, 'Retried notification matches');
+    assert(retried.deliveryAttempts! >= 2, 'Delivery attempt incremented');
+  });
+
+  await test('Master Plan Staging', 'Staging Readiness Diagnostics Engine: Automated evaluation against 4 release checklist domains', async () => {
+    const report = await sandboxStore.getStagingReadinessReport();
+    assert(Boolean(report), 'Staging readiness report returned');
+    assertEqual(report.overallStatus, 'READY_FOR_STAGING', 'Overall status is READY_FOR_STAGING');
+
+    const cats = report.categories;
+    assert(Boolean(cats.buildAndCodeQuality), 'Build and Code Quality domain evaluated');
+    assert(Boolean(cats.identityAndSecurity), 'Identity and Security domain evaluated');
+    assert(Boolean(cats.dataAndOperations), 'Data and Operations domain evaluated');
+    assert(Boolean(cats.platformAndRelease), 'Platform and Release domain evaluated');
+
+    assertEqual(cats.buildAndCodeQuality.status, 'PASS', 'Build domain PASS');
+    assertEqual(cats.identityAndSecurity.status, 'PASS', 'Security domain PASS');
+    assertEqual(cats.dataAndOperations.status, 'PASS', 'Data domain PASS');
+    assertEqual(cats.platformAndRelease.status, 'PASS', 'Release domain PASS');
+
+    assert(report.metrics.failures === 0, 'Zero staging check failures');
+    assert(report.metrics.passed >= 16, 'At least 16 discrete checks passed');
+  });
+
+  await test('Geospatial & Telemetry', 'Dispatch Geo-Coordinates & Live Map Telemetry: Origin, Destination, and Current GPS coordinates are stored and updated', async () => {
+    // 1. Verify pre-seeded dispatch dsp_001 has valid coordinates
+    const dsp = await sandboxStore.getDispatchById('dsp_001');
+    assert(Boolean(dsp), 'Dispatch dsp_001 exists');
+    if (!dsp) throw new Error('Dispatch dsp_001 not found');
+    assert(dsp.originLocationSnapshot.latitude !== undefined, 'Origin snapshot latitude exists');
+    assert(dsp.originLocationSnapshot.longitude !== undefined, 'Origin snapshot longitude exists');
+    assert(dsp.destinationSnapshot.latitude !== undefined, 'Destination snapshot latitude exists');
+    assert(dsp.destinationSnapshot.longitude !== undefined, 'Destination snapshot longitude exists');
+    assert(dsp.currentCoordinates !== undefined, 'currentCoordinates stored in dispatch record');
+    assert(typeof dsp.currentCoordinates?.latitude === 'number', 'currentCoordinates.latitude is numeric');
+    assert(typeof dsp.currentCoordinates?.longitude === 'number', 'currentCoordinates.longitude is numeric');
+
+    // 2. Create a fresh in-flight dispatch and test live telemetry waypoint update
+    const activeDsp = await sandboxStore.createDispatch(
+      {
+        originLocationId: 'loc_apex_main',
+        originLocationLabel: 'Chicago Central Hub',
+        originAddress: '104 Logistics Blvd',
+        partnerId: 'part_metro_north',
+        driverName: 'Test Carrier Driver',
+        lines: [
+          {
+            sku: 'SKU-MAP-TEST',
+            itemName: 'Telemetry Sensor Kits',
+            unit: 'boxes',
+            quantitySent: 25,
+          },
+        ],
+      },
+      senderUser
+    );
+
+    assert(activeDsp.originLocationSnapshot.latitude !== undefined, 'New dispatch origin latitude populated');
+    assert(activeDsp.destinationSnapshot.latitude !== undefined, 'New dispatch destination latitude populated');
+    assertEqual(activeDsp.status, 'DISPATCHED', 'Initial status is DISPATCHED');
+
+    const updated = await sandboxStore.updateDispatchTelemetry(activeDsp.id, {
+      latitude: 44.1234,
+      longitude: -92.5678,
+      speedKmh: 82,
+      heading: 320,
+      checkpointName: 'I-90 Mile Marker 290 Waypoint',
+      source: 'GPS',
+    });
+
+    assertEqual(updated.currentCoordinates?.latitude, 44.1234, 'Latitude updated');
+    assertEqual(updated.currentCoordinates?.longitude, -92.5678, 'Longitude updated');
+    assertEqual(updated.currentCoordinates?.speedKmh, 82, 'Speed updated');
+    assertEqual(updated.currentCoordinates?.checkpointName, 'I-90 Mile Marker 290 Waypoint', 'Checkpoint updated');
+    assertEqual(updated.status, 'IN_TRANSIT', 'Status transitioned to IN_TRANSIT');
   });
 
   // -------------------------------------------------------------------------

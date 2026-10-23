@@ -20,6 +20,9 @@ export const AuditPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [actionFilter, setActionFilter] = useState('ALL');
+  const [actorFilter, setActorFilter] = useState('ALL');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
     loadLogs();
@@ -39,15 +42,52 @@ export const AuditPage: React.FC = () => {
 
   if (loading) return <LoadingSpinner label="Compiling tamper-resistant audit logs..." />;
 
+  // Unique list of actors across all logs
+  const uniqueActors = Array.from(new Set(logs.map((l) => l.actorName))).filter(Boolean).sort();
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setActionFilter('ALL');
+    setActorFilter('ALL');
+    setStartDate('');
+    setEndDate('');
+  };
+
+  const hasActiveFilters =
+    searchTerm !== '' ||
+    actionFilter !== 'ALL' ||
+    actorFilter !== 'ALL' ||
+    startDate !== '' ||
+    endDate !== '';
+
   const filteredLogs = logs.filter((log) => {
     const matchesSearch =
+      !searchTerm ||
       log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.actorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.entityId.toLowerCase().includes(searchTerm.toLowerCase());
+      log.entityId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.action.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesAction = actionFilter === 'ALL' || log.action === actionFilter;
+    const matchesActor = actorFilter === 'ALL' || log.actorName === actorFilter;
 
-    return matchesSearch && matchesAction;
+    let matchesDate = true;
+    if (startDate) {
+      const logTime = new Date(log.timestamp).getTime();
+      const startTime = new Date(`${startDate}T00:00:00`).getTime();
+      if (!isNaN(startTime) && logTime < startTime) {
+        matchesDate = false;
+      }
+    }
+    if (endDate && matchesDate) {
+      const logTime = new Date(log.timestamp).getTime();
+      const endTime = new Date(`${endDate}T23:59:59.999`).getTime();
+      if (!isNaN(endTime) && logTime > endTime) {
+        matchesDate = false;
+      }
+    }
+
+    return matchesSearch && matchesAction && matchesActor && matchesDate;
   });
 
   return (
@@ -68,7 +108,7 @@ export const AuditPage: React.FC = () => {
 
         <button
           onClick={loadLogs}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>Refresh Ledger</span>
@@ -76,32 +116,95 @@ export const AuditPage: React.FC = () => {
       </div>
 
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="relative flex-1 sm:w-72">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filter audit entries..."
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white"
-            />
+        {/* Multi-Dimensional Filter Suite (Requirement 6) */}
+        <div className="space-y-3 pb-3 border-b border-slate-800/80">
+          <div className="flex flex-col md:flex-row items-center gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1 w-full">
+              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search audit descriptions, entity IDs, or actors..."
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            {/* Event Type Filter */}
+            <div className="w-full md:w-auto">
+              <select
+                value={actionFilter}
+                onChange={(e) => setActionFilter(e.target.value)}
+                className="w-full md:w-auto bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                title="Filter by event action type"
+              >
+                <option value="ALL">All Event Types</option>
+                <option value="DISPATCH_CREATED">Dispatch Created</option>
+                <option value="DISPATCH_VIEWED">Dispatch Viewed</option>
+                <option value="RECEIPT_RECORDED">Receipt Recorded</option>
+                <option value="RECEIPT_DISCREPANCY_RECORDED">Loss / Shortfall Recorded</option>
+                <option value="RECONCILIATION_FINALIZED">Reconciliation Closed</option>
+                <option value="USER_LOGIN">User Login</option>
+              </select>
+            </div>
+
+            {/* Actor Filter (Requirement 6) */}
+            <div className="w-full md:w-auto">
+              <select
+                value={actorFilter}
+                onChange={(e) => setActorFilter(e.target.value)}
+                className="w-full md:w-auto bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                title="Filter by actor"
+              >
+                <option value="ALL">All Actors</option>
+                {uniqueActors.map((act) => (
+                  <option key={act} value={act}>
+                    {act}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <select
-              value={actionFilter}
-              onChange={(e) => setActionFilter(e.target.value)}
-              className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
-            >
-              <option value="ALL">All Event Types</option>
-              <option value="DISPATCH_CREATED">Dispatch Created</option>
-              <option value="DISPATCH_VIEWED">Dispatch Viewed</option>
-              <option value="RECEIPT_RECORDED">Receipt Recorded</option>
-              <option value="RECEIPT_DISCREPANCY_RECORDED">Loss / Shortfall Recorded</option>
-              <option value="RECONCILIATION_FINALIZED">Reconciliation Closed</option>
-              <option value="USER_LOGIN">User Login</option>
-            </select>
+          {/* Date Range Row */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-slate-400 flex items-center gap-1 font-medium text-[11px]">
+                <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                Date Range:
+              </span>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  title="Start Date"
+                />
+                <span className="text-slate-500 text-xs">to</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  title="End Date"
+                />
+              </div>
+
+              {hasActiveFilters && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-medium transition-colors cursor-pointer border border-slate-700"
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+
+            <div className="text-[11px] text-slate-400">
+              Showing <span className="font-semibold text-slate-200">{filteredLogs.length}</span> of {logs.length} audit entries
+            </div>
           </div>
         </div>
 

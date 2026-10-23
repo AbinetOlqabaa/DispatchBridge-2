@@ -13,10 +13,21 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
 import { useTranslation } from '../../context/LanguageContext.js';
-import { Dispatch, DispatchStatus } from '../../types/dispatch.js';
+import { Dispatch, DispatchStatus, Partner } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { StatusBadge } from '../../components/common/StatusBadge.js';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner.js';
+import { DispatchSummaryCards } from '../../components/dispatches/DispatchSummaryCards.js';
+import { BulkUploadModal } from '../../components/dispatches/BulkUploadModal.js';
+import { exportDispatchesToCsv, exportDispatchesToPdf } from '../../utils/dispatchListExport.js';
+import {
+  Upload,
+  Download,
+  FileSpreadsheet,
+  FileText,
+  ChevronDown,
+  CheckCircle2,
+} from 'lucide-react';
 
 interface DispatchListPageProps {
   onSelectDispatch: (id: string) => void;
@@ -32,15 +43,37 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
   const { user, quickLoginDemoRole } = useAuth();
   const { t } = useTranslation();
   const [dispatches, setDispatches] = useState<Dispatch[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Bulk Upload & Data Export state
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
+  const [exportSuccessMsg, setExportSuccessMsg] = useState<string | null>(null);
+
   useEffect(() => {
-    loadDispatches();
+    if (user) {
+      loadDispatches();
+      loadPartners();
+    } else {
+      setDispatches([]);
+      setPartners([]);
+      setLoading(false);
+    }
   }, [statusFilter, user]);
+
+  const loadPartners = async () => {
+    try {
+      const pList = await api.getPartners();
+      setPartners(pList);
+    } catch {
+      // ignore
+    }
+  };
 
   const loadDispatches = async () => {
     setLoading(true);
@@ -61,6 +94,20 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
     navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleExportCsv = () => {
+    exportDispatchesToCsv(filteredDispatches);
+    setExportDropdownOpen(false);
+    setExportSuccessMsg(`Exported ${filteredDispatches.length} dispatches to CSV.`);
+    setTimeout(() => setExportSuccessMsg(null), 3000);
+  };
+
+  const handleExportPdf = () => {
+    exportDispatchesToPdf(filteredDispatches, statusFilter);
+    setExportDropdownOpen(false);
+    setExportSuccessMsg(`Generated official reconciliation report PDF (${filteredDispatches.length} records).`);
+    setTimeout(() => setExportSuccessMsg(null), 3000);
   };
 
   const filteredDispatches = dispatches.filter((d) => {
@@ -92,24 +139,42 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
           </p>
         </div>
 
-        {!user ? (
-          <button
-            onClick={() => quickLoginDemoRole('SENDER')}
-            className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>{t('nav.signin')}</span>
-          </button>
-        ) : canCreate ? (
-          <button
-            onClick={onCreateDispatch}
-            className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>{t('action.create_dispatch')}</span>
-          </button>
-        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {!user ? (
+            <button
+              onClick={() => quickLoginDemoRole('SENDER')}
+              className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>{t('nav.signin')}</span>
+            </button>
+          ) : canCreate ? (
+            <>
+              {/* Bulk Upload CSV Button */}
+              <button
+                onClick={() => setIsBulkUploadOpen(true)}
+                className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-sm transition-all cursor-pointer"
+                title="Bulk upload dispatches via CSV format"
+              >
+                <Upload className="w-4 h-4 text-sky-400" />
+                <span>Bulk Upload CSV</span>
+              </button>
+
+              {/* Create Dispatch Button */}
+              <button
+                onClick={onCreateDispatch}
+                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>{t('action.create_dispatch')}</span>
+              </button>
+            </>
+          ) : null}
+        </div>
       </div>
+
+      {/* Summary Cards with Recharts (Requirement 8) */}
+      <DispatchSummaryCards dispatches={dispatches} />
 
       {/* Guest Explorer Banner if not authenticated */}
       {!user && (
@@ -191,18 +256,66 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
             ))}
           </div>
 
-          {/* Search Box */}
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={`${t('action.search')}...`}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
-            />
+          {/* Search Box & Export */}
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="relative flex-1 md:w-64">
+              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={`${t('action.search')}...`}
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            {/* Export Dropdown (Requirement 9) */}
+            <div className="relative">
+              <button
+                onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
+                className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium px-3 py-1.5 rounded-xl cursor-pointer transition-colors shadow-sm"
+                title="Export filtered dispatches"
+              >
+                <Download className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Export</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              </button>
+
+              {exportDropdownOpen && (
+                <div className="absolute right-0 mt-1.5 w-44 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-30 py-1 text-xs">
+                  <button
+                    onClick={handleExportCsv}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-slate-200 hover:bg-slate-700 text-left cursor-pointer"
+                  >
+                    <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                    <div>
+                      <div className="font-medium">Export CSV</div>
+                      <div className="text-[10px] text-slate-400">Excel / Spreadsheet</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={handleExportPdf}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-slate-200 hover:bg-slate-700 text-left cursor-pointer border-t border-slate-700/60"
+                  >
+                    <FileText className="w-4 h-4 text-rose-400" />
+                    <div>
+                      <div className="font-medium">Export PDF</div>
+                      <div className="text-[10px] text-slate-400">Reconciliation Report</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Export Success Banner */}
+        {exportSuccessMsg && (
+          <div className="bg-emerald-950/70 border border-emerald-800/80 rounded-xl p-2.5 text-xs text-emerald-300 flex items-center gap-2 animate-fade-in">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{exportSuccessMsg}</span>
+          </div>
+        )}
 
         {/* Content Table / Cards */}
         {loading ? (
@@ -324,6 +437,16 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
           </div>
         )}
       </div>
+
+      {/* Bulk Upload Modal (Requirement 3) */}
+      <BulkUploadModal
+        isOpen={isBulkUploadOpen}
+        onClose={() => setIsBulkUploadOpen(false)}
+        onSuccess={() => {
+          loadDispatches();
+        }}
+        partners={partners}
+      />
     </div>
   );
 };

@@ -7,17 +7,23 @@ import {
   AlertCircle,
   Truck,
   Warehouse,
+  Map as MapIcon,
+  LayoutGrid,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
-import { Location } from '../../types/dispatch.js';
+import { Location, Partner, Dispatch } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner.js';
+import { LocationsMapView } from '../../components/locations/LocationsMapView.js';
 
 export const LocationsPage: React.FC = () => {
   const { user } = useAuth();
   const [locations, setLocations] = useState<Location[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [dispatches, setDispatches] = useState<Dispatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [viewMode, setViewMode] = useState<'map' | 'grid'>('map');
 
   // New location form
   const [label, setLabel] = useState('');
@@ -25,19 +31,27 @@ export const LocationsPage: React.FC = () => {
   const [city, setCity] = useState('');
   const [region, setRegion] = useState('');
   const [countryCode, setCountryCode] = useState('US');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [isDefault, setIsDefault] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    loadLocations();
+    loadAllData();
   }, []);
 
-  const loadLocations = async () => {
+  const loadAllData = async () => {
     setLoading(true);
     try {
-      const data = await api.getLocations();
-      setLocations(data);
+      const [locs, parts, dsps] = await Promise.all([
+        api.getLocations(),
+        api.getPartners(),
+        api.getDispatches(),
+      ]);
+      setLocations(locs);
+      setPartners(parts);
+      setDispatches(dsps);
     } catch (err) {
       console.error(err);
     } finally {
@@ -59,6 +73,8 @@ export const LocationsPage: React.FC = () => {
         city: city.trim(),
         region: region.trim(),
         countryCode: countryCode.trim(),
+        latitude: latitude ? parseFloat(latitude) : undefined,
+        longitude: longitude ? parseFloat(longitude) : undefined,
         isDefault,
       });
       setShowAddModal(false);
@@ -66,8 +82,10 @@ export const LocationsPage: React.FC = () => {
       setAddressLines('');
       setCity('');
       setRegion('');
+      setLatitude('');
+      setLongitude('');
       setIsDefault(false);
-      loadLocations();
+      loadAllData();
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to create location.');
     } finally {
@@ -75,7 +93,7 @@ export const LocationsPage: React.FC = () => {
     }
   };
 
-  if (loading) return <LoadingSpinner label="Loading dispatch origins..." />;
+  if (loading) return <LoadingSpinner label="Loading dispatch origins & active delivery points..." />;
 
   const canAdd = user && ['BUSINESS_OWNER', 'SENDER', 'SUPER_ADMIN'].includes(user.role);
 
@@ -86,29 +104,73 @@ export const LocationsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-semibold uppercase tracking-wider text-sky-400 bg-sky-950 px-2.5 py-0.5 rounded-full border border-sky-800">
-              Dispatch Origins
+              Dispatch Origins & Logistics Network
             </span>
             <span className="text-xs text-slate-400">{locations.length} terminal docks</span>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Origin Location Directory</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Manage fulfillment centers, dispatch warehouses, and freight loading docks for your shipments.
+            Manage fulfillment centers, dispatch warehouses, and freight loading docks with geospatial coordinate tracking.
           </p>
         </div>
 
-        {canAdd && (
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Origin Dock</span>
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* View Mode Toggle (Requirement 7) */}
+          <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
+            <button
+              onClick={() => setViewMode('map')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
+                viewMode === 'map'
+                  ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <MapIcon className="w-3.5 h-3.5" />
+              <span>Map View</span>
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Grid View</span>
+            </button>
+          </div>
+
+          {canAdd && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Origin Dock</span>
+            </button>
+          )}
+        </div>
       </div>
 
+      {/* Map View vs Grid View */}
+      {viewMode === 'map' ? (
+        <LocationsMapView
+          locations={locations}
+          partners={partners}
+          dispatches={dispatches}
+        />
+      ) : null}
+
       {/* Locations Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className={viewMode === 'map' ? 'mt-8' : ''}>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-bold text-white flex items-center gap-2">
+            <Warehouse className="w-4 h-4 text-sky-400" />
+            <span>Registered Dispatch Origins ({locations.length})</span>
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {locations.map((loc) => (
           <div
             key={loc.id}
@@ -139,6 +201,7 @@ export const LocationsPage: React.FC = () => {
             </div>
           </div>
         ))}
+        </div>
       </div>
 
       {/* Add Modal */}
@@ -199,6 +262,31 @@ export const LocationsPage: React.FC = () => {
                     value={region}
                     onChange={(e) => setRegion(e.target.value)}
                     placeholder="WA"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Latitude (optional)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={latitude}
+                    onChange={(e) => setLatitude(e.target.value)}
+                    placeholder="e.g. 47.6062"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Longitude (optional)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={longitude}
+                    onChange={(e) => setLongitude(e.target.value)}
+                    placeholder="e.g. -122.3321"
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
                   />
                 </div>
