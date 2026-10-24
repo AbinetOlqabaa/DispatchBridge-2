@@ -25,6 +25,7 @@ import { AuditPage } from './pages/audit/AuditPage.js';
 import { SystemStatusPage } from './pages/system/SystemStatusPage.js';
 import { RecommendationsView } from './components/recommendations/RecommendationsView.js';
 import { NotificationDrawer } from './components/notifications/NotificationDrawer.js';
+import { ProfileModal } from './components/auth/ProfileModal.js';
 
 import { LoadingSpinner } from './components/common/LoadingSpinner.js';
 
@@ -39,6 +40,7 @@ function MainApp() {
   // Modal & Drawer State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'register' | 'forgot' | 'verifyPhone'>('signin');
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isCreateDispatchOpen, setIsCreateDispatchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
@@ -143,6 +145,7 @@ function MainApp() {
           setIsAuthModalOpen(true);
         }}
         onOpenNotifications={() => setIsNotificationsOpen(true)}
+        onOpenProfile={() => setIsProfileModalOpen(true)}
       />
 
       {/* Sandbox Isolation & Notification Banners */}
@@ -220,6 +223,12 @@ function MainApp() {
         isOpen={isAuthModalOpen}
         initialMode={authModalMode}
         onClose={() => setIsAuthModalOpen(false)}
+      />
+
+      {/* User Profile Modal */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
       />
 
       {/* Create Dispatch Manifest Modal */}

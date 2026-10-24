@@ -21,16 +21,55 @@ export interface User {
   name: string;
   fullName?: string;
   phoneNumber: string;
+  maskedPhone?: string;
   phoneVerified: boolean;
+  phoneVerifiedAt?: string;
+  avatarUrl?: string;
   role: UserRole; // Active/primary role in current business context
   businessId: string; // Current active business context
   businessName: string;
   memberships: Membership[];
   partnerId?: string; // If RECEIVER role, binds to specific partner entity
   status: 'ACTIVE' | 'SUSPENDED';
+  suspendedReason?: string;
+  // Fayda e-ID Integration (Ethiopian National ID)
+  fan?: string; // Fayda Account Number (16 numeric digits, preserved as string)
+  fin?: string; // Fayda Identification Number (12 numeric digits, preserved as string)
+  maskedFan?: string; // e.g. "•••• •••• •••• 1234"
+  maskedFin?: string; // e.g. "•••• •••• 5678"
+  faydaStatus?: 'UNVERIFIED' | 'SIMULATED_VERIFIED' | 'VERIFIED' | 'FAILED' | 'PENDING_REVIEW';
+  faydaVerifiedAt?: string;
+  faydaVerificationMethod?: 'FAYDA_DEV_SIMULATOR' | 'FAYDA_NATIONAL_ID_API';
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string;
+}
+
+export interface FaydaVerificationResult {
+  verified: boolean;
+  matchScore: number;
+  verificationMethod: 'FAYDA_DEV_SIMULATOR' | 'FAYDA_NATIONAL_ID_API';
+  providerName: string;
+  isSimulation: boolean;
+  fullNameMatched: boolean;
+  phoneMatched: boolean;
+  maskedFan: string;
+  maskedFin: string;
+  timestamp: string;
+  error?: string;
+  errorCode?: 'INVALID_FAN' | 'INVALID_FIN' | 'ID_NOT_FOUND' | 'NAME_MISMATCH' | 'PHONE_MISMATCH' | 'PROVIDER_TIMEOUT' | 'PROVIDER_ERROR';
+}
+
+export interface OtpChallenge {
+  challengeId: string;
+  phoneNumber: string;
+  purpose: 'REGISTRATION' | 'LOGIN' | 'PASSWORD_RESET' | 'PROFILE_CHANGE';
+  expiresAt: number;
+  expiresInSeconds: number;
+  resendAvailableAt: number;
+  attemptsRemaining: number;
+  isSimulation: boolean;
+  simulatedCode?: string;
 }
 
 export interface Business {
