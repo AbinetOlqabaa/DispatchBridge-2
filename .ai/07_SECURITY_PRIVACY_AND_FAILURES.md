@@ -6,6 +6,11 @@ Inspect actual auth, APIs, database rules, storage, file uploads, exports, share
 ## Required controls
 - Validate and normalize all untrusted input at server boundaries using the stack's schema-validation approach.
 - Protect against IDOR, cross-tenant data leaks, privilege escalation, mass assignment, injection, unsafe file uploads, replay/duplicate submissions and race conditions.
+- Sensitive national identity data protection: Fayda FAN (16 digits) and FIN (12 digits) are masked (`•••• •••• •••• 1234`), never logged, never returned in API payloads, never stored unencrypted, and never shown on dashboard cards.
+- OTP Challenge Security: 6-digit cryptographic OTPs with SHA-256 storage, single-use enforcement, 5-minute expiry, 30s resend cooldown, max 5 attempts with auto-revocation, and phone-based rate limits.
+- Account suspension: Suspended users are denied authentication, and active session tokens are rejected immediately at the auth middleware level.
+- Lockout protection: Platform prevents deleting, suspending, or demoting the last remaining active Super Administrator.
+- File upload restrictions: Profile photos limited to 2MB, validated for safe image MIME types (JPEG, PNG, WebP), stored securely with default initials fallback.
 - Use idempotency/transaction guards for consequential writes.
 - Keep secrets only in supported secret management/server environment; provide `.env.example` placeholders only.
 - Use secure session/cookie/token practices, expiry/revocation where supported, CSRF protection where relevant, rate limiting and abuse controls where supported.
