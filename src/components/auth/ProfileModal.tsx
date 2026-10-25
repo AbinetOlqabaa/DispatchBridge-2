@@ -192,33 +192,43 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
     .slice(0, 2);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 text-slate-100 my-8">
-        <button
-          onClick={onClose}
-          aria-label="Close profile modal"
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition cursor-pointer"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="profile-modal-title"
+    >
+      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl text-slate-100 max-h-[90vh] flex flex-col overflow-hidden">
         {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
-            <UserCheck className="w-5 h-5" />
+        <div className="p-5 sm:p-6 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+              <UserCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 id="profile-modal-title" className="text-lg font-bold tracking-tight text-white leading-tight">
+                User Profile & Identity
+              </h2>
+              <p className="text-xs text-slate-400">Verified credentials, photo, and security controls</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-white">User Profile & Identity</h2>
-            <p className="text-xs text-slate-400">Verified credentials, photo, and security controls</p>
-          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close profile modal"
+            className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {photoError && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-            <span>{photoError}</span>
-          </div>
-        )}
+        {/* Scrollable Content Body */}
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1 scrollbar-thin">
+          {photoError && (
+            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+              <span>{photoError}</span>
+            </div>
+          )}
 
         {/* Profile Avatar & Quick Stats */}
         <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 mb-6 flex flex-col sm:flex-row items-center gap-4">
@@ -530,5 +540,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };

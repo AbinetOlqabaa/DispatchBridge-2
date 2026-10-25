@@ -107,13 +107,19 @@ function MainApp() {
 
     switch (user.role) {
       case 'SUPER_ADMIN':
-        return <SuperAdminDashboard onNavigateStatus={() => setCurrentTab('status')} />;
+        return (
+          <SuperAdminDashboard
+            onNavigateStatus={() => setCurrentTab('status')}
+            onOpenProfile={() => setIsProfileModalOpen(true)}
+          />
+        );
       case 'BUSINESS_OWNER':
         return (
           <BusinessOwnerDashboard
             onSelectDispatch={(id) => setSelectedDispatchId(id)}
             onNavigateTab={(tab) => setCurrentTab(tab)}
             onCreateDispatch={() => setIsCreateDispatchOpen(true)}
+            onOpenProfile={() => setIsProfileModalOpen(true)}
           />
         );
       case 'SENDER':
@@ -122,12 +128,24 @@ function MainApp() {
             onSelectDispatch={(id) => setSelectedDispatchId(id)}
             onCreateDispatch={() => setIsCreateDispatchOpen(true)}
             onOpenPublicLink={(token) => setPublicShareToken(token)}
+            onOpenProfile={() => setIsProfileModalOpen(true)}
           />
         );
       case 'RECEIVER':
-        return <ReceiverDashboard onSelectDispatch={(id) => setSelectedDispatchId(id)} />;
+        return (
+          <ReceiverDashboard
+            onSelectDispatch={(id) => setSelectedDispatchId(id)}
+            onOpenProfile={() => setIsProfileModalOpen(true)}
+          />
+        );
       default:
-        return <DispatchListPage onSelectDispatch={(id) => setSelectedDispatchId(id)} onCreateDispatch={() => setIsCreateDispatchOpen(true)} onOpenPublicLink={(t) => setPublicShareToken(t)} />;
+        return (
+          <DispatchListPage
+            onSelectDispatch={(id) => setSelectedDispatchId(id)}
+            onCreateDispatch={() => setIsCreateDispatchOpen(true)}
+            onOpenPublicLink={(t) => setPublicShareToken(t)}
+          />
+        );
     }
   };
 

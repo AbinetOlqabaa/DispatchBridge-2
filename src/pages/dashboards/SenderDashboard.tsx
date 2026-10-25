@@ -23,12 +23,14 @@ interface SenderDashboardProps {
   onSelectDispatch: (id: string) => void;
   onCreateDispatch: () => void;
   onOpenPublicLink: (token: string) => void;
+  onOpenProfile?: () => void;
 }
 
 export const SenderDashboard: React.FC<SenderDashboardProps> = ({
   onSelectDispatch,
   onCreateDispatch,
   onOpenPublicLink,
+  onOpenProfile,
 }) => {
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -74,7 +76,7 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
   return (
     <div className="space-y-6">
       {/* Profile Summary Card */}
-      <ProfileSummaryCard />
+      <ProfileSummaryCard onOpenProfile={onOpenProfile} />
 
       {/* Sender Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm">

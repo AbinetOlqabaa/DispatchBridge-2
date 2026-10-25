@@ -20,9 +20,10 @@ import { ProfileSummaryCard } from '../../components/common/ProfileSummaryCard.j
 
 interface ReceiverDashboardProps {
   onSelectDispatch: (id: string) => void;
+  onOpenProfile?: () => void;
 }
 
-export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDispatch }) => {
+export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDispatch, onOpenProfile }) => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [inboundDispatches, setInboundDispatches] = useState<Dispatch[]>([]);
@@ -52,7 +53,7 @@ export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDi
   return (
     <div className="space-y-6">
       {/* Profile Summary Card */}
-      <ProfileSummaryCard />
+      <ProfileSummaryCard onOpenProfile={onOpenProfile} />
 
       {/* Receiving Portal Header */}
       <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm">

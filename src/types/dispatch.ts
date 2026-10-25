@@ -39,7 +39,7 @@ export interface User {
   maskedFin?: string; // e.g. "•••• •••• 5678"
   faydaStatus?: 'UNVERIFIED' | 'SIMULATED_VERIFIED' | 'VERIFIED' | 'FAILED' | 'PENDING_REVIEW';
   faydaVerifiedAt?: string;
-  faydaVerificationMethod?: 'FAYDA_DEV_SIMULATOR' | 'FAYDA_NATIONAL_ID_API';
+  faydaVerificationMethod?: 'FAYDA_DEV_SIMULATOR' | 'FAYDA_DEV_SIMULATED' | 'FAYDA_NATIONAL_ID_API';
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string;
@@ -48,7 +48,7 @@ export interface User {
 export interface FaydaVerificationResult {
   verified: boolean;
   matchScore: number;
-  verificationMethod: 'FAYDA_DEV_SIMULATOR' | 'FAYDA_NATIONAL_ID_API';
+  verificationMethod: 'FAYDA_DEV_SIMULATOR' | 'FAYDA_DEV_SIMULATED' | 'FAYDA_NATIONAL_ID_API';
   providerName: string;
   isSimulation: boolean;
   fullNameMatched: boolean;
@@ -57,6 +57,7 @@ export interface FaydaVerificationResult {
   maskedFin: string;
   timestamp: string;
   error?: string;
+  failureReason?: string;
   errorCode?: 'INVALID_FAN' | 'INVALID_FIN' | 'ID_NOT_FOUND' | 'NAME_MISMATCH' | 'PHONE_MISMATCH' | 'PROVIDER_TIMEOUT' | 'PROVIDER_ERROR';
 }
 

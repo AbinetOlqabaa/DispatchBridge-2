@@ -1,11 +1,11 @@
 # Build State — Business Dispatch & Delivery Reconciliation (DispatchBridge)
 
-- **Last Updated:** 2026-10-23T04:33:00Z
+- **Last Updated:** 2026-10-25T00:15:00Z
 - **Runtime / Platform:** Node.js v22.14.0 on Linux container with Express 4 backend & Vite 8 React 19 Frontend. Configured as an installable mobile-first Progressive Web App (PWA). *Note: Native Android build tooling (Gradle / Android SDK) is not supported in this runtime environment.*
 - **Stack:**
-  - Backend: Node.js, Express 4, TypeScript, HMAC SHA-256 session tokens, timing-safe one-time bootstrap tokens, in-memory domain adapter (`sandboxStore`) with full multi-tenant isolation.
+  - Backend: Node.js, Express 4, TypeScript, HMAC SHA-256 session tokens, timing-safe one-time bootstrap tokens, Fayda e-ID verification adapter, OTP gateway adapter, in-memory domain adapter (`sandboxStore`) with full multi-tenant isolation.
   - Frontend: React 19, Tailwind CSS v4, Lucide React, Context API (`AuthContext`, `LanguageContext`, `ThemeContext`), clean component and page architecture.
-  - Test Suite: Node.js TypeScript test runner (`npm test` -> `tsx test/runTests.ts`) — **28/28 automated tests passing with 0 failures**.
+  - Test Suite: Node.js TypeScript test runner (`npm test` -> `tsx test/runTests.ts`) — **38/38 automated tests passing with 0 failures**.
 
 ---
 
@@ -20,8 +20,9 @@
 | Phase 5 | `.ai/05_NOTIFICATIONS_AND_AUDIT.md` | **COMPLETE** | Real-time in-app notification drawer with unread counter & read tracking; immutable audit trail logging actor, role, correlation ID, and metadata for every mutation. |
 | Phase 6 | `.ai/06_TABLET_FIRST_UI_UX_AND_ACCESSIBILITY.md` | **COMPLETE** | Comprehensive tablet portrait (768x1024, 820x1180) & landscape (1024x768, 1180x820) optimizations. Balanced 2-column card wrapping, unclipped filter pills, container-bounded tables with enhanced high-contrast scrollbars, and unclipped navigation. |
 | Phase 7 | `.ai/07_SECURITY_PRIVACY_AND_FAILURES.md` | **COMPLETE** | Strict cross-tenant isolation on store and route levels (HTTP 403 on mismatched tenant/partner access), timingSafeEqual constant-time comparisons, idempotency key deduplication. |
-| Phase 8 | `.ai/08_TESTING_AND_ACCEPTANCE.md` | **COMPLETE** | 28 automated unit, security, and integration acceptance tests passing with 0 failures (`npm test`). `tsc --noEmit` passing with 0 type errors. |
+| Phase 8 | `.ai/08_TESTING_AND_ACCEPTANCE.md` | **COMPLETE** | 38 automated unit, security, integration, and identity acceptance tests passing with 0 failures (`npm test`). `tsc --noEmit` passing with 0 type errors. |
 | Phase 9 | `.ai/09_RELEASE_CHECKLIST.md` | **COMPLETE** | Release checklist evaluated honestly. Verdict: **READY FOR STAGING**. |
+| Identity Update | `.ai/IDENTITY_UPDATE_EXECUTE.md` | **COMPLETE** | Fayda e-ID national ID adapter (FAN/FIN masking, simulation badge, production fail-closed), mobile-first E.164 auth, cryptographic 6-digit OTP challenges, password reset/change step-up, user profile photo upload, and `/api/admin/users` governance with suspension audit logs. |
 
 ---
 
@@ -121,7 +122,18 @@ $ npm test
 #   [PASS] Responsive Layout Boundaries: All tables, summary metrics, and status endpoints provide bounded fields without page-level overflow
 #   [PASS] Public Partner Token Reconciliation: External recipient signs off dock manifest via share token with digital signature
 #   [PASS] Tablet Multi-Viewport Density: Metric cards 2-column wrapping, responsive table scrolling bounds, and filter row protection
-# TEST RESULTS: 28/28 PASSED (0 failed)
+# --- 6. Identity, Fayda e-ID, OTP & Admin Governance Tests ---
+#   [PASS] FAN and FIN numeric format validation & data masking
+#   [PASS] Public self-registration strictly rejects SUPER_ADMIN role
+#   [PASS] Fayda adapter simulation fixtures & production fail-closed
+#   [PASS] OTP challenge lifecycle (purpose binding, attempt limits, single-use)
+#   [PASS] Mobile number authentication with E.164 normalization
+#   [PASS] End-to-end registration flow with unique linkage & opaque usr_ ID
+#   [PASS] Forgot-password recovery with FAN + FIN match & phone OTP
+#   [PASS] Signed-in password change with step-up OTP challenge
+#   [PASS] Profile photo upload size limits, validation & removal
+#   [PASS] Admin user governance & lockout protection for last super-admin
+# TEST RESULTS: 38/38 PASSED (0 failed)
 # ALL ACCEPTANCE TESTS PASSED SUCCESSFULLY!
 
 # 3. Applet Compilation Check:
@@ -133,8 +145,13 @@ $ npm test
 ## 4. Release Checklist Assessment (`.ai/09_RELEASE_CHECKLIST.md`)
 
 - [x] Build/type-check/lint passes in actual project environment (`npm run lint` -> 0 errors).
-- [x] Relevant unit, security, and integration tests pass (`npm test` -> 28/28 PASS).
+- [x] Relevant unit, security, integration, and identity tests pass (`npm test` -> 38/38 PASS).
 - [x] Critical end-to-end flows verified (Dispatch creation -> Manifest view tracking -> Dock receipt reporting -> Discrepancy resolution).
+- [x] Identity & Fayda verification verified (16-digit FAN / 12-digit FIN validation, secure masking, dev simulation badge, production fail-closed).
+- [x] Public registration lockout verified (SUPER_ADMIN self-registration blocked on client & server).
+- [x] Mobile-first authentication with E.164 phone normalization and cryptographically random 6-digit OTP verified.
+- [x] User Profile & Identity management verified (photo upload/preview/delete, signed-in password change step-up OTP challenge).
+- [x] Super Admin user governance verified (search, role filtering, suspension with justification, reactivation, last super-admin lockout protection).
 - [x] No hardcoded production secrets or test credentials; random 24-byte bootstrap tokens.
 - [x] Dependencies reviewed and locked in `package.json`.
 - [x] Loading, empty, and permission-denied (HTTP 403) states verified.
@@ -149,56 +166,52 @@ $ npm test
 ---
 
 ## 5. Changes Made in This Session
-- **High-Contrast Touch-Friendly Scrollbar Utilities (`src/index.css`)**:
-  - Replaced subtle dark scrollbar styling with a high-contrast `#475569` thumb and `rgba(30, 41, 59, 0.4)` rounded track.
-  - Increased scrollbar thickness to 7px for easy drag & touch interactions across tables on tablets and iPads.
-- **Tablet Navigation Density & Visual Continuity (`src/components/layout/Navbar.tsx`)**:
-  - Optimized tablet navigation strip to use compact pill density (`px-2.5 sm:px-3 py-1.5`, `text-[11px] sm:text-xs`) with visible `.scrollbar-thin` container.
-  - Ensures all 7 navigation items are accessible and smoothly scrollable without clipped borders on 768px - 1023px tablet viewports.
-- **Summary Metric Cards 2-Column Responsive Wrapping (`src/components/dispatches/DispatchSummaryCards.tsx`)**:
-  - Defect: At 768px-820px portrait, `md:grid-cols-3` squeezed the cards into ~225px widths, causing `$4,625.00` valuation numbers and "Waybill valuation" labels to collide and wrap awkwardly.
-  - Fix: Changed grid to `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4` with Card 3 spanning `sm:col-span-2 lg:col-span-1`.
-  - Added `flex-wrap gap-1` and tracking adjustments to valuation figures, providing ample breathing room and balanced card presentation.
-- **Status Filter Bar & Search Container Breakpoint Tuning (`src/pages/dispatches/DispatchListPage.tsx`)**:
-  - Defect: On tablet portrait (768px - 820px), status filter buttons and search/export controls were squeezed onto a single row (`md:flex-row`), causing the status buttons to truncate.
-  - Fix: Upgraded breakpoint to `flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3`. Status pills now have their own dedicated row across tablet portrait viewports, keeping all 6 status filters visible and reachable.
-- **Business Owner Dashboard Recent Dispatches Table Bounding (`src/pages/dashboards/BusinessOwnerDashboard.tsx`)**:
-  - Defect: On 768px portrait, `md:min-w-full` forced 100% container width on a 6-column table requiring ~760px, causing the rightmost column ("Action" and "Reconciliation Outcome") to be clipped.
-  - Fix: Replaced with `min-w-[760px] lg:min-w-full` with `.scrollbar-thin`, allowing smooth horizontal scrolling within the card on portrait while expanding to 100% full width on 1024px+ landscape.
-- **Sender Dashboard Outbound Table Header Optimization (`src/pages/dashboards/SenderDashboard.tsx`)**:
-  - Updated headers to concise labels (`Dispatch #`, `Destination`, `Partner View`, `Driver & Cargo`, `Share Link`, `Detail`) with `min-w-[760px] lg:min-w-full`.
-- **Dispatch Detail Snapshots Grid Balance (`src/pages/dispatches/DispatchDetailPage.tsx`)**:
-  - Added `sm:col-span-2 lg:col-span-1` to the Carrier & Driver card, eliminating the empty cell on tablet portrait.
-  - Updated manifest lines table to `min-w-[780px] lg:min-w-full`.
-- **Audit Page Table Width & Legibility (`src/pages/audit/AuditPage.tsx`)**:
-  - Updated table min-width to `min-w-[820px] lg:min-w-full` with dedicated column minimum widths for Entity (`min-w-[120px]`) and Audit Record Summary (`min-w-[220px]`).
-- **Receiver Dashboard Completed Receipts History (`src/pages/dashboards/ReceiverDashboard.tsx`)**:
-  - Updated table to `min-w-[640px] lg:min-w-full`.
+- **Fayda e-ID Verification Adapter (`src/server/adapters/faydaAdapter.ts`)**:
+  - Implemented 16-digit FAN and 12-digit FIN format validation with secure masking (`•••• •••• •••• 1234`).
+  - Added simulated national identity registry with `FAYDA_DEV_SIMULATED` badge in development and fail-closed behavior in production.
+- **Cryptographic OTP Challenge Adapter (`src/server/adapters/otpAdapter.ts`)**:
+  - Implemented 6-digit cryptographic OTP generation with purpose binding (`REGISTRATION`, `PASSWORD_RESET`, `PROFILE_CHANGE`).
+  - Enforced 5-minute expiry, 30-second cooldown, max 5 failed attempts with auto-revocation, and phone-based rate limiting.
+- **Identity & Authentication Routes (`src/server/routes/authRoutes.ts`)**:
+  - Enforced role validation prohibiting self-registration of `SUPER_ADMIN`.
+  - Added `/api/auth/register/initiate`, `/api/auth/register/complete`, `/api/auth/login-mobile`, `/api/auth/password-reset/initiate`, `/api/auth/password-reset/complete`, `/api/auth/profile`, and `/api/auth/profile/photo`.
+- **Platform Administrator User Governance (`src/server/routes/adminRoutes.ts`)**:
+  - Added `/api/admin/users` endpoints supporting pagination, search, role filtering, and status filtering.
+  - Implemented account suspension requiring audited justification, account reactivation, and last super-admin lockout protection.
+- **Frontend Authentication & Modal Enhancements (`src/pages/auth/AuthModal.tsx` & `src/components/auth/ProfileModal.tsx`)**:
+  - Two-step Fayda registration modal with live OTP entry, FAN/FIN validation, and country prefix picker.
+  - Profile modal with sticky header, visible close button, photo upload with 2MB validation, and password change with step-up OTP challenge.
+- **Tablet First-Class Navigation & User Governance UI (`src/pages/dashboards/SuperAdminDashboard.tsx`)**:
+  - Integrated dedicated User Administration & Roles tab displaying masked FAN/FIN, verified phone numbers, and action triggers.
+  - Optimized search input and role/status dropdowns with responsive wrapping on tablet portrait (768px-820px) and full-width container on tablet landscape (1024px).
 - **Automated Test Suite Expansion (`test/runTests.ts`)**:
-  - Added Test #28: `Tablet UX & Responsive Stability: Tablet Multi-Viewport Density: Metric cards 2-column wrapping, responsive table scrolling bounds, and filter row protection`.
-  - All 28 acceptance tests pass with 0 failures (`npm test`).
+  - Expanded test suite from 28 to 38 comprehensive automated acceptance tests covering all Fayda, OTP, registration, recovery, and admin governance requirements.
+  - All 38 tests pass with 0 failures (`npm test`).
 - **Visual Browser Verification Across Matrix (`playwright-cli`)**:
   - Captured and inspected live screenshots:
-    - `verify-768x1024-dispatches.png`: Confirmed 2-column metric cards, no text collision, and dedicated unclipped status filter row.
-    - `verify-768x1024-owner-table.png`: Confirmed container-bounded scrolling for Recent Outbound Dispatches table.
-    - `verify-1024x768-owner.png`: Confirmed 100% full-width table rendering on landscape with all 6 columns visible.
+    - `t-landscape-1024x768.png`: Verified tablet landscape navigation, metric cards, and filter controls.
+    - `t-admin-users-768x1024.png`: Verified Super Admin user governance table, search input, and masked FAN/FIN data.
+    - `t-admin-users-820x1180.png`: Verified tablet portrait layout at 820x1180.
+    - `t-profile-modal-768x1024.png`: Verified user profile modal, photo upload, and credential masking.
 
 ---
 
 ## 6. Current Acceptance Criteria Status
+- [x] Super Admin removed from public self-registration (enforced client & server).
+- [x] Fayda e-ID national identity verification adapter (FAN/FIN validation, masking, simulation badge, fail-closed).
+- [x] Mobile-first authentication with E.164 normalization, country selector, and SMS OTP.
+- [x] Forgot-password recovery with FAN + FIN match and OTP challenge.
+- [x] Signed-in user profile management (photo upload/preview/delete, step-up OTP password change).
+- [x] Server-backed administrator user governance (search, filter, suspend with reason, reactivate, lockout protection).
 - [x] Tablet portrait navigation & layout ergonomics (768x1024 / 820x1180).
 - [x] Tablet landscape layout, unclipped navigation, and scrollable modal containment (1024x768 / 1180x820).
-- [x] Public partner manifest dock inspection, digital signature capture, and photo upload.
-- [x] Table cell horizontal padding and minimum width constraints across all manifest and dispatch views.
-- [x] Unauthenticated guest exploration data loading and summary cards.
-- [x] Mobile bottom navigation & desktop navbar regression verification.
-- [x] 28/28 acceptance tests passing in test runner.
+- [x] 38/38 acceptance tests passing in test runner.
 - [x] Zero compilation or lint errors.
 
 ---
 
 ## 7. Next Recommended Actions
 1. **Production Infrastructure Transition**: When deploying to production environments, configure persistent PostgreSQL / Cloud SQL via Drizzle ORM or Firestore using the platform's provisioning skills.
-2. **External Gateway Credentials**: Configure SMS / WhatsApp webhook credentials in the platform's secure secrets store for live external carrier notifications.
+2. **External Gateway Credentials**: Configure SMS / WhatsApp webhook credentials in the platform's secure secrets store for live external carrier notifications and SMS OTP delivery.
 
 

@@ -30,12 +30,14 @@ interface BusinessOwnerDashboardProps {
   onSelectDispatch: (id: string) => void;
   onNavigateTab: (tab: string) => void;
   onCreateDispatch: () => void;
+  onOpenProfile?: () => void;
 }
 
 export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
   onSelectDispatch,
   onNavigateTab,
   onCreateDispatch,
+  onOpenProfile,
 }) => {
   const { user, switchBusiness, createBusiness } = useAuth();
   const { t } = useTranslation();
@@ -138,7 +140,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
   return (
     <div className="space-y-6">
       {/* Profile Summary Card */}
-      <ProfileSummaryCard />
+      <ProfileSummaryCard onOpenProfile={onOpenProfile} />
 
       {/* Executive Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm">

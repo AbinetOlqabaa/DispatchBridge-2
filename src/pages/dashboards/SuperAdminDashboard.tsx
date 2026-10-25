@@ -27,9 +27,10 @@ import { ProfileSummaryCard } from '../../components/common/ProfileSummaryCard.j
 
 interface SuperAdminDashboardProps {
   onNavigateStatus: () => void;
+  onOpenProfile?: () => void;
 }
 
-export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavigateStatus }) => {
+export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavigateStatus, onOpenProfile }) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'USERS'>('OVERVIEW');
 
@@ -203,7 +204,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
   return (
     <div className="space-y-6">
       {/* Profile Summary Card */}
-      <ProfileSummaryCard />
+      <ProfileSummaryCard onOpenProfile={onOpenProfile} />
 
       {/* Super Admin Control Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-purple-900/40 p-6 rounded-2xl shadow-sm">
@@ -491,7 +492,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
       {activeTab === 'USERS' && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
           {/* Controls Bar */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <Users className="w-5 h-5 text-purple-400" />
@@ -502,8 +503,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-              <div className="relative flex-1 sm:w-56">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
+              <div className="relative flex-1 sm:w-60 min-w-[180px]">
                 <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
                 <input
                   type="text"
@@ -515,47 +516,49 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                 />
               </div>
 
-              <select
-                aria-label="Filter users by role"
-                value={userRoleFilter}
-                onChange={(e) => {
-                  setUserRoleFilter(e.target.value as UserRole | '');
-                }}
-                className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
-              >
-                <option value="">All Roles</option>
-                <option value="SUPER_ADMIN">Super Admin</option>
-                <option value="BUSINESS_OWNER">Business Owner</option>
-                <option value="SENDER">Sender / Dispatcher</option>
-                <option value="RECEIVER">Receiver / Partner</option>
-              </select>
+              <div className="flex items-center gap-2">
+                <select
+                  aria-label="Filter users by role"
+                  value={userRoleFilter}
+                  onChange={(e) => {
+                    setUserRoleFilter(e.target.value as UserRole | '');
+                  }}
+                  className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500 cursor-pointer"
+                >
+                  <option value="">All Roles</option>
+                  <option value="SUPER_ADMIN">Super Admin</option>
+                  <option value="BUSINESS_OWNER">Business Owner</option>
+                  <option value="SENDER">Sender / Dispatcher</option>
+                  <option value="RECEIVER">Receiver / Partner</option>
+                </select>
 
-              <select
-                aria-label="Filter users by account status"
-                value={userStatusFilter}
-                onChange={(e) => {
-                  setUserStatusFilter(e.target.value as 'ACTIVE' | 'SUSPENDED' | '');
-                }}
-                className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
-              >
-                <option value="">All Statuses</option>
-                <option value="ACTIVE">Active</option>
-                <option value="SUSPENDED">Suspended</option>
-              </select>
+                <select
+                  aria-label="Filter users by account status"
+                  value={userStatusFilter}
+                  onChange={(e) => {
+                    setUserStatusFilter(e.target.value as 'ACTIVE' | 'SUSPENDED' | '');
+                  }}
+                  className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500 cursor-pointer"
+                >
+                  <option value="">All Statuses</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="SUSPENDED">Suspended</option>
+                </select>
 
-              <button
-                onClick={loadUsers}
-                className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
-                title="Apply Filter"
-              >
-                <RefreshCw className={`w-4 h-4 ${usersLoading ? 'animate-spin' : ''}`} />
-              </button>
+                <button
+                  onClick={loadUsers}
+                  className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer transition shrink-0"
+                  title="Apply Filter"
+                >
+                  <RefreshCw className={`w-4 h-4 ${usersLoading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* User Accounts Table */}
           <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
-            <table className="w-full text-left text-xs min-w-[840px]">
+            <table className="w-full text-left text-xs min-w-[860px] lg:min-w-full">
               <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/60 border-b border-slate-800">
                 <tr>
                   <th className="px-4 py-3 font-semibold">User</th>
