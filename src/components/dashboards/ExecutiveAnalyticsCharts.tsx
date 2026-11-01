@@ -108,11 +108,11 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-950 px-2.5 py-0.5 rounded-full border border-indigo-800">
-              Executive Analytics
+              {t('analytics.badge')}
             </span>
-            <span className="text-xs text-slate-400">Real-Time Operational Intelligence</span>
+            <span className="text-xs text-slate-400">{t('analytics.subtitle')}</span>
           </div>
-          <h2 className="text-lg font-bold text-white tracking-tight">Delivery Success Rates & Transit Lead Times</h2>
+          <h2 className="text-lg font-bold text-white tracking-tight">{t('analytics.title')}</h2>
         </div>
 
         {/* Tab Pills */}
@@ -125,7 +125,7 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Fulfillment & Success
+            {t('analytics.tab_fulfillment')}
           </button>
           <button
             onClick={() => setActiveMetricTab('leadtimes')}
@@ -135,7 +135,7 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Transit Lead Times
+            {t('analytics.tab_lead_times')}
           </button>
           <button
             onClick={() => setActiveMetricTab('discrepancies')}
@@ -145,7 +145,7 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Loss Root Cause
+            {t('analytics.tab_root_cause')}
           </button>
         </div>
       </div>
@@ -182,20 +182,20 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
               <div className="absolute flex flex-col items-center justify-center text-center">
                 <span className="text-2xl font-bold font-mono text-white">{successPercentage}%</span>
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
-                  Delivery Success
+                  {t('analytics.delivery_success')}
                 </span>
               </div>
             </div>
             <span className="text-xs text-slate-400 mt-2">
-              {totalReceived.toLocaleString()} of {totalSent.toLocaleString()} units received intact
+              {t('analytics.units_intact_summary', { received: totalReceived.toLocaleString(), sent: totalSent.toLocaleString() })}
             </span>
           </div>
 
           {/* Status Breakdown Legend & Bars */}
           <div className="md:col-span-2 space-y-3 p-4 bg-slate-950/50 rounded-xl border border-slate-800">
             <div className="text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
-              <span>Manifest Status Distribution</span>
-              <span className="text-slate-500 font-mono">{totalDispatches} total shipments</span>
+              <span>{t('analytics.manifest_distribution')}</span>
+              <span className="text-slate-500 font-mono">{t('analytics.total_shipments', { total: totalDispatches })}</span>
             </div>
 
             {/* Reconciled / Received */}
@@ -203,7 +203,7 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
               <div className="flex justify-between text-xs">
                 <span className="text-slate-300 flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                  Fully Reconciled & Intact
+                  {t('analytics.fully_reconciled')}
                 </span>
                 <span className="text-slate-400 font-mono font-semibold">
                   {reconciledCount} ({totalDispatches > 0 ? Math.round((reconciledCount / totalDispatches) * 100) : 0}%)
@@ -222,7 +222,7 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
               <div className="flex justify-between text-xs">
                 <span className="text-slate-300 flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
-                  Active / In Transit
+                  {t('analytics.active_transit')}
                 </span>
                 <span className="text-slate-400 font-mono font-semibold">
                   {inTransitCount} ({totalDispatches > 0 ? Math.round((inTransitCount / totalDispatches) * 100) : 0}%)
@@ -241,7 +241,7 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
               <div className="flex justify-between text-xs">
                 <span className="text-slate-300 flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                  Manifest Viewed by Partner
+                  {t('analytics.viewed_partner')}
                 </span>
                 <span className="text-slate-400 font-mono font-semibold">
                   {viewedCount} ({totalDispatches > 0 ? Math.round((viewedCount / totalDispatches) * 100) : 0}%)
@@ -260,7 +260,7 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
               <div className="flex justify-between text-xs">
                 <span className="text-slate-300 flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                  Discrepancy / Shortfall Under Review
+                  {t('analytics.discrepancy_review')}
                 </span>
                 <span className="text-slate-400 font-mono font-semibold">
                   {shortfallCount} ({totalDispatches > 0 ? Math.round((shortfallCount / totalDispatches) * 100) : 0}%)
@@ -284,34 +284,34 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
             <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-center">
               <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 mb-1">
                 <Clock className="w-3.5 h-3.5 text-sky-400" />
-                <span>Dispatch to Partner View</span>
+                <span>{t('analytics.dispatch_to_view')}</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-white">{avgViewHours} hrs</div>
-              <div className="text-[11px] text-emerald-400 mt-0.5">Average receiver notification response</div>
+              <div className="text-2xl font-bold font-mono text-white">{avgViewHours} {t('unit.hours')}</div>
+              <div className="text-[11px] text-emerald-400 mt-0.5">{t('analytics.avg_view_sub')}</div>
             </div>
 
             <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-center">
               <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 mb-1">
                 <Truck className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Dispatch to Dock Receipt</span>
+                <span>{t('analytics.dispatch_to_receipt')}</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-white">{avgReceiptHours} hrs</div>
-              <div className="text-[11px] text-sky-400 mt-0.5">Transit & unloading turnaround</div>
+              <div className="text-2xl font-bold font-mono text-white">{avgReceiptHours} {t('unit.hours')}</div>
+              <div className="text-[11px] text-sky-400 mt-0.5">{t('analytics.transit_turnaround_sub')}</div>
             </div>
 
             <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-center">
               <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 mb-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Full Reconciliation Cycle</span>
+                <span>{t('analytics.full_recon_cycle')}</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-white">{avgReconciledHours} hrs</div>
-              <div className="text-[11px] text-indigo-400 mt-0.5">End-to-end settlement & sign-off</div>
+              <div className="text-2xl font-bold font-mono text-white">{avgReconciledHours} {t('unit.hours')}</div>
+              <div className="text-[11px] text-indigo-400 mt-0.5">{t('analytics.end_to_end_sub')}</div>
             </div>
           </div>
 
           {/* Visual Lead Time Milestone Progress Bars */}
           <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800 space-y-3">
-            <div className="text-xs font-semibold text-slate-300">Shipment Transit Milestones & Durations</div>
+            <div className="text-xs font-semibold text-slate-300">{t('analytics.milestones_title')}</div>
             <div className="space-y-2">
               {leadTimes.slice(0, 3).map((item, idx) => (
                 <div key={idx} className="p-3 bg-slate-900 rounded-lg border border-slate-800/80 text-xs space-y-1.5">
@@ -321,13 +321,13 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-300">
                     <div className="bg-slate-800/60 px-2 py-1 rounded">
-                      Viewed in: <span className="font-mono font-semibold text-white">{item.viewHours || '-'}h</span>
+                      {t('analytics.viewed_in')} <span className="font-mono font-semibold text-white">{item.viewHours || '-'}h</span>
                     </div>
                     <div className="bg-slate-800/60 px-2 py-1 rounded">
-                      Received in: <span className="font-mono font-semibold text-white">{item.receiptHours || '-'}h</span>
+                      {t('analytics.received_in')} <span className="font-mono font-semibold text-white">{item.receiptHours || '-'}h</span>
                     </div>
                     <div className="bg-slate-800/60 px-2 py-1 rounded">
-                      Reconciled in: <span className="font-mono font-semibold text-white">{item.reconciledHours || '-'}h</span>
+                      {t('analytics.reconciled_in')} <span className="font-mono font-semibold text-white">{item.reconciledHours || '-'}h</span>
                     </div>
                   </div>
                 </div>
@@ -343,10 +343,10 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
           <div className="flex items-center justify-between text-xs">
             <span className="font-semibold text-slate-300 flex items-center gap-1.5">
               <AlertTriangle className="w-4 h-4 text-rose-400" />
-              Cargo Shortfall & Damage Breakdown ({totalLost} Units Lost)
+              {t('analytics.discrepancy_breakdown_title', { lost: totalLost })}
             </span>
             <span className="text-slate-500 font-mono">
-              {totalDiscrepancies > 0 ? `${totalDiscrepancies} incident units` : '0 incidents'}
+              {totalDiscrepancies > 0 ? t('analytics.incident_units', { count: totalDiscrepancies }) : t('analytics.zero_incidents')}
             </span>
           </div>
 
@@ -356,8 +356,14 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
               return (
                 <div key={category} className="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
                   <div className="flex justify-between text-xs">
-                    <span className="font-semibold text-white">{category.replace(/_/g, ' ')}</span>
-                    <span className="font-mono text-rose-400 font-bold">{count} units ({pct}%)</span>
+                    <span className="font-semibold text-white">
+                      {category === 'DAMAGED'
+                        ? t('condition.damaged')
+                        : category === 'SHORTAGE'
+                        ? t('discrepancy.shortage')
+                        : category.replace(/_/g, ' ')}
+                    </span>
+                    <span className="font-mono text-rose-400 font-bold">{count} {t('unit.units')} ({pct}%)</span>
                   </div>
                   <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
                     <div
@@ -367,10 +373,10 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                   </div>
                   <div className="text-[11px] text-slate-500">
                     {category === 'DAMAGED'
-                      ? 'Broken seals, container puncture, or transit impact.'
+                      ? t('analytics.desc_damaged')
                       : category === 'SHORTAGE'
-                      ? 'Item count discrepancy between dock loading & partner receipt.'
-                      : 'Catalog variance or missing carton units.'}
+                      ? t('analytics.desc_shortage')
+                      : t('analytics.desc_mismatch')}
                   </div>
                 </div>
               );

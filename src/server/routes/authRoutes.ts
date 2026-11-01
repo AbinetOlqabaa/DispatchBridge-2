@@ -186,11 +186,30 @@ router.post('/password-change', authenticate, async (req: AuthenticatedRequest, 
   }
 });
 
-// Profile Management: Update Profile (Name & Photo)
+// Profile Management: Direct Password Change
+router.post('/change-password', authenticate, async (req: AuthenticatedRequest, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ error: 'Current password and new password are required.' });
+      return;
+    }
+    const result = await sandboxStore.changePassword(
+      req.user!.id,
+      currentPassword,
+      newPassword
+    );
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Failed to update password.' });
+  }
+});
+
+// Profile Management: Update Profile (Name, Phone & Photo)
 router.put('/profile', authenticate, async (req: AuthenticatedRequest, res) => {
   try {
-    const { name, avatarUrl } = req.body;
-    const updatedUser = await sandboxStore.updateProfile(req.user!.id, { name, avatarUrl });
+    const { name, phoneNumber, avatarUrl } = req.body;
+    const updatedUser = await sandboxStore.updateProfile(req.user!.id, { name, phoneNumber, avatarUrl });
     res.json({ user: updatedUser });
   } catch (err: any) {
     res.status(400).json({ error: err.message || 'Failed to update profile.' });

@@ -12,6 +12,7 @@ import {
   Info,
 } from 'lucide-react';
 import { Location, Partner, Dispatch } from '../../types/dispatch.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 
 export interface MapPoint {
   id: string;
@@ -55,6 +56,7 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
   dispatches = [],
   onSelectPoint,
 }) => {
+  const { t } = useTranslation();
   const [filterType, setFilterType] = useState<'ALL' | 'ORIGIN' | 'DELIVERY'>('ALL');
   const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
   const [copiedCoord, setCopiedCoord] = useState<string | null>(null);
@@ -221,11 +223,14 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 font-semibold text-slate-200">
             <Compass className="w-4 h-4 text-sky-400" />
-            <span>GIS Geographic Coordinates Network</span>
+            <span>{t('map.network_title', 'GIS Geographic Coordinates Network')}</span>
           </div>
           <span className="text-slate-500">|</span>
           <span className="text-slate-400">
-            {locations.length} Origin Docks • {partners.length} Delivery Points
+            {t('map.points_summary', '{origins} Origin Docks • {destinations} Delivery Points', {
+              origins: locations.length,
+              destinations: partners.length,
+            })}
           </span>
         </div>
 
@@ -239,7 +244,7 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
                 : 'bg-slate-800 text-slate-400 hover:text-white'
             }`}
           >
-            All Points ({mapPoints.length})
+            {t('map.points_all', 'All Points ({count})', { count: mapPoints.length })}
           </button>
           <button
             onClick={() => setFilterType('ORIGIN')}
@@ -250,7 +255,7 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
             }`}
           >
             <Warehouse className="w-3.5 h-3.5 text-sky-400" />
-            <span>Origins ({locations.length})</span>
+            <span>{t('map.points_origins', 'Origins ({count})', { count: locations.length })}</span>
           </button>
           <button
             onClick={() => setFilterType('DELIVERY')}
@@ -261,7 +266,7 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
             }`}
           >
             <MapPin className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Delivery Points ({partners.length})</span>
+            <span>{t('map.points_destinations', 'Delivery Points ({count})', { count: partners.length })}</span>
           </button>
         </div>
       </div>
@@ -273,7 +278,7 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
           {/* Map Header Overlay */}
           <div className="absolute top-3 left-3 z-10 flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-[11px] text-slate-300">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Live Geospatial Coordinate View</span>
+            <span>{t('map.live_view_title', 'Live Geospatial Coordinate View')}</span>
             <span className="text-slate-500 font-mono text-[10px]">
               [{bounds.minLat.toFixed(2)}°N, {bounds.minLng.toFixed(2)}°W] to [{bounds.maxLat.toFixed(2)}°N, {bounds.maxLng.toFixed(2)}°W]
             </span>
@@ -445,16 +450,16 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
           <div className="absolute bottom-3 left-3 z-10 flex flex-wrap items-center gap-3 bg-slate-900/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-800 text-[11px]">
             <div className="flex items-center gap-1.5 text-sky-300">
               <span className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-sm shadow-sky-400"></span>
-              <span className="font-semibold">Dispatch Origin Dock</span>
+              <span className="font-semibold">{t('map.legend_origin_dock', 'Dispatch Origin Dock')}</span>
             </div>
             <div className="flex items-center gap-1.5 text-emerald-300">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400"></span>
-              <span className="font-semibold">Delivery Destination</span>
+              <span className="font-semibold">{t('map.legend_destination', 'Delivery Destination')}</span>
             </div>
             {activeRoutes.length > 0 && (
               <div className="flex items-center gap-1.5 text-sky-400">
                 <span className="w-4 h-0.5 bg-sky-400 border-t border-dashed"></span>
-                <span>Active Freight Vector ({activeRoutes.length})</span>
+                <span>{t('map.legend_freight_vector', 'Active Freight Vector ({count})', { count: activeRoutes.length })}</span>
               </div>
             )}
           </div>
@@ -466,10 +471,10 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
             <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-2 mb-3">
               <div className="flex items-center gap-1.5 text-xs font-bold text-white min-w-0">
                 <Layers className="w-4 h-4 text-sky-400 shrink-0" />
-                <span className="truncate">Geospatial Directory</span>
+                <span className="truncate">{t('map.geospatial_dir', 'Geospatial Directory')}</span>
               </div>
               <span className="text-[11px] font-mono text-slate-400 shrink-0">
-                {filteredPoints.length} Points
+                {t('map.points_count', '{count} Points', { count: filteredPoints.length })}
               </span>
             </div>
 
@@ -485,13 +490,15 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
                           : 'bg-emerald-950 text-emerald-300 border-emerald-800'
                       }`}
                     >
-                      {selectedPoint.type === 'ORIGIN' ? 'Origin Terminal' : 'Delivery Destination'}
+                      {selectedPoint.type === 'ORIGIN'
+                        ? t('map.origin_terminal', 'Origin Terminal')
+                        : t('map.legend_destination', 'Delivery Destination')}
                     </span>
                     <h4 className="font-bold text-white text-xs mt-1.5">{selectedPoint.label}</h4>
                   </div>
                   {selectedPoint.isDefault && (
                     <span className="text-[10px] text-amber-300 font-semibold bg-amber-950 px-1.5 py-0.5 rounded border border-amber-800">
-                      Default
+                      {t('map.default_badge', 'Default')}
                     </span>
                   )}
                 </div>
@@ -520,7 +527,7 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
                         )
                       }
                       className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 cursor-pointer"
-                      title="Copy coordinates"
+                      title={t('map.copy_coords', 'Copy coordinates')}
                     >
                       {copiedCoord === selectedPoint.id ? (
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -532,14 +539,14 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
 
                   {selectedPoint.contactPerson && (
                     <div className="text-[10px] text-slate-400 pt-1">
-                      <span className="text-slate-500 font-semibold">Contact:</span> {selectedPoint.contactPerson} ({selectedPoint.phone})
+                      <span className="text-slate-500 font-semibold">{t('map.contact_label', 'Contact:')}</span> {selectedPoint.contactPerson} ({selectedPoint.phone})
                     </div>
                   )}
 
                   {selectedPoint.activeDispatchesCount !== undefined && selectedPoint.activeDispatchesCount > 0 && (
                     <div className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1 pt-1">
                       <Truck className="w-3 h-3" />
-                      <span>{selectedPoint.activeDispatchesCount} Active In-Transit Shipment(s)</span>
+                      <span>{t('map.active_shipments_count', '{count} Active In-Transit Shipment(s)', { count: selectedPoint.activeDispatchesCount })}</span>
                     </div>
                   )}
                 </div>
@@ -547,9 +554,9 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
             ) : (
               <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 text-center text-slate-400 text-xs mb-3">
                 <Navigation className="w-6 h-6 text-slate-600 mx-auto mb-1.5" />
-                <div className="font-semibold text-slate-300 text-xs">Select a Coordinate Pin</div>
+                <div className="font-semibold text-slate-300 text-xs">{t('map.select_pin', 'Select a Coordinate Pin')}</div>
                 <p className="text-[10px] text-slate-500 mt-0.5">
-                  Click any marker on the map to inspect dock coordinates and transit connections.
+                  {t('map.select_pin_desc', 'Click any marker on the map to inspect dock coordinates and transit connections.')}
                 </p>
               </div>
             )}
@@ -588,7 +595,7 @@ export const LocationsMapView: React.FC<LocationsMapViewProps> = ({
           </div>
 
           <div className="text-[10px] text-slate-500 border-t border-slate-800 pt-2">
-            Integrated coordinate projections synced with dispatch routing and receiving docks.
+            {t('map.synced_note', 'Integrated coordinate projections synced with dispatch routing and receiving docks.')}
           </div>
         </div>
       </div>

@@ -16,6 +16,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { api } from '../../services/api.js';
 
 interface ProfileModalProps {
@@ -25,6 +26,7 @@ interface ProfileModalProps {
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   const { user, updateProfile, removeProfilePhoto } = useAuth();
+  const { t } = useTranslation();
 
   const [name, setName] = useState(user?.name || '');
   const [isUpdatingName, setIsUpdatingName] = useState(false);
@@ -207,9 +209,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
             </div>
             <div>
               <h2 id="profile-modal-title" className="text-lg font-bold tracking-tight text-white leading-tight">
-                User Profile & Identity
+                {t('profile.title')}
               </h2>
-              <p className="text-xs text-slate-400">Verified credentials, photo, and security controls</p>
+              <p className="text-xs text-slate-400">{t('profile.subtitle')}</p>
             </div>
           </div>
           <button
@@ -278,7 +280,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
                 className="text-xs px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium flex items-center gap-1 transition cursor-pointer disabled:opacity-50"
               >
                 <Camera className="w-3 h-3" />
-                <span>{user.avatarUrl ? 'Change Photo' : 'Upload Photo'}</span>
+                <span>{t('profile.change_photo')}</span>
               </button>
               {user.avatarUrl && (
                 <button
@@ -288,7 +290,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
                   className="text-xs px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-medium flex items-center gap-1 transition cursor-pointer disabled:opacity-50"
                 >
                   <Trash2 className="w-3 h-3" />
-                  <span>Remove</span>
+                  <span>{t('profile.remove_photo')}</span>
                 </button>
               )}
             </div>
@@ -298,7 +300,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
         {/* Identity & Fayda Verification Badges */}
         <div className="space-y-3 mb-6">
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            Verified Identity & Credentials
+            {t('profile.identity_info')}
           </div>
 
           <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2.5">
@@ -306,7 +308,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-400 flex items-center gap-1.5">
                 <Smartphone className="w-3.5 h-3.5 text-slate-500" />
-                <span>Mobile Number:</span>
+                <span>{t('auth.mobile_phone')}:</span>
               </span>
               <span className="font-mono font-medium text-slate-200">
                 {user.maskedPhone || user.phoneNumber}
@@ -317,7 +319,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
             <div className="flex items-center justify-between text-xs border-t border-slate-800/80 pt-2">
               <span className="text-slate-400 flex items-center gap-1.5">
                 <CreditCard className="w-3.5 h-3.5 text-sky-400" />
-                <span>Fayda Account (FAN):</span>
+                <span>{t('auth.fayda_id')}:</span>
               </span>
               <span className="font-mono font-medium text-sky-300">
                 {user.maskedFan || '•••• •••• •••• 4444'}
@@ -328,7 +330,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
             <div className="flex items-center justify-between text-xs border-t border-slate-800/80 pt-2">
               <span className="text-slate-400 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Fayda Identification (FIN):</span>
+                <span>{t('auth.fin_number')}:</span>
               </span>
               <span className="font-mono font-medium text-emerald-300">
                 {user.maskedFin || '•••• •••• 3333'}
@@ -337,22 +339,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
 
             {/* Fayda Verification Status Chip */}
             <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
-              <span className="text-[11px] text-slate-400">National e-ID Verification:</span>
+              <span className="text-[11px] text-slate-400">{t('auth.fayda_verification_title')}:</span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                 <ShieldCheck className="w-3 h-3" />
-                <span>Fayda Verified (Simulation / Dev Mode)</span>
+                <span>{t('auth.verified_badge')}</span>
               </span>
             </div>
           </div>
-          <p className="text-[11px] text-slate-500 italic">
-            * Sensitive national ID numbers (FAN/FIN) are strictly masked and encrypted. Raw values are never returned to clients or displayed on dashboard manifest cards.
-          </p>
         </div>
 
         {/* Edit Full Name Form */}
         <form onSubmit={handleSaveName} className="mb-6 p-4 rounded-xl bg-slate-950/40 border border-slate-800">
           <label className="block text-xs font-medium text-slate-300 mb-1.5">
-            Display Name
+            {t('auth.full_name')}
           </label>
           <div className="flex gap-2">
             <input
@@ -367,13 +366,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
               disabled={isUpdatingName || name === user.name}
               className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition cursor-pointer disabled:opacity-40"
             >
-              {isUpdatingName ? 'Saving...' : 'Save'}
+              {isUpdatingName ? t('auth.submitting') : t('profile.update_name')}
             </button>
           </div>
           {nameSuccess && (
             <p className="text-xs text-emerald-400 mt-1.5 flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" />
-              <span>Name updated successfully!</span>
+              <span>{t('profile.name_updated')}</span>
             </p>
           )}
         </form>
@@ -383,7 +382,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Lock className="w-4 h-4 text-indigo-400" />
-              <span className="text-xs font-semibold text-slate-200">Security & Password</span>
+              <span className="text-xs font-semibold text-slate-200">{t('profile.security_password')}</span>
             </div>
             <button
               type="button"
@@ -394,7 +393,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
               }}
               className="text-xs text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer"
             >
-              {showPasswordSection ? 'Hide' : 'Change Password'}
+              {showPasswordSection ? t('common.close') : t('profile.change_password_action')}
             </button>
           </div>
 
@@ -418,7 +417,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
                 <>
                   <div>
                     <label className="block text-xs font-medium text-slate-300 mb-1">
-                      Current Password
+                      {t('auth.current_password')}
                     </label>
                     <div className="relative">
                       <input
@@ -441,7 +440,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-slate-300 mb-1">
-                        New Password (min 8 chars)
+                        {t('auth.new_password')}
                       </label>
                       <div className="relative">
                         <input
@@ -463,7 +462,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
 
                     <div>
                       <label className="block text-xs font-medium text-slate-300 mb-1">
-                        Confirm New Password
+                        {t('auth.confirm_password')}
                       </label>
                       <input
                         type="password"
@@ -482,19 +481,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
                     className="w-full mt-2 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition cursor-pointer disabled:opacity-40 flex items-center justify-center gap-1.5"
                   >
                     <KeyRound className="w-3.5 h-3.5" />
-                    <span>{isRequestingOtp ? 'Dispatching Step-Up OTP...' : 'Request Step-Up OTP Verification'}</span>
+                    <span>{isRequestingOtp ? t('auth.submitting') : t('profile.request_otp')}</span>
                   </button>
                 </>
               ) : (
                 <form onSubmit={handleSubmitPasswordChange} className="space-y-3">
                   <div className="p-3 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs">
-                    <p className="font-semibold text-sky-200">Step-Up Verification Code Dispatched</p>
+                    <p className="font-semibold text-sky-200">{t('auth.otp_verification')}</p>
                     <p className="text-slate-300 mt-1">
-                      An OTP has been sent to your verified mobile number <span className="font-mono text-white">{user.maskedPhone || user.phoneNumber}</span>.
+                      {t('profile.password_change_desc')} <span className="font-mono text-white">{user.maskedPhone || user.phoneNumber}</span>.
                     </p>
                     {simulatedCode && (
                       <div className="mt-2 p-1.5 rounded bg-sky-950/80 border border-sky-700/50 flex items-center justify-between">
-                        <span className="text-[10px] text-sky-300 font-mono">Dev Mode Simulated Code:</span>
+                        <span className="text-[10px] text-sky-300 font-mono">{t('auth.simulated_sms_code', { code: '' })}</span>
                         <span className="text-xs font-bold font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700">
                           {simulatedCode}
                         </span>
@@ -504,7 +503,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
 
                   <div>
                     <label className="block text-xs font-medium text-slate-300 mb-1">
-                      Enter 6-Digit OTP Code
+                      {t('auth.enter_otp')}
                     </label>
                     <input
                       type="text"
@@ -523,14 +522,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
                       onClick={() => setOtpChallengeId(null)}
                       className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition cursor-pointer"
                     >
-                      Back
+                      {t('auth.back_to_form')}
                     </button>
                     <button
                       type="submit"
                       disabled={isChangingPassword || otpCode.length < 6}
                       className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition cursor-pointer disabled:opacity-50"
                     >
-                      {isChangingPassword ? 'Verifying...' : 'Confirm Update'}
+                      {isChangingPassword ? t('auth.submitting') : t('profile.change_password_action')}
                     </button>
                   </div>
                 </form>

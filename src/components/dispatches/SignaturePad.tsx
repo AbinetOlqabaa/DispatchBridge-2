@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { PenTool, RotateCcw, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { useTranslation } from '../../context/LanguageContext.js';
 
 interface SignaturePadProps {
   onSignatureChange: (signatureDataUrl: string | null) => void;
@@ -12,19 +13,31 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
   signerName = 'Receiving Supervisor',
   initialSignature,
 }) => {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
 
-  useEffect(() => {
+  const initCanvas = (preserveContent = true) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // High DPI scaling
+    let savedDataUrl: string | null = null;
+    if (preserveContent && hasDrawn && canvas.width > 0 && canvas.height > 0) {
+      try {
+        savedDataUrl = canvas.toDataURL('image/png');
+      } catch {
+        savedDataUrl = null;
+      }
+    }
+
+    // High DPI scaling with orientation awareness
     const ratio = Math.max(window.devicePixelRatio || 1, 1);
     const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
     canvas.width = rect.width * ratio;
     canvas.height = rect.height * ratio;
     ctx.scale(ratio, ratio);
@@ -34,15 +47,36 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    if (initialSignature) {
+    const sourceImage = savedDataUrl || initialSignature;
+    if (sourceImage) {
       const img = new Image();
       img.onload = () => {
         ctx.drawImage(img, 0, 0, rect.width, rect.height);
         setHasDrawn(true);
       };
-      img.src = initialSignature;
+      img.src = sourceImage;
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    initCanvas(false);
+
+    let resizeTimer: any;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        initCanvas(true);
+      }, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      clearTimeout(resizeTimer);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, [hasDrawn]);
 
   const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -145,7 +179,7 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
       <div className="flex items-center justify-between text-xs">
         <label className="font-semibold text-slate-300 flex items-center gap-1.5">
           <PenTool className="w-3.5 h-3.5 text-sky-400" />
-          <span>Receiver Digital Dock Sign-off (Canvas Capture)</span>
+          <span>{t('signature.title', 'Receiver Digital Dock Sign-off (Canvas Capture)')}</span>
         </label>
         <div className="flex items-center gap-2">
           <button
@@ -153,7 +187,7 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
             onClick={generatePresetSignature}
             className="text-[11px] text-sky-400 hover:text-sky-300 font-medium cursor-pointer"
           >
-            Quick Sign
+            {t('signature.quick_sign', 'Quick Sign')}
           </button>
           <button
             type="button"
@@ -161,7 +195,7 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
             className="text-[11px] text-slate-400 hover:text-rose-400 flex items-center gap-1 font-medium cursor-pointer"
           >
             <RotateCcw className="w-3 h-3" />
-            <span>Clear</span>
+            <span>{t('signature.clear', 'Clear')}</span>
           </button>
         </div>
       </div>
@@ -176,26 +210,26 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
           onTouchStart={startDrawing}
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
-          className="w-full h-28 cursor-crosshair block"
+          className="w-full h-32 md:h-36 cursor-crosshair block"
         />
 
         {!hasDrawn && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-slate-500 text-xs gap-1">
             <PenTool className="w-5 h-5 opacity-40 text-slate-400" />
-            <span>Sign with finger, stylus, or cursor on glass</span>
+            <span>{t('signature.hint', 'Sign with finger, stylus, or cursor on glass')}</span>
           </div>
         )}
 
         <div className="absolute bottom-1 right-2 text-[10px] text-slate-500 flex items-center gap-1 pointer-events-none">
           <ShieldCheck className="w-3 h-3 text-teal-500" />
-          <span>Legally binding digital acceptance</span>
+          <span>{t('signature.legal_note', 'Legally binding digital acceptance')}</span>
         </div>
       </div>
 
       {hasDrawn && (
         <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
           <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>Signature recorded & ready to lock into manifest record</span>
+          <span>{t('signature.recorded', 'Signature recorded & ready to lock into manifest record')}</span>
         </div>
       )}
     </div>

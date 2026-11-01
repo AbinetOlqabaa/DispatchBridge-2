@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { Dispatch, RouteWaypoint } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import {
   saveMapCache,
   getMapCache,
@@ -71,6 +72,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
   dispatch,
   onTelemetryUpdate,
 }) => {
+  const { t } = useTranslation();
   const [copiedCoords, setCopiedCoords] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [activeWaypointTooltip, setActiveWaypointTooltip] = useState<RouteWaypoint | null>(null);
@@ -435,11 +437,13 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           <div className="flex items-center gap-2">
             <WifiOff className="w-4 h-4 text-amber-400 shrink-0" />
             <span className="font-semibold">
-              Operating in Offline Transit Mode • Using Cached Coordinate Data & Offline Map Canvas
+              {t('map.offline_transit_mode', 'Operating in Offline Transit Mode • Using Cached Coordinate Data & Offline Map Canvas')}
             </span>
           </div>
           <span className="text-[11px] bg-amber-900/60 px-2 py-0.5 rounded border border-amber-700/60 font-mono">
-            Cache Hit: {cachedRecord ? `${(cachedRecord.sizeBytes / 1024).toFixed(1)} KB` : 'Local Grid'}
+            {t('map.cache_hit', 'Cache Hit: {size}', {
+              size: cachedRecord ? `${(cachedRecord.sizeBytes / 1024).toFixed(1)} KB` : t('map.local_grid', 'Local Grid'),
+            })}
           </span>
         </div>
       )}
@@ -458,13 +462,17 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-sky-950 text-sky-400 border border-sky-800/80">
               <Radio className="w-3 h-3 text-sky-400 animate-pulse" />
-              Live Telemetry & Geo-Coordinates
+              {t('map.live_telemetry_badge', 'Live Telemetry & Geo-Coordinates')}
             </span>
 
             {/* Offline Cache Status Badge */}
             <span className="flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
               <Database className="w-3 h-3 text-emerald-400" />
-              {cachedRecord ? `Cached Offline (${(cachedRecord.sizeBytes / 1024).toFixed(1)} KB)` : 'Uncached'}
+              {cachedRecord
+                ? t('map.cached_offline_badge', 'Cached Offline ({size})', {
+                    size: `${(cachedRecord.sizeBytes / 1024).toFixed(1)} KB`,
+                  })
+                : t('map.uncached', 'Uncached')}
             </span>
 
             {/* Network Status Toggle */}
@@ -478,7 +486,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               title="Toggle simulated low-signal/offline transit mode"
             >
               {isSimulatedOffline ? <WifiOff className="w-3 h-3 text-amber-400" /> : <Wifi className="w-3 h-3 text-emerald-400" />}
-              <span>{isSimulatedOffline ? 'Simulating Offline' : 'Online Connection'}</span>
+              <span>{isSimulatedOffline ? t('map.simulating_offline_btn', 'Simulating Offline') : t('map.online_conn_btn', 'Online Connection')}</span>
             </button>
           </div>
 
@@ -502,7 +510,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             title="Pre-cache map tiles, waypoints and vector paths for offline transit"
           >
             <Database className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Pre-cache Route</span>
+            <span>{t('map.precache')}</span>
           </button>
 
           {/* Simulate Ping Button */}
@@ -514,7 +522,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               title="Record next live GPS telemetry waypoint"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSimulatingPing ? 'animate-spin' : ''}`} />
-              <span>{isSimulatingPing ? 'Pinging...' : 'Simulate GPS Ping'}</span>
+              <span>{isSimulatingPing ? t('map.pinging') : t('map.simulate_ping')}</span>
             </button>
           )}
 
@@ -527,12 +535,12 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             {copiedCoords ? (
               <>
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400">Copied</span>
+                <span className="text-emerald-400">{t('action.copied')}</span>
               </>
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5 text-slate-400" />
-                <span>Copy Lat/Lng</span>
+                <span>{t('map.copy_coords')}</span>
               </>
             )}
           </button>
@@ -546,7 +554,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             title="View exact geo-coordinates on Google Maps"
           >
             <ExternalLink className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Open in Maps</span>
+            <span>{t('map.open_in_maps')}</span>
           </a>
         </div>
       </div>
@@ -564,7 +572,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
         {/* Layer Toggles */}
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-slate-500 font-semibold text-[11px] uppercase tracking-wider flex items-center gap-1">
-            <Layers className="w-3 h-3 text-slate-400" /> Polyline Layers:
+            <Layers className="w-3 h-3 text-slate-400" /> {t('map.polyline_layers')}
           </span>
 
           {/* Toggle Planned Polyline */}
@@ -577,7 +585,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             }`}
           >
             <span className="w-3 h-0.5 bg-indigo-400 inline-block border-b border-dashed border-indigo-300" />
-            <span>Planned Corridor ({plannedWaypoints.length} pts)</span>
+            <span>{t('map.planned_corridor', { count: plannedWaypoints.length })}</span>
           </button>
 
           {/* Toggle Actual Polyline */}
@@ -590,7 +598,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             }`}
           >
             <span className="w-3 h-1 bg-cyan-400 inline-block rounded-full shadow" />
-            <span>Actual Route ({actualWaypoints.length} recorded)</span>
+            <span>{t('map.actual_route', { count: actualWaypoints.length })}</span>
           </button>
 
           {/* Toggle Breadcrumbs */}
@@ -603,16 +611,16 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             }`}
           >
             <History className="w-3 h-3 text-sky-400" />
-            <span>Waypoints</span>
+            <span>{t('map.waypoints')}</span>
           </button>
         </div>
 
         {/* Corridor Variance Indicator */}
         <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
-          <span className="text-slate-500">Corridor Variance:</span>
+          <span className="text-slate-500">{t('map.corridor_variance')}</span>
           <span className="text-emerald-400 font-semibold">{corridorVarianceKm.toFixed(1)} km</span>
           <span className="text-slate-500">•</span>
-          <span className="text-slate-300">98.4% Adherence</span>
+          <span className="text-slate-300">{t('map.adherence')}</span>
         </div>
       </div>
 
@@ -768,7 +776,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
                 id: 'origin_pin',
                 latitude: originCoords.lat,
                 longitude: originCoords.lng,
-                label: dispatch.originLocationSnapshot?.label || 'Origin Loading Terminal',
+                label: dispatch.originLocationSnapshot?.label || t('dispatch.origin_terminal', 'Origin Loading Terminal'),
               })
             }
           >
@@ -779,7 +787,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               textAnchor="middle"
               className="fill-slate-300 font-sans font-semibold text-[11px] drop-shadow"
             >
-              {dispatch.originLocationSnapshot?.label || 'Origin Dock'}
+              {dispatch.originLocationSnapshot?.label || t('map.origin_dock_pin', 'Origin Dock')}
             </text>
           </g>
 
@@ -792,7 +800,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
                 id: 'dest_pin',
                 latitude: destCoords.lat,
                 longitude: destCoords.lng,
-                label: dispatch.destinationSnapshot?.partnerName || 'Destination Terminal',
+                label: dispatch.destinationSnapshot?.partnerName || t('map.dest_terminal_pin', 'Destination Terminal'),
               })
             }
           >
@@ -816,7 +824,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
                 id: 'vehicle_pin',
                 latitude: currentCoords.lat,
                 longitude: currentCoords.lng,
-                label: `Current GPS: ${currentCoords.checkpointName}`,
+                label: `${t('map.current_gps', 'Current GPS:')} ${currentCoords.checkpointName}`,
                 speedKmh: currentCoords.speedKmh,
                 timestamp: currentCoords.updatedAt,
               })
@@ -876,7 +884,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-1">
               <span className="font-semibold text-sky-300 flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-sky-400" />
-                Waypoint Inspection
+                {t('map.waypoint_inspection')}
               </span>
               <button
                 onClick={() => setActiveWaypointTooltip(null)}
@@ -891,12 +899,12 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             </div>
             {activeWaypointTooltip.speedKmh !== undefined && (
               <div className="text-[11px] text-slate-400">
-                Speed: <span className="text-amber-400 font-mono">{activeWaypointTooltip.speedKmh} km/h</span>
+                {t('map.speed')}: <span className="text-amber-400 font-mono">{activeWaypointTooltip.speedKmh} km/h</span>
               </div>
             )}
             {activeWaypointTooltip.timestamp && (
               <div className="text-[10px] text-slate-500">
-                Timestamp: {new Date(activeWaypointTooltip.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                {t('system.timestamp')}: {new Date(activeWaypointTooltip.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
               </div>
             )}
           </div>
@@ -907,21 +915,21 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           <button
             onClick={() => setZoomLevel((z) => Math.min(2.5, z + 0.35))}
             className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 shadow-md cursor-pointer transition-colors"
-            title="Zoom In"
+            title={t('map.zoom_in')}
           >
             <ZoomIn className="w-4 h-4" />
           </button>
           <button
             onClick={() => setZoomLevel((z) => Math.max(0.75, z - 0.35))}
             className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 shadow-md cursor-pointer transition-colors"
-            title="Zoom Out"
+            title={t('map.zoom_out')}
           >
             <ZoomOut className="w-4 h-4" />
           </button>
           <button
             onClick={() => setZoomLevel(1)}
             className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 shadow-md cursor-pointer transition-colors"
-            title="Reset to Fit Route Bounds"
+            title={t('map.fit_bounds')}
           >
             <Maximize2 className="w-4 h-4" />
           </button>
@@ -937,7 +945,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               </span>
             </div>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-sky-400 bg-sky-950 px-2 py-0.5 rounded-full border border-sky-800">
-              {progressPercentage}% Completed
+              {t('map.completed_progress', { progress: progressPercentage })}
             </span>
           </div>
 
@@ -945,7 +953,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             <div>
               <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-sky-400" /> Latitude
+                <MapPin className="w-3 h-3 text-sky-400" /> {t('map.latitude')}
               </div>
               <div className="font-mono font-semibold text-slate-200">
                 {currentCoords.lat.toFixed(5)}° N
@@ -954,7 +962,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
 
             <div>
               <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-sky-400" /> Longitude
+                <MapPin className="w-3 h-3 text-sky-400" /> {t('map.longitude')}
               </div>
               <div className="font-mono font-semibold text-slate-200">
                 {Math.abs(currentCoords.lng).toFixed(5)}° W
@@ -963,7 +971,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
 
             <div>
               <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <Gauge className="w-3 h-3 text-amber-400" /> Speed
+                <Gauge className="w-3 h-3 text-amber-400" /> {t('map.speed')}
               </div>
               <div className="font-mono font-semibold text-slate-200">
                 {currentCoords.speedKmh} km/h
@@ -972,7 +980,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
 
             <div>
               <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <Compass className="w-3 h-3 text-indigo-400" /> Heading
+                <Compass className="w-3 h-3 text-indigo-400" /> {t('map.heading')}
               </div>
               <div className="font-mono font-semibold text-slate-200">
                 {headingToCardinal(currentCoords.heading)}
@@ -992,7 +1000,10 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               <span>{originCoords.lat.toFixed(4)}°, {originCoords.lng.toFixed(4)}°</span>
             </span>
             <span className="font-medium text-slate-300">
-              {coveredDistanceKm.toFixed(0)} km covered • {remainingDistanceKm.toFixed(0)} km remaining
+              {t('map.distance_covered_rem', '{covered} km covered • {remaining} km remaining', {
+                covered: coveredDistanceKm.toFixed(0),
+                remaining: remainingDistanceKm.toFixed(0),
+              })}
             </span>
             <span className="flex items-center gap-1">
               <Store className="w-3.5 h-3.5 text-emerald-400" />
@@ -1010,11 +1021,13 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-400 pt-1">
             <div className="flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-slate-500" />
-              <span>Last GPS Ping: {new Date(currentCoords.updatedAt).toLocaleString()}</span>
+              <span>{t('map.last_gps_ping', 'Last GPS Ping: {time}', { time: new Date(currentCoords.updatedAt).toLocaleString() })}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-500">Carrier:</span>
-              <span className="text-slate-300 font-medium">{dispatch.driverName || 'Designated Driver'} ({dispatch.driverPhone || 'Radio dispatched'})</span>
+              <span className="text-slate-500">{t('map.carrier_label', 'Carrier:')}</span>
+              <span className="text-slate-300 font-medium">
+                {dispatch.driverName || t('map.designated_driver', 'Designated Driver')} ({dispatch.driverPhone || t('map.radio_dispatched', 'Radio dispatched')})
+              </span>
             </div>
           </div>
         </div>

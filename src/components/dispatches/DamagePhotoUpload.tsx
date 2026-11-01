@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Camera, Image as ImageIcon, Trash2, ShieldCheck, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { CargoEvidence } from '../../types/dispatch.js';
 
 interface DamagePhotoUploadProps {
@@ -13,6 +14,7 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
   onChange,
   maxFiles = 4,
 }) => {
+  const { t } = useTranslation();
   const [computingHash, setComputingHash] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -160,10 +162,10 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
       <div className="flex items-center justify-between">
         <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
           <Camera className="w-3.5 h-3.5 text-amber-400" />
-          <span>Cargo Damage Photos & Tamper-Evident Evidence</span>
+          <span>{t('recon.damage_photos_title', 'Cargo Damage Photos & Tamper-Evident Evidence')}</span>
         </label>
         <span className="text-[11px] text-slate-400">
-          {evidence.length} / {maxFiles} attachments
+          {t('recon.attachments_count', '{count} / {max} attachments', { count: evidence.length, max: maxFiles })}
         </span>
       </div>
 
@@ -205,7 +207,7 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
                 </div>
                 <div className="flex items-center gap-1 text-emerald-400 text-[9px]">
                   <ShieldCheck className="w-3 h-3" />
-                  <span>Hash verified</span>
+                  <span>{t('recon.hash_verified', 'Hash verified')}</span>
                 </div>
               </div>
             </div>
@@ -217,7 +219,7 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
       <div className="flex flex-wrap items-center gap-2 pt-1">
         <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold cursor-pointer border border-slate-700 shrink-0">
           <Camera className="w-3.5 h-3.5 text-sky-400" />
-          <span>{computingHash ? 'Verifying SHA-256...' : 'Capture / Upload Photo'}</span>
+          <span>{computingHash ? t('recon.verifying_sha', 'Verifying SHA-256...') : t('recon.upload_photo', 'Capture / Upload Photo')}</span>
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp"
@@ -230,14 +232,14 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
         </label>
 
         <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-          <span>Staging Presets:</span>
+          <span>{t('recon.staging_presets', 'Staging Presets:')}</span>
           <button
             type="button"
             onClick={() => addSimulatedEvidencePhoto('Crushed Pallet Carton', '#f43f5e')}
             disabled={evidence.length >= maxFiles}
             className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-rose-300 font-medium cursor-pointer border border-slate-700"
           >
-            + Crushed Box
+            {t('recon.crushed_box', '+ Crushed Box')}
           </button>
           <button
             type="button"
@@ -245,7 +247,7 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
             disabled={evidence.length >= maxFiles}
             className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-medium cursor-pointer border border-slate-700"
           >
-            + Broken Seal
+            {t('recon.broken_seal', '+ Broken Seal')}
           </button>
         </div>
       </div>

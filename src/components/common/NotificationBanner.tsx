@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, CheckCircle, ShieldAlert, X, Smartphone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 
 interface NotificationBannerProps {
   onOpenPhoneVerify?: () => void;
@@ -12,6 +13,7 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
   onNavigateStatus,
 }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
 
   return (
@@ -24,7 +26,7 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
               <AlertTriangle className="w-3.5 h-3.5" />
             </span>
             <div>
-              <span className="font-semibold text-amber-100">Sandbox Kernel Mode:</span> Running isolated development provider with mock persistence. Real credentials are not connected yet.
+              {t('banner.sandbox_mode', 'Sandbox Kernel Mode: Running isolated development provider with mock persistence.')}
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -33,7 +35,7 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
                 onClick={onNavigateStatus}
                 className="underline hover:text-white font-medium cursor-pointer"
               >
-                Inspect Setup & Status
+                {t('banner.inspect_status', 'Inspect Setup & Status')}
               </button>
             )}
             <button

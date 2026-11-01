@@ -15,6 +15,21 @@ export interface Membership {
   createdAt: string;
 }
 
+export interface Invitation {
+  id: string;
+  businessId: string;
+  businessName: string;
+  inviteeEmail: string;
+  inviteePhone?: string;
+  proposedRole: UserRole;
+  token: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REVOKED' | 'EXPIRED';
+  invitedByUserId: string;
+  invitedByName: string;
+  createdAt: string;
+  expiresAt: string;
+}
+
 export interface User {
   id: string;
   email: string;

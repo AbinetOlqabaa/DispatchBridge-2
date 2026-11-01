@@ -20,6 +20,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { AuditLogEntry, Business, SystemStatusInfo, User, UserRole } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner.js';
@@ -32,6 +33,7 @@ interface SuperAdminDashboardProps {
 
 export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavigateStatus, onOpenProfile }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'USERS'>('OVERVIEW');
 
   // Overview data
@@ -230,14 +232,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>Refresh</span>
+            <span>{t('action.refresh', 'Refresh')}</span>
           </button>
           <button
             onClick={onNavigateStatus}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-lg shadow-purple-600/30 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-lg shadow-purple-600/30 cursor-pointer"
           >
             <Activity className="w-3.5 h-3.5" />
-            <span>Diagnostic Health</span>
+            <span>{t('nav.status', 'Diagnostic Health')}</span>
           </button>
         </div>
       </div>
@@ -253,7 +255,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
           }`}
         >
           <Activity className="w-4 h-4" />
-          <span>Platform Overview & Ledger</span>
+          <span>{t('nav.dashboard', 'Platform Overview')}</span>
         </button>
         <button
           onClick={() => {
@@ -267,7 +269,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>User Administration & Roles ({usersList.length})</span>
+          <span>{t('nav.team', 'User Administration & Roles')} ({usersList.length})</span>
         </button>
       </div>
 

@@ -11,6 +11,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { Partner } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner.js';
@@ -21,6 +22,7 @@ interface PartnersPageProps {
 
 export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWithPartner }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -94,13 +96,13 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-semibold uppercase tracking-wider text-sky-400 bg-sky-950 px-2.5 py-0.5 rounded-full border border-sky-800">
-              Receiving Partners
+              {t('nav.partners', 'Receiving Partners')}
             </span>
-            <span className="text-xs text-slate-400">{partners.length} verified destinations</span>
+            <span className="text-xs text-slate-400">{partners.length} {t('metric.registered_partners')}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Partner Directory & Delivery Docks</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">{t('nav.partners', 'Partner Directory')}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Manage receiving partners, retail storefronts, and wholesale distribution hubs.
+            {t('action.manage_partners', 'Manage receiving partners, retail storefronts, and wholesale distribution hubs.')}
           </p>
         </div>
 
@@ -110,7 +112,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
             className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Partner Destination</span>
+            <span>{t('action.add_partner', 'Add Partner Destination')}</span>
           </button>
         )}
       </div>
@@ -156,7 +158,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
                 className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer mt-3"
               >
                 <Truck className="w-3.5 h-3.5 text-sky-400" />
-                <span>Create Dispatch to Partner</span>
+                <span>{t('rec.quick_dispatch', 'Create Dispatch to Partner')}</span>
               </button>
             )}
           </div>
@@ -167,7 +169,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
           <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-100 shadow-2xl space-y-4">
-            <h3 className="text-base font-bold text-white">Add New Receiving Partner</h3>
+            <h3 className="text-base font-bold text-white">{t('action.add_partner', 'Add New Receiving Partner')}</h3>
 
             {errorMessage && (
               <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
@@ -178,7 +180,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
 
             <form onSubmit={handleCreatePartner} className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Company / Branch Name *</label>
+                <label className="block text-slate-300 font-semibold mb-1">{t('auth.biz_legal_name', 'Company / Branch Name')} *</label>
                 <input
                   type="text"
                   required
@@ -190,22 +192,22 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Partner Type</label>
+                <label className="block text-slate-300 font-semibold mb-1">{t('table.type', 'Partner Type')}</label>
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value as any)}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
                 >
-                  <option value="RETAILER">Retailer</option>
-                  <option value="WHOLESALER">Wholesaler</option>
-                  <option value="DISTRIBUTOR">Distributor</option>
-                  <option value="FRANCHISE">Franchise</option>
-                  <option value="CONSTRUCTION_SITE">Construction Site / Project</option>
+                  <option value="RETAILER">{t('partner.type_retailer', 'Retailer')}</option>
+                  <option value="WHOLESALER">{t('partner.type_wholesaler', 'Wholesaler')}</option>
+                  <option value="DISTRIBUTOR">{t('partner.type_distributor', 'Distributor')}</option>
+                  <option value="FRANCHISE">{t('partner.type_franchise', 'Franchise')}</option>
+                  <option value="CONSTRUCTION_SITE">{t('partner.type_construction', 'Construction Site / Project')}</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Contact Person *</label>
+                <label className="block text-slate-300 font-semibold mb-1">{t('table.contact', 'Contact Person')} *</label>
                 <input
                   type="text"
                   required
@@ -218,7 +220,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Email *</label>
+                  <label className="block text-slate-300 font-semibold mb-1">{t('auth.email_address', 'Email')} *</label>
                   <input
                     type="email"
                     required
@@ -229,7 +231,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Phone *</label>
+                  <label className="block text-slate-300 font-semibold mb-1">{t('auth.mobile_phone', 'Phone')} *</label>
                   <input
                     type="tel"
                     required
@@ -242,7 +244,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Delivery Dock Address *</label>
+                <label className="block text-slate-300 font-semibold mb-1">{t('table.address', 'Delivery Dock Address')} *</label>
                 <textarea
                   required
                   rows={2}
@@ -259,14 +261,14 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
                   onClick={() => setShowAddModal(false)}
                   className="px-3 py-2 text-slate-400 hover:text-white"
                 >
-                  Cancel
+                  {t('action.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl"
                 >
-                  {isSubmitting ? 'Saving...' : 'Register Partner'}
+                  {isSubmitting ? t('auth.submitting', 'Saving...') : t('auth.complete_enrollment', 'Register Partner')}
                 </button>
               </div>
             </form>

@@ -1,6 +1,6 @@
-import React from 'react';
 import { User, Building, Smartphone, ShieldCheck, CheckCircle2, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 
 interface ProfileSummaryCardProps {
   onOpenProfile?: () => void;
@@ -9,6 +9,7 @@ interface ProfileSummaryCardProps {
 
 export const ProfileSummaryCard: React.FC<ProfileSummaryCardProps> = ({ onOpenProfile, className = '' }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   if (!user) return null;
 
   const initials = (user.name || user.fullName || 'User')
@@ -54,7 +55,7 @@ export const ProfileSummaryCard: React.FC<ProfileSummaryCardProps> = ({ onOpenPr
           {user.phoneVerified && (
             <div
               className="absolute -bottom-1 -right-1 bg-emerald-500 text-white rounded-full p-0.5 border-2 border-slate-900"
-              title="Verified Identity"
+              title={t('profile.verified_identity')}
             >
               <CheckCircle2 className="w-3 h-3" />
             </div>
@@ -68,11 +69,11 @@ export const ProfileSummaryCard: React.FC<ProfileSummaryCardProps> = ({ onOpenPr
             <span
               className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${getRoleBadgeColor()}`}
             >
-              {user.role}
+              {t(`role.${user.role.toLowerCase()}`)}
             </span>
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
               <ShieldCheck className="w-2.5 h-2.5" />
-              <span>Fayda Verified</span>
+              <span>{t('profile.fayda_verified')}</span>
             </span>
           </div>
 
@@ -95,7 +96,7 @@ export const ProfileSummaryCard: React.FC<ProfileSummaryCardProps> = ({ onOpenPr
           onClick={onOpenProfile}
           className="self-stretch sm:self-auto px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition cursor-pointer shrink-0"
         >
-          Manage Profile
+          {t('profile.manage_profile')}
         </button>
       )}
     </div>

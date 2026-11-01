@@ -14,6 +14,7 @@ import {
   Package,
   Camera,
   PenTool,
+  Globe,
 } from 'lucide-react';
 import { CargoEvidence, DiscrepancyType, Dispatch, ItemCondition } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
@@ -21,6 +22,7 @@ import { StatusBadge } from '../../components/common/StatusBadge.js';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner.js';
 import { SignaturePad } from '../../components/dispatches/SignaturePad.js';
 import { DamagePhotoUpload } from '../../components/dispatches/DamagePhotoUpload.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 
 interface PublicPartnerViewProps {
   shareToken: string;
@@ -28,6 +30,7 @@ interface PublicPartnerViewProps {
 }
 
 export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken, onExit }) => {
+  const { t, language, setLanguage, languages } = useTranslation();
   const [dispatch, setDispatch] = useState<Dispatch | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -171,32 +174,48 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 px-4 py-6">
-      {/* Top Banner */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      {/* Top Banner with Language Selector */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
             <Boxes className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-bold text-white">DispatchBridge Partner Portal</div>
-            <div className="text-[10px] text-slate-400">Authenticated Delivery Slip</div>
+            <div className="text-xs font-bold text-white">{t('app.name')} • {t('app.subtitle')}</div>
+            <div className="text-[10px] text-slate-400">{t('auth.signin_subtitle')}</div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Quick Language Switcher for external partners */}
+          <div className="flex items-center bg-slate-800 border border-slate-700/80 rounded-lg p-0.5">
+            <Globe className="w-3 h-3 text-sky-400 ml-1.5 mr-1" />
+            {languages.map((l) => (
+              <button
+                key={l.code}
+                onClick={() => setLanguage(l.code)}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
+                  language === l.code ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {l.shortLabel}
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Print Slip</span>
+            <span className="hidden sm:inline">Print</span>
           </button>
           {onExit && (
             <button
               onClick={onExit}
-              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs cursor-pointer"
+              className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs cursor-pointer"
             >
-              Close
+              {t('action.close')}
             </button>
           )}
         </div>
@@ -342,7 +361,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
             <div className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">
-                  Verified Digital Glass Signature
+                  {t('recon.verified_glass_sig', 'Verified Digital Glass Signature')}
                 </span>
                 <div className="mt-1 bg-slate-950 p-2 rounded-xl border border-slate-800 inline-block">
                   <img
@@ -353,7 +372,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                 </div>
               </div>
               <div className="text-[11px] text-slate-400">
-                Enforceable cryptographic proof-of-delivery captured on receiving glass terminal.
+                {t('recon.enforceable_proof_note', 'Enforceable cryptographic proof-of-delivery captured on receiving glass terminal.')}
               </div>
             </div>
           )}
@@ -365,7 +384,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
         <div className="bg-slate-900 border border-rose-900/60 rounded-2xl p-5 text-xs space-y-3">
           <div className="flex items-center gap-2 text-rose-400 font-bold">
             <AlertTriangle className="w-4 h-4" />
-            <span>Recorded Discrepancy & Claims ({dispatch.discrepancyCases.length})</span>
+            <span>{t('recon.recorded_claims_title', 'Recorded Discrepancy & Claims ({count})', { count: dispatch.discrepancyCases.length })}</span>
           </div>
           <div className="space-y-2">
             {dispatch.discrepancyCases.map((c) => (
@@ -376,7 +395,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                     {c.type} (-{c.shortfallQuantity})
                   </span>
                 </div>
-                {c.notes && <p className="text-[11px] text-slate-400">Note: {c.notes}</p>}
+                {c.notes && <p className="text-[11px] text-slate-400">{t('table.notes', 'Note')}: {c.notes}</p>}
                 {c.evidence && c.evidence.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                     {c.evidence.map((ev) => (
@@ -399,15 +418,15 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
       {/* Interactive Verification Form on Dock */}
       {!isAlreadyReceived && !isVerifying && (
         <div className="bg-slate-900 border border-amber-900/60 rounded-2xl p-6 text-center space-y-3">
-          <h3 className="text-sm font-bold text-white">Unload & Confirm Delivery on Dock</h3>
+          <h3 className="text-sm font-bold text-white">{t('recon.unload_dock_title', 'Unload & Confirm Delivery on Dock')}</h3>
           <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Receiving supervisor: Count items offloaded from the carrier truck. Verify physical items match this manifest.
+            {t('recon.unload_dock_desc', 'Receiving supervisor: Count items offloaded from the carrier truck. Verify physical items match this manifest.')}
           </p>
           <button
             onClick={() => setIsVerifying(true)}
             className="px-6 py-3 min-h-[44px] bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-amber-600/30 cursor-pointer"
           >
-            Start Dock Count & Sign Off
+            {t('recon.start_dock_count', 'Start Dock Count & Sign Off')}
           </button>
         </div>
       )}
@@ -415,9 +434,9 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
       {isVerifying && (
         <div className="bg-slate-900 border border-amber-700/80 rounded-2xl p-6 shadow-2xl space-y-4">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h3 className="text-sm font-bold text-white">Confirm Dock Count & Sign Off</h3>
+            <h3 className="text-sm font-bold text-white">{t('recon.confirm_dock_count', 'Confirm Dock Count & Sign Off')}</h3>
             <button onClick={() => setIsVerifying(false)} className="text-xs text-slate-400 hover:text-white cursor-pointer min-h-[44px] px-2 flex items-center">
-              Cancel
+              {t('action.cancel', 'Cancel')}
             </button>
           </div>
 
@@ -461,15 +480,15 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                         }}
                         className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                       >
-                        <option value="GOOD">Good / Intact</option>
-                        <option value="DAMAGED">Damaged</option>
-                        <option value="LOST">Lost / Missing</option>
-                        <option value="OTHER">Other</option>
+                        <option value="GOOD">{t('condition.good_intact', 'Good / Intact')}</option>
+                        <option value="DAMAGED">{t('condition.damaged', 'Damaged')}</option>
+                        <option value="LOST">{t('condition.lost_missing', 'Lost / Missing')}</option>
+                        <option value="OTHER">{t('condition.other', 'Other')}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-[11px] text-slate-400 mb-1">Discrepancy Category</label>
+                      <label className="block text-[11px] text-slate-400 mb-1">{t('table.discrepancy_category', 'Discrepancy Category')}</label>
                       <select
                         value={lineReceipts[idx]?.discrepancyType || 'NONE'}
                         onChange={(e) => {
@@ -479,17 +498,17 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                         }}
                         className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                       >
-                        <option value="NONE">None (Full Count)</option>
-                        <option value="SHORTAGE">Shortage</option>
-                        <option value="DAMAGED">Damaged in Transit</option>
-                        <option value="OVERAGE">Overage (Excess)</option>
-                        <option value="NOT_RECEIVED">Not Received</option>
-                        <option value="OTHER">Other</option>
+                        <option value="NONE">{t('discrepancy.none', 'None (Full Count)')}</option>
+                        <option value="SHORTAGE">{t('discrepancy.shortage', 'Shortage')}</option>
+                        <option value="DAMAGED">{t('discrepancy.damaged', 'Damaged in Transit')}</option>
+                        <option value="OVERAGE">{t('discrepancy.overage', 'Overage (Excess)')}</option>
+                        <option value="NOT_RECEIVED">{t('discrepancy.not_received', 'Not Received')}</option>
+                        <option value="OTHER">{t('condition.other', 'Other')}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-[11px] text-slate-400 mb-1">Inspection Note</label>
+                      <label className="block text-[11px] text-slate-400 mb-1">{t('table.notes', 'Inspection Note')}</label>
                       <input
                         type="text"
                         value={lineReceipts[idx]?.notes || ''}
@@ -520,7 +539,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Signer Full Name *</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('recon.signer_name_field', 'Receiver Signer Name')} *</label>
                 <input
                   type="text"
                   required
@@ -531,7 +550,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Title / Role *</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('recon.signer_role_field', 'Supervisor / Role Title')} *</label>
                 <input
                   type="text"
                   required
@@ -544,7 +563,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Dock Comments & Seal Inspection</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">{t('recon.dock_notes_field', 'Dock Notes & Cargo Comments')}</label>
               <textarea
                 rows={2}
                 value={comments}
@@ -568,14 +587,14 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                 onClick={() => setIsVerifying(false)}
                 className="px-4 py-2.5 text-xs text-slate-400 hover:text-white cursor-pointer min-h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-800/60"
               >
-                Cancel
+                {t('action.cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="px-6 py-2.5 min-h-[44px] bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white text-xs font-semibold rounded-xl cursor-pointer shadow-lg shadow-emerald-600/30 flex items-center justify-center"
               >
-                {isSubmitting ? 'Submitting receipt...' : 'Submit Official Dock Sign-Off'}
+                {isSubmitting ? t('auth.submitting', 'Submitting receipt...') : t('recon.confirm_signoff_btn', 'Confirm Delivery & Submit Sign-Off')}
               </button>
             </div>
           </form>

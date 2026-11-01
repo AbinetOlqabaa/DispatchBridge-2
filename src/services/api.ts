@@ -2,6 +2,7 @@ import {
   AuditLogEntry,
   Business,
   Dispatch,
+  Invitation,
   Location,
   NotificationItem,
   Partner,
@@ -210,7 +211,24 @@ class ApiService {
     });
   }
 
-  async updateProfile(data: { name?: string; avatarUrl?: string }): Promise<User> {
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    return this.request('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  }
+
+  async switchBusiness(businessId: string): Promise<{ user: User }> {
+    const res = await this.request<{ user: User }>('/api/auth/switch-business', {
+      method: 'POST',
+      body: JSON.stringify({ businessId }),
+    });
+    this.user = res.user;
+    localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+    return res;
+  }
+
+  async updateProfile(data: { name?: string; phoneNumber?: string; avatarUrl?: string }): Promise<User> {
     const res = await this.request<{ user: User }>('/api/auth/profile', {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -589,6 +607,58 @@ class ApiService {
 
   async getStagingReadinessReport(): Promise<any> {
     return this.request('/api/system/staging-readiness');
+  }
+
+  // Team & Membership Management
+  async getMembersAndInvitations(): Promise<{ businessId: string; members: any[]; invitations: Invitation[] }> {
+    return this.request('/api/memberships');
+  }
+
+  async inviteMember(payload: {
+    inviteeEmail: string;
+    inviteePhone?: string;
+    proposedRole: UserRole;
+  }): Promise<Invitation> {
+    return this.request('/api/memberships/invite', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async revokeInvitation(id: string): Promise<{ success: boolean; message: string }> {
+    return this.request(`/api/memberships/invitations/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async acceptInvitation(token: string): Promise<{ success: boolean; membership: any; user: User }> {
+    const res = await this.request<{ success: boolean; membership: any; user: User }>('/api/memberships/accept', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
+    if (res.user) {
+      this.user = res.user;
+      localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+    }
+    return res;
+  }
+
+  async updateMemberRole(userId: string, role: UserRole): Promise<User> {
+    return this.request(`/api/memberships/${userId}/role`, {
+      method: 'PUT',
+      body: JSON.stringify({ role }),
+    });
+  }
+
+  async removeMember(userId: string): Promise<{ success: boolean; message: string }> {
+    return this.request(`/api/memberships/${userId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Executive Reports & Analytics
+  async getAnalyticsReport(): Promise<any> {
+    return this.request('/api/reports/analytics');
   }
 }
 

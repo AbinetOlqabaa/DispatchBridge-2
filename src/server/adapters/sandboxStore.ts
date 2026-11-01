@@ -7,6 +7,7 @@ import {
   DispatchLine,
   DispatchStatus,
   ItemCondition,
+  Invitation,
   Location,
   Membership,
   NotificationItem,
@@ -815,6 +816,24 @@ const auditLogs: AuditLogEntry[] = [
 // Idempotency keys store
 const idempotencyStore = new Map<string, any>();
 
+// In-memory Team Invitations store
+const invitations: Invitation[] = [
+  {
+    id: 'inv_001',
+    businessId: 'biz_apex_supply',
+    businessName: 'Apex Supply Logistics',
+    inviteeEmail: 'sarah.logistics@apexsupply.com',
+    inviteePhone: '+1-555-019-8833',
+    proposedRole: 'SENDER',
+    token: 'inv_tok_apex_sample_8833',
+    status: 'PENDING',
+    invitedByUserId: 'usr_business_owner',
+    invitedByName: 'Eleanor Vance',
+    createdAt: '2026-10-20T10:00:00.000Z',
+    expiresAt: '2026-11-20T10:00:00.000Z',
+  },
+];
+
 export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificationAdapter {
   readonly isMock = true;
   readonly providerName = 'Sandbox In-Memory / Dev State';
@@ -1259,8 +1278,8 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
     userId: string,
     currentPassword: string,
     newPassword: string,
-    challengeId: string,
-    otpCode: string
+    challengeId?: string,
+    otpCode?: string
   ): Promise<{ success: boolean; message: string }> {
     const user = users.find((u) => u.id === userId);
     if (!user) throw new Error('User not found.');
@@ -1269,9 +1288,11 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
       throw new Error('Current password is incorrect or does not match.');
     }
 
-    const otpRes = await otpAdapter.verifyCode(challengeId, otpCode);
-    if (!otpRes.success) {
-      throw new Error(otpRes.error || 'Invalid step-up OTP code.');
+    if (challengeId && otpCode) {
+      const otpRes = await otpAdapter.verifyCode(challengeId, otpCode);
+      if (!otpRes.success) {
+        throw new Error(otpRes.error || 'Invalid step-up OTP code.');
+      }
     }
 
     if (!newPassword || newPassword.length < 8) {
@@ -1289,7 +1310,9 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
       action: 'PASSWORD_CHANGED',
       entityType: 'USER',
       entityId: user.id,
-      details: `User password successfully updated with step-up OTP verification.`,
+      details: challengeId
+        ? `User password successfully updated with step-up OTP verification.`
+        : `User password updated successfully.`,
     });
 
     return { success: true, message: 'Password updated successfully.' };
@@ -1297,7 +1320,7 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
 
   async updateProfile(
     userId: string,
-    data: { name?: string; avatarUrl?: string; avatarDataUri?: string }
+    data: { name?: string; phoneNumber?: string; avatarUrl?: string; avatarDataUri?: string }
   ): Promise<User> {
     const user = users.find((u) => u.id === userId);
     if (!user) throw new Error('User not found.');
@@ -1324,6 +1347,15 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
     if (data.name && data.name.trim().length > 0) {
       user.name = data.name.trim();
       user.fullName = data.name.trim();
+    }
+
+    if (data.phoneNumber && data.phoneNumber.trim().length > 0) {
+      const normalized = normalizeToE164(data.phoneNumber.trim());
+      if (normalized !== user.phoneNumber) {
+        user.phoneNumber = normalized;
+        user.maskedPhone = maskPhoneNumber(normalized);
+        user.phoneVerified = false;
+      }
     }
 
     user.updatedAt = new Date().toISOString();
@@ -3142,6 +3174,328 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
       createdCount: created.length,
       dispatches: created,
       errors: errors.length > 0 ? errors : undefined,
+    };
+  }
+
+  // --- Team & Membership Management ---
+
+  async getBusinessMembers(businessId: string): Promise<Array<User & { membershipRole: UserRole; membershipStatus: string; membershipCreatedAt: string }>> {
+    const results: Array<User & { membershipRole: UserRole; membershipStatus: string; membershipCreatedAt: string }> = [];
+    for (const u of users) {
+      const mem = u.memberships?.find((m) => m.businessId === businessId && m.status !== 'SUSPENDED');
+      if (mem) {
+        const { passwordHash, fan, fin, ...safeUser } = u;
+        results.push({
+          ...safeUser,
+          membershipRole: mem.role,
+          membershipStatus: mem.status,
+          membershipCreatedAt: mem.createdAt,
+        });
+      }
+    }
+    return results;
+  }
+
+  async getBusinessInvitations(businessId: string): Promise<Invitation[]> {
+    return invitations.filter((inv) => inv.businessId === businessId && inv.status !== 'REVOKED');
+  }
+
+  async createInvitation(
+    data: { businessId: string; inviteeEmail: string; inviteePhone?: string; proposedRole: UserRole },
+    actor: User
+  ): Promise<Invitation> {
+    const biz = businesses.find((b) => b.id === data.businessId);
+    const bizName = biz?.name || actor.businessName || 'Business Organization';
+    const normEmail = data.inviteeEmail.toLowerCase().trim();
+
+    const token = 'inv_tok_' + crypto.randomBytes(16).toString('hex');
+    const newInvitation: Invitation = {
+      id: 'inv_' + crypto.randomBytes(6).toString('hex'),
+      businessId: data.businessId,
+      businessName: bizName,
+      inviteeEmail: normEmail,
+      inviteePhone: data.inviteePhone?.trim(),
+      proposedRole: data.proposedRole,
+      token,
+      status: 'PENDING',
+      invitedByUserId: actor.id,
+      invitedByName: actor.name,
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+
+    invitations.push(newInvitation);
+
+    await this.recordAudit({
+      actorId: actor.id,
+      actorName: actor.name,
+      actorRole: actor.role,
+      businessId: data.businessId,
+      action: 'TEAM_MEMBER_INVITED',
+      entityType: 'USER',
+      entityId: newInvitation.id,
+      details: `Invitation issued to ${normEmail} with proposed role ${data.proposedRole}.`,
+    });
+
+    return newInvitation;
+  }
+
+  async revokeInvitation(invitationId: string, actor: User): Promise<{ success: boolean; message: string }> {
+    const inv = invitations.find((i) => i.id === invitationId);
+    if (!inv) throw new Error('Invitation not found.');
+    if (inv.businessId !== actor.businessId && actor.role !== 'SUPER_ADMIN') {
+      throw new Error('Forbidden: Cannot revoke invitation for another business organization.');
+    }
+
+    inv.status = 'REVOKED';
+
+    await this.recordAudit({
+      actorId: actor.id,
+      actorName: actor.name,
+      actorRole: actor.role,
+      businessId: actor.businessId,
+      action: 'TEAM_INVITATION_REVOKED',
+      entityType: 'USER',
+      entityId: inv.id,
+      details: `Invitation for ${inv.inviteeEmail} was revoked by ${actor.name}.`,
+    });
+
+    return { success: true, message: 'Invitation successfully revoked.' };
+  }
+
+  async acceptInvitation(token: string, actor: User): Promise<{ success: boolean; membership: Membership; user: User }> {
+    const inv = invitations.find((i) => i.token === token.trim());
+    if (!inv) throw new Error('Invalid or expired invitation token.');
+    if (inv.status !== 'PENDING') {
+      throw new Error(`Invitation is no longer active (Status: ${inv.status}).`);
+    }
+
+    const userRecord = users.find((u) => u.id === actor.id);
+    if (!userRecord) throw new Error('User not found.');
+
+    let existingMem = userRecord.memberships.find((m) => m.businessId === inv.businessId);
+    if (existingMem) {
+      existingMem.role = inv.proposedRole;
+      existingMem.status = 'ACTIVE';
+    } else {
+      existingMem = {
+        id: 'mem_' + crypto.randomBytes(6).toString('hex'),
+        userId: userRecord.id,
+        businessId: inv.businessId,
+        businessName: inv.businessName,
+        role: inv.proposedRole,
+        status: 'ACTIVE',
+        createdAt: new Date().toISOString(),
+      };
+      userRecord.memberships.push(existingMem);
+    }
+
+    userRecord.businessId = inv.businessId;
+    userRecord.businessName = inv.businessName;
+    userRecord.role = inv.proposedRole;
+    userRecord.updatedAt = new Date().toISOString();
+
+    inv.status = 'ACCEPTED';
+
+    await this.recordAudit({
+      actorId: userRecord.id,
+      actorName: userRecord.name,
+      actorRole: userRecord.role,
+      businessId: inv.businessId,
+      action: 'TEAM_INVITATION_ACCEPTED',
+      entityType: 'USER',
+      entityId: existingMem.id,
+      details: `${userRecord.name} joined ${inv.businessName} as ${inv.proposedRole}.`,
+    });
+
+    const { passwordHash, fan, fin, ...safeUser } = userRecord;
+    return {
+      success: true,
+      membership: existingMem,
+      user: safeUser,
+    };
+  }
+
+  async updateMemberRole(businessId: string, targetUserId: string, newRole: UserRole, actor: User): Promise<User> {
+    if (actor.businessId !== businessId && actor.role !== 'SUPER_ADMIN') {
+      throw new Error('Forbidden: Cannot update members of another organization.');
+    }
+
+    const target = users.find((u) => u.id === targetUserId);
+    if (!target) throw new Error('Target user not found.');
+
+    const mem = target.memberships.find((m) => m.businessId === businessId);
+    if (!mem) throw new Error('User is not a member of this organization.');
+
+    const prevRole = mem.role;
+    mem.role = newRole;
+
+    if (target.businessId === businessId) {
+      target.role = newRole;
+    }
+    target.updatedAt = new Date().toISOString();
+
+    await this.recordAudit({
+      actorId: actor.id,
+      actorName: actor.name,
+      actorRole: actor.role,
+      businessId,
+      action: 'TEAM_MEMBER_ROLE_UPDATED',
+      entityType: 'USER',
+      entityId: mem.id,
+      details: `Member ${target.name} role changed from ${prevRole} to ${newRole} by ${actor.name}.`,
+    });
+
+    const { passwordHash, fan, fin, ...safeUser } = target;
+    return safeUser;
+  }
+
+  async removeMember(businessId: string, targetUserId: string, actor: User): Promise<{ success: boolean; message: string }> {
+    if (actor.businessId !== businessId && actor.role !== 'SUPER_ADMIN') {
+      throw new Error('Forbidden: Cannot remove members from another organization.');
+    }
+
+    if (targetUserId === actor.id) {
+      throw new Error('Cannot remove yourself from your active organization.');
+    }
+
+    const target = users.find((u) => u.id === targetUserId);
+    if (!target) throw new Error('Target user not found.');
+
+    const memIndex = target.memberships.findIndex((m) => m.businessId === businessId);
+    if (memIndex === -1) throw new Error('User is not a member of this organization.');
+
+    target.memberships.splice(memIndex, 1);
+
+    if (target.businessId === businessId) {
+      if (target.memberships.length > 0) {
+        const fallback = target.memberships[0];
+        target.businessId = fallback.businessId;
+        target.businessName = fallback.businessName;
+        target.role = fallback.role;
+      }
+    }
+    target.updatedAt = new Date().toISOString();
+
+    await this.recordAudit({
+      actorId: actor.id,
+      actorName: actor.name,
+      actorRole: actor.role,
+      businessId,
+      action: 'TEAM_MEMBER_REMOVED',
+      entityType: 'USER',
+      entityId: target.id,
+      details: `Member ${target.name} removed from organization by ${actor.name}.`,
+    });
+
+    return { success: true, message: 'Member successfully removed.' };
+  }
+
+  // --- Executive Reports & Performance Analytics ---
+
+  async getAnalyticsReport(businessId: string, _actor?: User): Promise<any> {
+    const bizDispatches = dispatches.filter(
+      (d) => d.senderBusinessId === businessId || d.destinationSnapshot?.partnerName?.includes(businessId)
+    );
+
+    const totalDispatches = bizDispatches.length;
+    const deliveredDispatches = bizDispatches.filter(
+      (d) => d.status === 'RECEIVED' || d.status === 'RECONCILED'
+    ).length;
+    const inTransitDispatches = bizDispatches.filter(
+      (d) => d.status === 'DISPATCHED' || d.status === 'IN_TRANSIT' || d.status === 'VIEWED'
+    ).length;
+    const discrepancyDispatches = bizDispatches.filter(
+      (d) => d.status === 'PARTIALLY_RECEIVED' || d.status === 'DISCREPANCY_REVIEW'
+    ).length;
+
+    const deliverySuccessRate = totalDispatches > 0 ? Math.round((deliveredDispatches / totalDispatches) * 100) : 100;
+    const discrepancyRate = totalDispatches > 0 ? Math.round((discrepancyDispatches / totalDispatches) * 100) : 0;
+
+    let totalDispatchedVolume = 0;
+    let totalReceivedVolume = 0;
+    let totalLostVolume = 0;
+    let totalCargoValue = 0;
+
+    let shortage = 0;
+    let damaged = 0;
+    let lost = 0;
+    let overage = 0;
+    let countMismatch = 0;
+
+    const partnerMap = new Map<string, {
+      partnerId: string;
+      partnerName: string;
+      totalDispatches: number;
+      deliveredCount: number;
+      discrepancyCount: number;
+      totalVolume: number;
+    }>();
+
+    for (const d of bizDispatches) {
+      totalDispatchedVolume += d.totalQuantityDispatched || 0;
+      totalReceivedVolume += d.totalQuantityReceived || 0;
+      totalLostVolume += d.totalQuantityLost || 0;
+
+      for (const l of d.lines) {
+        const price = l.unitPrice || 25;
+        totalCargoValue += (l.quantitySent || 0) * price;
+
+        if (l.discrepancyType === 'SHORTAGE') shortage += l.lossQty || 0;
+        else if (l.discrepancyType === 'DAMAGED') damaged += l.lossQty || 0;
+        else if (l.discrepancyType === 'LOST') lost += l.lossQty || 0;
+        else if (l.discrepancyType === 'OVERAGE') overage += Math.abs(l.lossQty || 0);
+        else if (l.discrepancyType === 'COUNT_MISMATCH') countMismatch += Math.abs(l.lossQty || 0);
+      }
+
+      const pId = d.partnerId || 'default_partner';
+      const pName = d.partnerName || d.destinationSnapshot?.partnerName || 'Key Delivery Partner';
+      const existing = partnerMap.get(pId) || {
+        partnerId: pId,
+        partnerName: pName,
+        totalDispatches: 0,
+        deliveredCount: 0,
+        discrepancyCount: 0,
+        totalVolume: 0,
+      };
+
+      existing.totalDispatches += 1;
+      existing.totalVolume += d.totalQuantityDispatched || 0;
+      if (d.status === 'RECEIVED' || d.status === 'RECONCILED') {
+        existing.deliveredCount += 1;
+      }
+      if (d.status === 'PARTIALLY_RECEIVED' || d.status === 'DISCREPANCY_REVIEW') {
+        existing.discrepancyCount += 1;
+      }
+      partnerMap.set(pId, existing);
+    }
+
+    const partnerPerformance = Array.from(partnerMap.values()).map((p) => ({
+      ...p,
+      successRate: p.totalDispatches > 0 ? Math.round((p.deliveredCount / p.totalDispatches) * 100) : 100,
+    }));
+
+    return {
+      summary: {
+        totalDispatches,
+        deliveredDispatches,
+        inTransitDispatches,
+        discrepancyDispatches,
+        deliverySuccessRate,
+        discrepancyRate,
+        totalDispatchedVolume,
+        totalReceivedVolume,
+        totalLostVolume,
+        totalCargoValue,
+      },
+      discrepancyBreakdown: {
+        shortage,
+        damaged,
+        lost,
+        overage,
+        countMismatch,
+      },
+      partnerPerformance,
     };
   }
 }

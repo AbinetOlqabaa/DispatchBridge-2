@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Location, Partner } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 
 interface CreateDispatchModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
   onSuccess,
   preselectedPartnerId,
 }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<'input' | 'review'>('input');
   const [partners, setPartners] = useState<Partner[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -216,7 +218,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                   : 'bg-slate-800 text-slate-400'
               }`}
             >
-              <span>1. Manifest Details</span>
+              <span>{t('dispatch.step_manifest_details')}</span>
             </div>
             <ArrowRight className="w-3.5 h-3.5 text-slate-600" />
             <div
@@ -226,7 +228,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                   : 'bg-slate-800 text-slate-400'
               }`}
             >
-              <span>2. Pre-Submission Review</span>
+              <span>{t('dispatch.step_review')}</span>
             </div>
           </div>
 
@@ -254,7 +256,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
                   <Warehouse className="w-3.5 h-3.5 text-indigo-400" />
-                  Origin Dispatch Terminal *
+                  {t('dispatch.origin_terminal_label')}
                 </label>
                 <select
                   value={selectedLocationId}
@@ -272,7 +274,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-sky-400" />
-                  Destination Partner *
+                  {t('dispatch.dest_partner_label')}
                 </label>
                 <select
                   value={selectedPartnerId}
@@ -290,7 +292,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Destination Address *</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.dest_address_label')}</label>
               <input
                 type="text"
                 required
@@ -304,7 +306,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
             {/* Carrier info */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-800/40 p-3 rounded-xl border border-slate-800">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Driver Name</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.driver_name')}</label>
                 <input
                   type="text"
                   value={driverName}
@@ -314,7 +316,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Driver Phone</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.driver_phone')}</label>
                 <input
                   type="tel"
                   value={driverPhone}
@@ -324,7 +326,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Truck Plate</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.truck_plate')}</label>
                 <input
                   type="text"
                   value={vehicleReg}
@@ -340,9 +342,9 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                   <Package className="w-3.5 h-3.5 text-indigo-400" />
-                  Cargo Line Items ({lines.length})
+                  {t('dispatch.line_items_title', { count: lines.length })}
                 </label>
-                <span className="text-xs font-mono text-indigo-300">Total Units: {totalUnits}</span>
+                <span className="text-xs font-mono text-indigo-300">{t('dispatch.total_units', { total: totalUnits })}</span>
               </div>
 
               <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
@@ -351,7 +353,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                     key={index}
                     className="grid grid-cols-12 gap-2 bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/60 items-center text-xs"
                   >
-                    <div className="col-span-2">
+                    <div className="col-span-4 sm:col-span-2">
                       <input
                         type="text"
                         value={item.sku}
@@ -361,7 +363,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                       />
                     </div>
 
-                    <div className="col-span-5">
+                    <div className="col-span-8 sm:col-span-5">
                       <input
                         type="text"
                         required
@@ -372,7 +374,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                       />
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="col-span-5 sm:col-span-2">
                       <select
                         value={item.unit}
                         onChange={(e) => handleLineChange(index, 'unit', e.target.value)}
@@ -389,7 +391,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                       </select>
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="col-span-5 sm:col-span-2">
                       <input
                         type="number"
                         required
@@ -402,7 +404,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                       />
                     </div>
 
-                    <div className="col-span-1 text-right">
+                    <div className="col-span-2 sm:col-span-1 text-right">
                       <button
                         type="button"
                         disabled={lines.length <= 1}
@@ -422,12 +424,12 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1.5 mt-2 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Add Line Item</span>
+                <span>{t('dispatch.add_line_item')}</span>
               </button>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Delivery Notes</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.delivery_notes')}</label>
               <textarea
                 rows={2}
                 value={notes}
@@ -444,13 +446,13 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white rounded-xl cursor-pointer"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
                 className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-2 cursor-pointer min-h-[40px]"
               >
-                <span>Continue to Review</span>
+                <span>{t('dispatch.continue_review')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -464,28 +466,28 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
               <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 space-y-3 text-xs">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <FileCheck className="w-4 h-4 text-emerald-400" />
-                  Review Dispatch Summary
+                  {t('dispatch.review_summary')}
                 </h3>
 
                 <div className="grid grid-cols-2 gap-3 text-slate-300">
                   <div>
-                    <span className="text-slate-500 font-semibold block">Origin Terminal:</span>
+                    <span className="text-slate-500 font-semibold block">{t('table.origin_location', 'Origin Terminal')}:</span>
                     <div className="font-semibold text-white">{selectedLocation?.label || 'Main Dock'}</div>
                   </div>
                   <div>
-                    <span className="text-slate-500 font-semibold block">Destination Partner:</span>
+                    <span className="text-slate-500 font-semibold block">{t('table.destination_partner', 'Destination Partner')}:</span>
                     <div className="font-semibold text-white">{selectedPartner?.name}</div>
                     <div className="text-[11px] text-slate-400">{destinationAddress}</div>
                   </div>
                   <div>
-                    <span className="text-slate-500 font-semibold block">Carrier / Driver:</span>
-                    <div>{driverName || 'Unassigned'} ({vehicleReg || 'TRK'})</div>
+                    <span className="text-slate-500 font-semibold block">{t('dispatch.carrier_driver', 'Carrier / Driver')}:</span>
+                    <div>{driverName || t('dispatch.carrier_unassigned', 'Unassigned')} ({vehicleReg || 'TRK'})</div>
                     {driverPhone && <div className="text-[11px] text-slate-400">{driverPhone}</div>}
                   </div>
                   <div>
-                    <span className="text-slate-500 font-semibold block">Total Manifest Quantity:</span>
+                    <span className="text-slate-500 font-semibold block">{t('dispatch.total_manifest_qty')}:</span>
                     <div className="font-mono font-bold text-indigo-300 text-sm">
-                      {totalUnits} units across {lines.length} lines
+                      {t('dispatch.units_across_lines', { units: totalUnits, lines: lines.length })}
                     </div>
                   </div>
                 </div>
@@ -493,7 +495,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
 
               {/* Line items preview table */}
               <div className="bg-slate-900 border border-slate-800 rounded-xl p-3">
-                <div className="text-xs font-bold text-white mb-2">Item Breakdown</div>
+                <div className="text-xs font-bold text-white mb-2">{t('dispatch.item_breakdown')}</div>
                 <div className="divide-y divide-slate-800 text-xs">
                   {lines.map((l, i) => (
                     <div key={i} className="py-2 flex items-center justify-between">
@@ -511,7 +513,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
 
               {notes && (
                 <div className="bg-slate-800/30 p-2.5 rounded-lg border border-slate-800 text-xs text-slate-300">
-                  <span className="text-slate-500 font-semibold block">Notes:</span>
+                  <span className="text-slate-500 font-semibold block">{t('dispatch.delivery_notes')}:</span>
                   {notes}
                 </div>
               )}
@@ -525,7 +527,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white cursor-pointer min-h-[40px]"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Back to Edit</span>
+                <span>{t('dispatch.back_to_edit')}</span>
               </button>
 
               <button
@@ -535,11 +537,11 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white text-xs font-semibold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2 cursor-pointer min-h-[40px]"
               >
                 {isLoading ? (
-                  <span>Generating Manifest...</span>
+                  <span>{t('dispatch.generating_manifest')}</span>
                 ) : (
                   <>
                     <Truck className="w-4 h-4" />
-                    <span>Confirm & Transmit Dispatch</span>
+                    <span>{t('dispatch.confirm_transmit')}</span>
                   </>
                 )}
               </button>

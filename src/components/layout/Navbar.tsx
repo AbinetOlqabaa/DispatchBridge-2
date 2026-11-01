@@ -104,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'dispatches', label: t('nav.dispatches', 'Dispatches'), icon: Truck, show: true },
     { id: 'locations', label: t('nav.locations', 'Origins & Docks'), icon: Warehouse, show: !!user && user.role !== 'RECEIVER' },
     { id: 'partners', label: t('nav.partners', 'Partners'), icon: Users, show: !!user && user.role !== 'RECEIVER' },
-    { id: 'recommendations', label: 'Recommendations', icon: Sparkles, show: true },
+    { id: 'recommendations', label: t('nav.recommendations', 'Recommendations'), icon: Sparkles, show: true },
     { id: 'audit', label: t('nav.audit', 'Audit Trail'), icon: FileText, show: !!user && (user.role === 'SUPER_ADMIN' || user.role === 'BUSINESS_OWNER') },
     { id: 'status', label: t('nav.status', 'System Status'), icon: Shield, show: true },
   ];
@@ -282,7 +282,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               {!isOnline ? (
                 <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-800 text-[11px] font-semibold">
                   <WifiOff className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Offline {queueCount > 0 ? `(${queueCount} queued)` : ''}</span>
+                  <span>{t('nav.offline', 'Offline ({count} queued)', { count: queueCount })}</span>
                 </div>
               ) : queueCount > 0 ? (
                 <button
@@ -291,7 +291,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   title="Click to sync queued actions with server"
                 >
                   <RefreshCw className="w-3 h-3 text-teal-400 animate-spin" />
-                  <span>Sync ({queueCount})</span>
+                  <span>{t('nav.sync', 'Sync ({count})', { count: queueCount })}</span>
                 </button>
               ) : null}
 

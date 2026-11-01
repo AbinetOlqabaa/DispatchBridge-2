@@ -155,7 +155,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                 title="Bulk upload dispatches via CSV format"
               >
                 <Upload className="w-4 h-4 text-sky-400" />
-                <span>Bulk Upload CSV</span>
+                <span>{t('action.bulk_upload_csv', 'Bulk Upload CSV')}</span>
               </button>
 
               {/* Create Dispatch Button */}
@@ -275,7 +275,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                 title="Export filtered dispatches"
               >
                 <Download className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Export</span>
+                <span>{t('action.export', 'Export')}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
@@ -287,7 +287,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                   >
                     <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
                     <div>
-                      <div className="font-medium">Export CSV</div>
+                      <div className="font-medium">{t('action.export_csv', 'Export CSV')}</div>
                       <div className="text-[10px] text-slate-400">Excel / Spreadsheet</div>
                     </div>
                   </button>
@@ -297,7 +297,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                   >
                     <FileText className="w-4 h-4 text-rose-400" />
                     <div>
-                      <div className="font-medium">Export PDF</div>
+                      <div className="font-medium">{t('action.export_pdf', 'Export PDF')}</div>
                       <div className="text-[10px] text-slate-400">Reconciliation Report</div>
                     </div>
                   </button>
@@ -321,7 +321,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
         ) : filteredDispatches.length === 0 ? (
           <div className="py-12 text-center text-slate-400 space-y-2">
             <Truck className="w-10 h-10 text-slate-600 mx-auto" />
-            <div className="text-sm font-semibold text-slate-300">No dispatches match this filter</div>
+            <div className="text-sm font-semibold text-slate-300">{t('empty.no_dispatches_match', 'No dispatches match this filter')}</div>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               {statusFilter !== 'ALL'
                 ? `No shipments found with status "${statusFilter}". Try selecting "${t('status.all')}".`
@@ -359,7 +359,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                     </td>
                     <td className="px-3.5 py-3.5 text-slate-300">
                       <div className="font-medium text-slate-200">{d.senderBusinessName}</div>
-                      <div className="text-[10px] text-slate-500">By {d.senderName}</div>
+                      <div className="text-[10px] text-slate-500">{t('table.by_sender', 'By {name}', { name: d.senderName })}</div>
                     </td>
                     <td className="px-3.5 py-3.5 text-slate-200">
                       <div className="font-semibold">{d.partnerName}</div>
@@ -373,29 +373,29 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                         <div className="flex items-center gap-1.5 text-indigo-300">
                           <Eye className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                           <div>
-                            <div className="text-[11px] font-medium">Viewed</div>
+                            <div className="text-[11px] font-medium">{t('status.viewed', 'Viewed')}</div>
                             <div className="text-[10px] text-slate-400">
                               {new Date(d.firstViewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
                           </div>
                         </div>
                       ) : (
-                        <span className="text-[11px] text-slate-500">Unviewed</span>
+                        <span className="text-[11px] text-slate-500">{t('status.unviewed', 'Unviewed')}</span>
                       )}
                     </td>
                     <td className="px-3.5 py-3.5 whitespace-nowrap">
                       <div className="font-mono text-slate-200">
-                        {d.totalQuantityDispatched} units
+                        {d.totalQuantityDispatched} {t('unit.units', 'units')}
                       </div>
                       {d.totalQuantityLost !== undefined && d.totalQuantityLost > 0 ? (
                         <span className="text-[10px] text-rose-400 font-bold flex items-center gap-1">
                           <AlertTriangle className="w-3 h-3" />
-                          Loss: {d.totalQuantityLost} units
+                          {t('table.loss', 'Loss: {count} units', { count: d.totalQuantityLost })}
                         </span>
                       ) : d.totalQuantityReceived !== undefined ? (
-                        <span className="text-[10px] text-emerald-400 font-medium">100% Intact</span>
+                        <span className="text-[10px] text-emerald-400 font-medium">{t('table.intact', '100% Intact')}</span>
                       ) : (
-                        <span className="text-[10px] text-slate-500">Pending</span>
+                        <span className="text-[10px] text-slate-500">{t('status.pending', 'Pending')}</span>
                       )}
                     </td>
                     <td className="px-3.5 py-3.5 text-right whitespace-nowrap">

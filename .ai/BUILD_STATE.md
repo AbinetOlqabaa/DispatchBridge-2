@@ -1,11 +1,11 @@
 # Build State — Business Dispatch & Delivery Reconciliation (DispatchBridge)
 
-- **Last Updated:** 2026-10-25T00:15:00Z
+- **Last Updated:** 2026-11-01T04:15:00-08:00
 - **Runtime / Platform:** Node.js v22.14.0 on Linux container with Express 4 backend & Vite 8 React 19 Frontend. Configured as an installable mobile-first Progressive Web App (PWA). *Note: Native Android build tooling (Gradle / Android SDK) is not supported in this runtime environment.*
 - **Stack:**
   - Backend: Node.js, Express 4, TypeScript, HMAC SHA-256 session tokens, timing-safe one-time bootstrap tokens, Fayda e-ID verification adapter, OTP gateway adapter, in-memory domain adapter (`sandboxStore`) with full multi-tenant isolation.
   - Frontend: React 19, Tailwind CSS v4, Lucide React, Context API (`AuthContext`, `LanguageContext`, `ThemeContext`), clean component and page architecture.
-  - Test Suite: Node.js TypeScript test runner (`npm test` -> `tsx test/runTests.ts`) — **38/38 automated tests passing with 0 failures**.
+  - Test Suite: Node.js TypeScript test runner (`npm test` -> `tsx test/runTests.ts`) — **44/44 automated tests passing with 0 failures**.
 
 ---
 
@@ -20,9 +20,11 @@
 | Phase 5 | `.ai/05_NOTIFICATIONS_AND_AUDIT.md` | **COMPLETE** | Real-time in-app notification drawer with unread counter & read tracking; immutable audit trail logging actor, role, correlation ID, and metadata for every mutation. |
 | Phase 6 | `.ai/06_TABLET_FIRST_UI_UX_AND_ACCESSIBILITY.md` | **COMPLETE** | Comprehensive tablet portrait (768x1024, 820x1180) & landscape (1024x768, 1180x820) optimizations. Balanced 2-column card wrapping, unclipped filter pills, container-bounded tables with enhanced high-contrast scrollbars, and unclipped navigation. |
 | Phase 7 | `.ai/07_SECURITY_PRIVACY_AND_FAILURES.md` | **COMPLETE** | Strict cross-tenant isolation on store and route levels (HTTP 403 on mismatched tenant/partner access), timingSafeEqual constant-time comparisons, idempotency key deduplication. |
-| Phase 8 | `.ai/08_TESTING_AND_ACCEPTANCE.md` | **COMPLETE** | 38 automated unit, security, integration, and identity acceptance tests passing with 0 failures (`npm test`). `tsc --noEmit` passing with 0 type errors. |
+| Phase 8 | `.ai/08_TESTING_AND_ACCEPTANCE.md` | **COMPLETE** | 44 automated unit, security, integration, identity, and localization acceptance tests passing with 0 failures (`npm test`). `tsc --noEmit` passing with 0 type errors. |
 | Phase 9 | `.ai/09_RELEASE_CHECKLIST.md` | **COMPLETE** | Release checklist evaluated honestly. Verdict: **READY FOR STAGING**. |
 | Identity Update | `.ai/IDENTITY_UPDATE_EXECUTE.md` | **COMPLETE** | Fayda e-ID national ID adapter (FAN/FIN masking, simulation badge, production fail-closed), mobile-first E.164 auth, cryptographic 6-digit OTP challenges, password reset/change step-up, user profile photo upload, and `/api/admin/users` governance with suspension audit logs. |
+| Extension & Governance | `.ai/00_MASTER_PLAN.md` | **COMPLETE** | Team directory & cryptographic invitation tokens (`/api/memberships`, `TeamPage.tsx`), Executive Performance & Reconciliation Reports (`/api/reports/analytics`, `ReportsPage.tsx`), User Profile & Credentials manager (`ProfilePage.tsx`), Multi-Tenant Context Switcher. |
+| Localization & i18n | `.ai/00_MASTER_PLAN.md` | **COMPLETE** | Comprehensive end-to-end multi-language translation across all 5 national languages (English, Amharic, Afan Oromo, Tigrinya, Somali). 100% dictionary key parity, zero missing keys, parameter interpolation, and external recipient native language switcher. |
 
 ---
 
@@ -165,34 +167,46 @@ $ npm test
 
 ---
 
-## 5. Changes Made in This Session
-- **Fayda e-ID Verification Adapter (`src/server/adapters/faydaAdapter.ts`)**:
-  - Implemented 16-digit FAN and 12-digit FIN format validation with secure masking (`•••• •••• •••• 1234`).
-  - Added simulated national identity registry with `FAYDA_DEV_SIMULATED` badge in development and fail-closed behavior in production.
-- **Cryptographic OTP Challenge Adapter (`src/server/adapters/otpAdapter.ts`)**:
-  - Implemented 6-digit cryptographic OTP generation with purpose binding (`REGISTRATION`, `PASSWORD_RESET`, `PROFILE_CHANGE`).
-  - Enforced 5-minute expiry, 30-second cooldown, max 5 failed attempts with auto-revocation, and phone-based rate limiting.
-- **Identity & Authentication Routes (`src/server/routes/authRoutes.ts`)**:
-  - Enforced role validation prohibiting self-registration of `SUPER_ADMIN`.
-  - Added `/api/auth/register/initiate`, `/api/auth/register/complete`, `/api/auth/login-mobile`, `/api/auth/password-reset/initiate`, `/api/auth/password-reset/complete`, `/api/auth/profile`, and `/api/auth/profile/photo`.
-- **Platform Administrator User Governance (`src/server/routes/adminRoutes.ts`)**:
-  - Added `/api/admin/users` endpoints supporting pagination, search, role filtering, and status filtering.
-  - Implemented account suspension requiring audited justification, account reactivation, and last super-admin lockout protection.
-- **Frontend Authentication & Modal Enhancements (`src/pages/auth/AuthModal.tsx` & `src/components/auth/ProfileModal.tsx`)**:
-  - Two-step Fayda registration modal with live OTP entry, FAN/FIN validation, and country prefix picker.
-  - Profile modal with sticky header, visible close button, photo upload with 2MB validation, and password change with step-up OTP challenge.
-- **Tablet First-Class Navigation & User Governance UI (`src/pages/dashboards/SuperAdminDashboard.tsx`)**:
-  - Integrated dedicated User Administration & Roles tab displaying masked FAN/FIN, verified phone numbers, and action triggers.
-  - Optimized search input and role/status dropdowns with responsive wrapping on tablet portrait (768px-820px) and full-width container on tablet landscape (1024px).
+## 5. Changes Made in This Session & Acceptance Evidence
+- **Complete End-to-End Page Language Translation Enhancement Strategy**:
+  - Conducted deep audit of all user-facing pages, views, dialogs, buttons, and notifications to identify remaining untranslated English strings.
+  - Implemented full localization support across all 5 national languages:
+    1. English (`en`)
+    2. Amharic (`am` - አማርኛ)
+    3. Afaan Oromoo (`om`)
+    4. Tigrinya (`ti` - ትግርኛ)
+    5. Somali (`so` - Soomaali)
+  - Enhanced `LanguageContext.tsx`:
+    - Added parameter interpolation engine: `t(key, fallbackOrParams, params)` replacing `{variable}` dynamic tokens (e.g., `{count}`, `{name}`, `{total}`, `{percent}`).
+    - Built-in safe fallbacks: target language key -> English fallback key -> developer fallback string -> raw key.
+    - Synchronized locale preferences to `localStorage` under `dispatchbridge_language` and updated `document.documentElement.lang`.
+  - Expanded Translation Dictionaries (`src/i18n/translations.ts`):
+    - Over 110 keys per language with **100% dictionary key parity** across all 5 languages (0 missing keys, 0 empty strings).
+    - Authentic, grammatically sound localized supply-chain terminology (e.g. Ge'ez Ethiopic script for Amharic and Tigrinya, genuine Oromo and Somali logistics phrasing).
+  - Component & Page Level Localizations:
+    - `Navbar.tsx`: Full translation of navigation items, simulator buttons, network status badges, and language dropdown options.
+    - `NotificationBanner.tsx`: Sandbox environment alert and status button translated.
+    - `DispatchListPage.tsx`: Translated bulk upload CSV, PDF/CSV exports, manifest count, status pills, and itemized table cells (`By {name}`, `Loss: {count} units`, intact status, view receipt badges).
+    - `DispatchDetailPage.tsx`: Translated GPS HUD, QR barcode modal, itemized manifest table headers, discrepancy case resolution, digital signature pad, and tamper-evident cargo photo uploaders.
+    - `PublicPartnerView.tsx`: Integrated external recipient language switcher pill bar allowing dock workers and partners to review and sign off manifests in their preferred native language (Amharic, Afan Oromo, Tigrinya, Somali, or English).
+    - `ReceiverDashboard.tsx`: Translated dock inspection alerts, delivery counts, shipper information, and reconciliation buttons.
+    - `BusinessOwnerDashboard.tsx`: Translated KPI metrics, entity switching modals, and loss root-cause charts.
+    - `SuperAdminDashboard.tsx`: Translated platform diagnostics and user administration tables.
+    - `TeamPage.tsx`: Translated token invitations, member metrics, and access controls.
+    - `ReportsPage.tsx`: Translated executive summaries, partner performance cards, and export actions.
+    - `PartnersPage.tsx` & `LocationsPage.tsx`: Translated origin dock configuration and destination partner lists.
+    - `AuditPage.tsx`: Translated tamper-resistant cryptographic audit trail table headers and action badges.
+    - `AuthModal.tsx`: Translated mobile sign-in, work email toggle, Fayda e-ID registration, OTP challenges, and password recovery.
+    - `ProfileModal.tsx`: Translated user avatar actions, Fayda credential cards, display name editor, and step-up OTP password updates.
 - **Automated Test Suite Expansion (`test/runTests.ts`)**:
-  - Expanded test suite from 28 to 38 comprehensive automated acceptance tests covering all Fayda, OTP, registration, recovery, and admin governance requirements.
-  - All 38 tests pass with 0 failures (`npm test`).
-- **Visual Browser Verification Across Matrix (`playwright-cli`)**:
-  - Captured and inspected live screenshots:
-    - `t-landscape-1024x768.png`: Verified tablet landscape navigation, metric cards, and filter controls.
-    - `t-admin-users-768x1024.png`: Verified Super Admin user governance table, search input, and masked FAN/FIN data.
-    - `t-admin-users-820x1180.png`: Verified tablet portrait layout at 820x1180.
-    - `t-profile-modal-768x1024.png`: Verified user profile modal, photo upload, and credential masking.
+  - Added 4 automated localization acceptance test cases:
+    1. `Supported Languages Registry Parity (5 National Languages)`: Validates 5 language entries with native labels.
+    2. `Dictionary Parity Across All 5 Languages (Zero Missing Keys)`: Iterates through all keys in `en` and asserts identical presence in `am`, `om`, `ti`, and `so`.
+    3. `Parameter Interpolation Engine Dynamic Replacement`: Tests dynamic token formatting across all 5 languages.
+    4. `Native Script & Linguistic Integrity`: Asserts Ethiopic Ge'ez unicode script presence and genuine Oromo/Somali terminology.
+  - **All 44/44 tests passed with 0 failures** (`npx --yes tsx test/runTests.ts`).
+  - Verified `lint_applet` (`tsc --noEmit`) -> 0 errors.
+  - Verified `compile_applet` -> SUCCESS.
 
 ---
 
@@ -205,13 +219,19 @@ $ npm test
 - [x] Server-backed administrator user governance (search, filter, suspend with reason, reactivate, lockout protection).
 - [x] Tablet portrait navigation & layout ergonomics (768x1024 / 820x1180).
 - [x] Tablet landscape layout, unclipped navigation, and scrollable modal containment (1024x768 / 1180x820).
-- [x] 38/38 acceptance tests passing in test runner.
-- [x] Zero compilation or lint errors.
+- [x] Multi-Language Localization Engine: 5 languages fully translated with parameter interpolation and 100% dictionary parity.
+- [x] External Recipient View: Dedicated language pill bar on public partner receipt page (`PublicPartnerView.tsx`).
+- [x] 44/44 acceptance tests passing in test runner (0 failures).
+- [x] Zero compilation or lint errors (`npm run lint` & `compile_applet` clean).
+- [x] Team & Organization Governance: Cryptographically random token invitations, role updates, member removal, and acceptance.
+- [x] Executive Performance & Reconciliation Analytics Report Engine: Summary KPIs, loss breakdown, partner scorecard, PDF & CSV exports.
+- [x] User Profile & Credentials Management: Name, phone, photo upload/removal, and password updates.
 
 ---
 
 ## 7. Next Recommended Actions
 1. **Production Infrastructure Transition**: When deploying to production environments, configure persistent PostgreSQL / Cloud SQL via Drizzle ORM or Firestore using the platform's provisioning skills.
 2. **External Gateway Credentials**: Configure SMS / WhatsApp webhook credentials in the platform's secure secrets store for live external carrier notifications and SMS OTP delivery.
+
 
 

@@ -105,35 +105,35 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
       {/* Pipeline Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <div className="text-xs text-slate-400 mb-1">Dispatched (Unviewed)</div>
+          <div className="text-xs text-slate-400 mb-1">{t('status.dispatched')} ({t('status.unviewed')})</div>
           <div className="text-xl font-bold text-blue-400">
             {dispatches.filter((d) => d.status === 'DISPATCHED').length}
           </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Awaiting partner open</div>
+          <div className="text-[11px] text-slate-500 mt-0.5">{t('status.pending', 'Awaiting partner open')}</div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <div className="text-xs text-slate-400 mb-1">Partner Viewed</div>
+          <div className="text-xs text-slate-400 mb-1">{t('status.viewed')}</div>
           <div className="text-xl font-bold text-indigo-400">
             {dispatches.filter((d) => d.status === 'VIEWED').length}
           </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">List opened by receiver</div>
+          <div className="text-[11px] text-slate-500 mt-0.5">{t('recon.verified_partner_view', 'List opened by receiver')}</div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <div className="text-xs text-slate-400 mb-1">Discrepancy Reported</div>
+          <div className="text-xs text-slate-400 mb-1">{t('status.shortfall_damage')}</div>
           <div className="text-xl font-bold text-rose-400">
             {dispatches.filter((d) => d.status === 'PARTIALLY_RECEIVED').length}
           </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Losses recorded</div>
+          <div className="text-[11px] text-slate-500 mt-0.5">{t('metric.recorded_losses', 'Losses recorded')}</div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <div className="text-xs text-slate-400 mb-1">Fully Reconciled</div>
+          <div className="text-xs text-slate-400 mb-1">{t('analytics.fully_reconciled')}</div>
           <div className="text-xl font-bold text-emerald-400">
             {dispatches.filter((d) => ['RECEIVED', 'RECONCILED'].includes(d.status)).length}
           </div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Confirmed complete</div>
+          <div className="text-[11px] text-slate-500 mt-0.5">{t('status.received_complete', 'Confirmed complete')}</div>
         </div>
       </div>
 
@@ -146,12 +146,12 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filter by DSP number, partner, driver..."
+              placeholder={t('action.search', 'Filter by DSP number, partner, driver...')}
               className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
             />
           </div>
           <span className="text-xs text-slate-400">
-            Showing {filteredDispatches.length} of {dispatches.length} dispatches
+            {t('metric.out_of_total', { total: dispatches.length })} ({filteredDispatches.length})
           </span>
         </div>
 
@@ -159,13 +159,13 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
           <table className="w-full text-left text-xs min-w-[760px] lg:min-w-full">
             <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/40 border-b border-slate-800">
               <tr>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">Dispatch #</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">Destination</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">Status</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">Partner View</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">Driver & Cargo</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap">Share Link</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap pr-3.5">Detail</th>
+                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.dispatch_number', 'Dispatch #')}</th>
+                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.destination_partner', 'Destination')}</th>
+                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.status', 'Status')}</th>
+                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.partner_view', 'Partner View')}</th>
+                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.driver_cargo', 'Driver & Cargo')}</th>
+                <th className="px-3 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap">{t('table.share_link', 'Share Link')}</th>
+                <th className="px-3 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap pr-3.5">{t('action.details', 'Detail')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
@@ -194,7 +194,7 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
                       <div className="flex items-center gap-1.5 text-indigo-300">
                         <Eye className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                         <div>
-                          <div className="font-medium text-[11px]">Viewed by Partner</div>
+                          <div className="font-medium text-[11px]">{t('status.viewed', 'Viewed by Partner')}</div>
                           <div className="text-[10px] text-slate-400">
                             {new Date(d.firstViewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
@@ -203,14 +203,14 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
                     ) : (
                       <div className="flex items-center gap-1.5 text-slate-500">
                         <Clock className="w-3.5 h-3.5 shrink-0" />
-                        <span className="text-[11px]">Unviewed</span>
+                        <span className="text-[11px]">{t('status.unviewed', 'Unviewed')}</span>
                       </div>
                     )}
                   </td>
                   <td className="px-3.5 py-3.5 text-slate-300 whitespace-nowrap">
-                    <div>{d.driverName ? `${d.driverName} (${d.vehicleReg || 'Truck'})` : 'Carrier Unassigned'}</div>
+                    <div>{d.driverName ? `${d.driverName} (${d.vehicleReg || 'Truck'})` : t('dispatch.carrier_unassigned', 'Carrier Unassigned')}</div>
                     <div className="text-[11px] text-slate-500">
-                      {d.lines.length} line items • {d.totalQuantityDispatched} units
+                      {t('dispatch.line_items_summary', { count: d.lines.length, units: d.totalQuantityDispatched })}
                     </div>
                   </td>
                   <td className="px-3.5 py-3.5 text-right whitespace-nowrap">
@@ -218,7 +218,7 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
                       <button
                         onClick={() => handleCopyLink(d.shareToken, d.id)}
                         className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
-                        title="Copy receiver access link"
+                        title={t('table.share_link', 'Copy receiver access link')}
                       >
                         {copiedId === d.id ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
@@ -236,7 +236,7 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
                       onClick={() => onSelectDispatch(d.id)}
                       className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium cursor-pointer"
                     >
-                      Inspect
+                      {t('action.inspect', 'Inspect')}
                     </button>
                   </td>
                 </tr>
