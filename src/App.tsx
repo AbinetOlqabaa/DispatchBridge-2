@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
 import { ThemeProvider } from './context/ThemeContext.js';
-import { LanguageProvider } from './context/LanguageContext.js';
+import { LanguageProvider, useTranslation } from './context/LanguageContext.js';
 import { Navbar } from './components/layout/Navbar.js';
 import { BottomNav } from './components/layout/BottomNav.js';
 import { NotificationBanner } from './components/common/NotificationBanner.js';
@@ -32,6 +32,7 @@ import { LoadingSpinner } from './components/common/LoadingSpinner.js';
 
 function MainApp() {
   const { user, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   // Navigation State
   const [currentTab, setCurrentTab] = useState<string>('dispatches');
@@ -89,9 +90,9 @@ function MainApp() {
     if (!user) {
       return (
         <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl max-w-lg mx-auto my-12 space-y-3">
-          <h2 className="text-lg font-bold text-white">Sign In Required</h2>
+          <h2 className="text-lg font-bold text-white">{t('auth.signin_required', 'Sign In Required')}</h2>
           <p className="text-xs text-slate-400">
-            Please sign in to access your role-specific dashboard, or explore the public Dispatches and System Status pages.
+            {t('auth.signin_prompt_desc', 'Please sign in to access your role-specific dashboard, or explore the public Dispatches and System Status pages.')}
           </p>
           <button
             onClick={() => {
@@ -100,7 +101,7 @@ function MainApp() {
             }}
             className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl cursor-pointer"
           >
-            Sign In to Dashboard
+            {t('auth.signin_to_dashboard', 'Sign In to Dashboard')}
           </button>
         </div>
       );

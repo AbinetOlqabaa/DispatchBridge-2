@@ -213,13 +213,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-semibold uppercase tracking-wider text-purple-400 bg-purple-950 px-2.5 py-0.5 rounded-full border border-purple-800">
-              Super Administrator Control Center
+              {t('admin.control_center', 'Super Administrator Control Center')}
             </span>
-            <span className="text-xs text-slate-400">Privileged Session</span>
+            <span className="text-xs text-slate-400">{t('admin.privileged_session', 'Privileged Session')}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">System Infrastructure & User Governance</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">{t('admin.infra_governance', 'System Infrastructure & User Governance')}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Cross-tenant inspection, Fayda identity oversight, user activation controls, and cryptographic audit ledger.
+            {t('admin.infra_subtitle', 'Cross-tenant inspection, Fayda identity oversight, user activation controls, and cryptographic audit ledger.')}
           </p>
         </div>
 
@@ -299,29 +299,29 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
           {/* System Highlights */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-              <div className="text-xs text-slate-400 mb-1">Total Audit Events</div>
+              <div className="text-xs text-slate-400 mb-1">{t('admin.total_audit_events', 'Total Audit Events')}</div>
               <div className="text-xl font-bold text-purple-400">{logs.length}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">Immutable append-only ledger</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">{t('admin.immutable_ledger', 'Immutable append-only ledger')}</div>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-              <div className="text-xs text-slate-400 mb-1">Enrolled Users</div>
+              <div className="text-xs text-slate-400 mb-1">{t('admin.enrolled_users', 'Enrolled Users')}</div>
               <div className="text-xl font-bold text-emerald-400">{usersList.length}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">Fayda verified accounts</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">{t('admin.fayda_accounts', 'Fayda verified accounts')}</div>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-              <div className="text-xs text-slate-400 mb-1">Registered Tenants</div>
+              <div className="text-xs text-slate-400 mb-1">{t('admin.registered_tenants', 'Registered Tenants')}</div>
               <div className="text-xl font-bold text-sky-400">{businesses.length}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">Active business entities</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">{t('admin.active_entities', 'Active business entities')}</div>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-              <div className="text-xs text-slate-400 mb-1">Database Adapter</div>
+              <div className="text-xs text-slate-400 mb-1">{t('system.db_adapter', 'Database Adapter')}</div>
               <div className="text-xs font-bold text-amber-400 truncate mt-1">
                 {statusInfo?.databaseProvider || 'Sandbox In-Memory'}
               </div>
-              <div className="text-[11px] text-slate-500 mt-0.5">Isolated dev provider</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">{t('system.staging_ready', 'Isolated dev provider')}</div>
             </div>
           </div>
 
@@ -498,10 +498,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <Users className="w-5 h-5 text-purple-400" />
-                <span>Platform User Accounts & Identity Oversight</span>
+                <span>{t('admin.user_oversight_title', 'Platform User Accounts & Identity Oversight')}</span>
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Manage roles, view Fayda identity verification status, and enforce account suspension with audit logs.
+                {t('admin.user_oversight_subtitle', 'Manage roles, view Fayda identity verification status, and enforce account suspension with audit logs.')}
               </p>
             </div>
 
@@ -513,7 +513,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && loadUsers()}
-                  placeholder="Search name, phone, FAN..."
+                  placeholder={t('admin.search_placeholder', 'Search name, phone, FAN...')}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
                 />
               </div>
@@ -527,11 +527,11 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   }}
                   className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500 cursor-pointer"
                 >
-                  <option value="">All Roles</option>
-                  <option value="SUPER_ADMIN">Super Admin</option>
-                  <option value="BUSINESS_OWNER">Business Owner</option>
-                  <option value="SENDER">Sender / Dispatcher</option>
-                  <option value="RECEIVER">Receiver / Partner</option>
+                  <option value="">{t('admin.all_roles', 'All Roles')}</option>
+                  <option value="SUPER_ADMIN">{t('role.super_admin', 'Super Admin')}</option>
+                  <option value="BUSINESS_OWNER">{t('role.business_owner', 'Business Owner')}</option>
+                  <option value="SENDER">{t('role.sender', 'Sender / Dispatcher')}</option>
+                  <option value="RECEIVER">{t('role.receiver', 'Receiver / Partner')}</option>
                 </select>
 
                 <select
@@ -542,9 +542,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   }}
                   className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500 cursor-pointer"
                 >
-                  <option value="">All Statuses</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="SUSPENDED">Suspended</option>
+                  <option value="">{t('admin.all_statuses', 'All Statuses')}</option>
+                  <option value="ACTIVE">{t('admin.status_active', 'Active')}</option>
+                  <option value="SUSPENDED">{t('admin.status_suspended', 'Suspended')}</option>
                 </select>
 
                 <button
@@ -563,13 +563,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
             <table className="w-full text-left text-xs min-w-[860px] lg:min-w-full">
               <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/60 border-b border-slate-800">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">User</th>
-                  <th className="px-4 py-3 font-semibold">Verified Phone</th>
-                  <th className="px-4 py-3 font-semibold">Fayda e-ID (Masked)</th>
-                  <th className="px-4 py-3 font-semibold">Business Entity</th>
-                  <th className="px-4 py-3 font-semibold">Assigned Role</th>
-                  <th className="px-4 py-3 font-semibold">Status</th>
-                  <th className="px-4 py-3 font-semibold text-right">Actions</th>
+                  <th className="px-4 py-3 font-semibold">{t('admin.col_user', 'User')}</th>
+                  <th className="px-4 py-3 font-semibold">{t('admin.col_phone', 'Verified Phone')}</th>
+                  <th className="px-4 py-3 font-semibold">{t('admin.col_fayda', 'Fayda e-ID (Masked)')}</th>
+                  <th className="px-4 py-3 font-semibold">{t('admin.col_business', 'Business Entity')}</th>
+                  <th className="px-4 py-3 font-semibold">{t('admin.col_role', 'Assigned Role')}</th>
+                  <th className="px-4 py-3 font-semibold">{t('table.status', 'Status')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{t('table.actions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
@@ -672,14 +672,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                             }}
                             className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 font-semibold text-[11px] transition cursor-pointer"
                           >
-                            Suspend...
+                            {t('admin.suspend_btn', 'Suspend...')}
                           </button>
                         ) : (
                           <button
                             onClick={() => handleReactivateUser(u)}
                             className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-semibold text-[11px] transition cursor-pointer"
                           >
-                            Reactivate
+                            {t('admin.reactivate_btn', 'Reactivate')}
                           </button>
                         )}
                       </td>
@@ -705,7 +705,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
 
             <div className="flex items-center gap-2.5 mb-4 text-rose-400">
               <UserX className="w-5 h-5" />
-              <h3 className="text-base font-bold text-white">Suspend User Account</h3>
+              <h3 className="text-base font-bold text-white">{t('admin.suspend_modal_title', 'Suspend User Account')}</h3>
             </div>
 
             <p className="text-xs text-slate-300 mb-2 leading-relaxed">
@@ -718,7 +718,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
             <form onSubmit={handleConfirmSuspend} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Suspension Justification Reason <span className="text-rose-400">*</span>
+                  {t('admin.suspension_reason_label', 'Suspension Justification Reason')} <span className="text-rose-400">*</span>
                 </label>
                 <textarea
                   required
@@ -736,14 +736,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   onClick={() => setSuspendTarget(null)}
                   className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
                 >
-                  Cancel
+                  {t('action.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingSuspend || !suspendReason.trim()}
                   className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 transition cursor-pointer disabled:opacity-50"
                 >
-                  {isSubmittingSuspend ? 'Suspending...' : 'Confirm Suspension'}
+                  {isSubmittingSuspend ? 'Suspending...' : t('admin.confirm_suspend_btn', 'Confirm Suspension')}
                 </button>
               </div>
             </form>

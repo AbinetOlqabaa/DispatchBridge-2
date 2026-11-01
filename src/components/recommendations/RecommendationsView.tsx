@@ -28,6 +28,7 @@ import {
 import { Dispatch } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 
 interface RecommendationsViewProps {
   onCreateDispatchWithItem?: (item: CatalogItem) => void;
@@ -36,6 +37,7 @@ interface RecommendationsViewProps {
 export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
   onCreateDispatchWithItem,
 }) => {
+  const { t } = useTranslation();
   const [dispatches, setDispatches] = useState<Dispatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPreferences, setShowPreferences] = useState(false);
@@ -123,13 +125,13 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-950 px-2.5 py-0.5 rounded-full border border-indigo-800 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
-              Collaborative Filtering & Affinity Engine
+              {t('rec.engine_badge', 'Collaborative Filtering & Affinity Engine')}
             </span>
             <span className="text-xs text-slate-400">Requirement 10</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Personalized Products & Services</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">{t('rec.personalized_title', 'Personalized Products & Services')}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Analyzes your dispatch history, manifest browsing behavior, and stated handling preferences.
+            {t('rec.personalized_desc', 'Analyzes your dispatch history, manifest browsing behavior, and stated handling preferences.')}
           </p>
         </div>
 
@@ -144,7 +146,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Recommended for You</span>
+            <span>{t('rec.tab_recommended', 'Recommended for You')}</span>
           </button>
           <button
             onClick={() => setActiveTab('architecture')}
@@ -155,7 +157,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
             }`}
           >
             <Cpu className="w-3.5 h-3.5" />
-            <span>Future Roadmap</span>
+            <span>{t('rec.tab_roadmap', 'Future Roadmap')}</span>
           </button>
         </div>
       </div>
@@ -167,7 +169,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sliders className="w-4 h-4 text-indigo-400" />
-                <h3 className="font-semibold text-white text-xs">Stated Preferences & Context Signals</h3>
+                <h3 className="font-semibold text-white text-xs">{t('rec.preferences_title', 'Stated Preferences & Context Signals')}</h3>
                 <span className="text-[11px] text-slate-400">
                   (Adjust below to dynamically steer recommendation scoring)
                 </span>
@@ -176,7 +178,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
                 onClick={() => setShowPreferences(!showPreferences)}
                 className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer"
               >
-                <span>{showPreferences ? 'Hide Controls' : 'Customize Signals'}</span>
+                <span>{showPreferences ? t('rec.hide_controls', 'Hide Controls') : t('rec.customize_signals', 'Customize Signals')}</span>
                 {showPreferences ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
               </button>
             </div>
@@ -185,7 +187,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-slate-800 text-xs">
                 {/* Category Toggles */}
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-2">Preferred Categories</label>
+                  <label className="block text-slate-300 font-semibold mb-2">{t('rec.preferred_categories', 'Preferred Categories')}</label>
                   <div className="flex flex-wrap gap-1.5">
                     {[
                       { id: 'FOOD_BEVERAGE', label: 'Food & Beverage' },
@@ -211,7 +213,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
 
                 {/* Temperature Handling */}
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-2">Temperature Handling</label>
+                  <label className="block text-slate-300 font-semibold mb-2">{t('rec.temp_handling', 'Temperature Handling')}</label>
                   <div className="flex gap-2">
                     {[
                       { id: 'ANY', label: 'Any Temp' },
@@ -237,7 +239,7 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
 
                 {/* Speed Priority */}
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-2">Lead Time Priority</label>
+                  <label className="block text-slate-300 font-semibold mb-2">{t('rec.speed_priority', 'Lead Time Priority')}</label>
                   <div className="flex gap-2">
                     {[
                       { id: 'STANDARD', label: 'Standard (12-24h)' },
@@ -385,14 +387,14 @@ export const RecommendationsView: React.FC<RecommendationsViewProps> = ({
                 <div className="space-y-2 text-xs pt-2 border-t border-slate-800">
                   <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
                     <span className="text-[11px] font-semibold text-amber-300 block mb-0.5">
-                      Why It Matters:
+                      {t('rec.why_it_matters', 'Why It Matters:')}
                     </span>
                     <p className="text-[11px] text-slate-400 leading-relaxed">{plan.rationale}</p>
                   </div>
 
                   <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
                     <span className="text-[11px] font-semibold text-sky-300 block mb-0.5">
-                      Production Implementation:
+                      {t('rec.production_impl', 'Production Implementation:')}
                     </span>
                     <p className="text-[11px] text-slate-400 leading-relaxed">
                       {plan.implementationStrategy}

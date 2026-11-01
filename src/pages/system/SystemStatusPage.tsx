@@ -105,10 +105,10 @@ export const SystemStatusPage: React.FC = () => {
       <div className="bg-amber-950/40 border border-amber-800/80 rounded-2xl p-5 space-y-2">
         <div className="flex items-center gap-2.5 text-amber-300 font-bold text-sm">
           <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>Notice: Isolated Staging & Development Sandbox Active</span>
+          <span>{t('system.sandbox_notice_title', 'Notice: Isolated Staging & Development Sandbox Active')}</span>
         </div>
         <p className="text-xs text-amber-200/90 leading-relaxed">
-          The application is operating with an in-memory staging adapter (<code className="text-amber-100">SandboxStore</code>) with full multi-tenant isolation, cryptographic HMAC session validation, outbox delivery queues, digital glass signature capture, and tamper-evident SHA-256 cargo evidence hashes.
+          {t('system.sandbox_notice_desc', 'The application is operating with an in-memory staging adapter (SandboxStore) with full multi-tenant isolation, cryptographic HMAC session validation, outbox delivery queues, digital glass signature capture, and tamper-evident SHA-256 cargo evidence hashes.')}
         </p>
       </div>
 
@@ -118,10 +118,10 @@ export const SystemStatusPage: React.FC = () => {
           <div>
             <h2 className="text-sm font-bold text-white flex items-center gap-2">
               <Shield className="w-4 h-4 text-emerald-400" />
-              Automated Staging Acceptance Inspector (.ai/09_RELEASE_CHECKLIST.md)
+              {t('system.inspector_title', 'Automated Staging Acceptance Inspector (.ai/09_RELEASE_CHECKLIST.md)')}
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Live automated evaluation against all 4 release verification domains defined in the release checklist.
+              {t('system.inspector_subtitle', 'Live automated evaluation against all 4 release verification domains defined in the release checklist.')}
             </p>
           </div>
 
@@ -138,7 +138,7 @@ export const SystemStatusPage: React.FC = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold cursor-pointer border border-slate-700"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${runningStagingCheck ? 'animate-spin' : ''}`} />
-              <span>{runningStagingCheck ? 'Evaluating...' : 'Run Diagnostics'}</span>
+              <span>{runningStagingCheck ? t('system.evaluating', 'Evaluating...') : t('system.run_diagnostics', 'Run Diagnostics')}</span>
             </button>
           </div>
         </div>
@@ -177,31 +177,31 @@ export const SystemStatusPage: React.FC = () => {
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
         <h2 className="text-sm font-bold text-white flex items-center gap-2">
           <Cpu className="w-4 h-4 text-sky-400" />
-          Platform Inspection & Hardware Target
+          {t('system.platform_inspection_title', 'Platform Inspection & Hardware Target')}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 space-y-2">
-            <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Target Architecture</span>
-            <div className="font-bold text-white text-sm">Progressive Web App (PWA)</div>
+            <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">{t('system.target_architecture', 'Target Architecture')}</span>
+            <div className="font-bold text-white text-sm">{t('system.pwa_badge', 'Progressive Web App (PWA)')}</div>
             <p className="text-slate-400 leading-relaxed text-[11px]">
-              Inspected cloud builder capabilities: this environment is a Linux container with Node.js 22 and Web preview. Native Android toolchains (Gradle, JVM Android SDK, APK packaging) are not present. Consequently, the application is built as an installable, mobile-optimized PWA with manifest, touch navigation, and responsive viewport.
+              {t('system.pwa_desc', 'Inspected cloud builder capabilities: this environment is a Linux container with Node.js 22 and Web preview. Native Android toolchains (Gradle, JVM Android SDK, APK packaging) are not present. Consequently, the application is built as an installable, mobile-optimized PWA with manifest, touch navigation, and responsive viewport.')}
             </p>
             <div className="flex items-center gap-1.5 text-emerald-400 font-medium text-[11px] pt-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Installable PWA Manifest Configured</span>
+              <span>{t('system.pwa_configured', 'Installable PWA Manifest Configured')}</span>
             </div>
           </div>
 
           <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 space-y-2">
-            <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Backend Server</span>
-            <div className="font-bold text-white text-sm">Full-Stack Express + Vite Integration</div>
+            <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">{t('system.backend_server', 'Backend Server')}</span>
+            <div className="font-bold text-white text-sm">{t('system.express_badge', 'Full-Stack Express + Vite Integration')}</div>
             <p className="text-slate-400 leading-relaxed text-[11px]">
-              Runs an Express server (<code className="text-slate-300">server.ts</code>) serving RESTful API routes under <code className="text-slate-300">/api/*</code> and mounting Vite development middleware. All privileged operations, role validation, and token signing are executed strictly server-side.
+              {t('system.express_desc', 'Runs an Express server (server.ts) serving RESTful API routes under /api/* and mounting Vite development middleware. All privileged operations, role validation, and token signing are executed strictly server-side.')}
             </p>
             <div className="flex items-center gap-1.5 text-emerald-400 font-medium text-[11px] pt-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Privileged Operations Isolated to Server-Side</span>
+              <span>{t('system.express_isolated', 'Privileged Operations Isolated to Server-Side')}</span>
             </div>
           </div>
         </div>
@@ -211,7 +211,7 @@ export const SystemStatusPage: React.FC = () => {
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
         <h2 className="text-sm font-bold text-white flex items-center gap-2">
           <Layers className="w-4 h-4 text-indigo-400" />
-          Component Adapter Matrix
+          {t('system.adapter_matrix_title', 'Component Adapter Matrix')}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
@@ -220,17 +220,17 @@ export const SystemStatusPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-200 flex items-center gap-1.5">
                 <Database className="w-4 h-4 text-sky-400" />
-                Database Adapter
+                {t('system.db_adapter', 'Database Adapter')}
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
-                Staging Ready
+                {t('system.staging_ready', 'Staging Ready')}
               </span>
             </div>
             <div className="text-white font-medium">{status?.databaseProvider}</div>
             <div className="text-[11px] text-slate-400 space-y-1">
-              <div>• Total Dispatches: {status?.totalDispatches}</div>
-              <div>• Registered Partners: {status?.totalPartners}</div>
-              <div>• Audit Ledger Events: {status?.totalAuditEvents}</div>
+              <div>• {t('system.total_dispatches', { count: status?.totalDispatches ?? 0 })}</div>
+              <div>• {t('system.total_partners', { count: status?.totalPartners ?? 0 })}</div>
+              <div>• {t('system.total_audit_events', { count: status?.totalAuditEvents ?? 0 })}</div>
             </div>
             <div className="pt-2 text-[10px] text-indigo-300">
               Contract: <code className="text-slate-300">IDatabaseAdapter</code> pluggable interface
@@ -242,7 +242,7 @@ export const SystemStatusPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-200 flex items-center gap-1.5">
                 <Shield className="w-4 h-4 text-purple-400" />
-                Auth Adapter
+                {t('system.auth_adapter', 'Auth Adapter')}
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
                 HMAC SHA-256
@@ -264,17 +264,17 @@ export const SystemStatusPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-200 flex items-center gap-1.5">
                 <Smartphone className="w-4 h-4 text-emerald-400" />
-                Notification Adapter
+                {t('system.notif_adapter', 'Notification Adapter')}
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
-                Multi-Channel Active
+                {t('system.multichannel_active', 'Multi-Channel Active')}
               </span>
             </div>
             <div className="text-white font-medium">{status?.notificationProvider}</div>
             <div className="text-[11px] text-slate-400 space-y-1">
-              <div>• Outbound SMS Gateway Queue</div>
-              <div>• SMTP Transactional Relayer</div>
-              <div>• Signed HTTPS Webhooks</div>
+              <div>• {t('system.sms_queue', 'Outbound SMS Gateway Queue')}</div>
+              <div>• {t('system.smtp_relayer', 'SMTP Transactional Relayer')}</div>
+              <div>• {t('system.signed_webhooks', 'Signed HTTPS Webhooks')}</div>
             </div>
             <div className="pt-2 text-[10px] text-indigo-300">
               Contract: <code className="text-slate-300">INotificationAdapter</code> interface

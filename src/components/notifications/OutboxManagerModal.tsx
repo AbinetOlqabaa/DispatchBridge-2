@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { NotificationItem } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 
 interface OutboxManagerModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface OutboxManagerModalProps {
 }
 
 export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [outboxItems, setOutboxItems] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'ALL' | 'SMS' | 'EMAIL' | 'WEBHOOK'>('ALL');
@@ -104,9 +106,9 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
             </div>
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                Outbound Notification Delivery Gateway
+                {t('outbox.title', 'Outbound Notification Delivery Gateway')}
                 <span className="text-xs px-2 py-0.5 rounded-full bg-teal-950 text-teal-300 border border-teal-800">
-                  Staging Engine
+                  {t('outbox.staging_badge', 'Staging Engine')}
                 </span>
               </h2>
               <p className="text-xs text-slate-400">
@@ -137,14 +139,14 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
                 <Send className="w-3.5 h-3.5 text-sky-400" />
-                Dispatch Test Outbound Alert
+                {t('outbox.test_dispatch_title', 'Dispatch Test Outbound Alert')}
               </span>
               <span className="text-[11px] text-slate-500">Staging sandbox delivery simulator</span>
             </div>
 
             <form onSubmit={handleSendTest} className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1">Channel Adapter</label>
+                <label className="text-[11px] text-slate-400 block mb-1">{t('outbox.channel_adapter', 'Channel Adapter')}</label>
                 <select
                   value={testChannel}
                   onChange={(e) => {
@@ -164,7 +166,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
               </div>
 
               <div>
-                <label className="text-[11px] text-slate-400 block mb-1">Target Recipient / Endpoint</label>
+                <label className="text-[11px] text-slate-400 block mb-1">{t('outbox.recipient_endpoint', 'Target Recipient / Endpoint')}</label>
                 <input
                   type="text"
                   value={testRecipient}
@@ -176,7 +178,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
 
               <div className="md:col-span-2 flex items-end gap-2">
                 <div className="flex-1">
-                  <label className="text-[11px] text-slate-400 block mb-1">Message Preview</label>
+                  <label className="text-[11px] text-slate-400 block mb-1">{t('outbox.message_preview', 'Message Preview')}</label>
                   <input
                     type="text"
                     value={testMessage}
@@ -190,7 +192,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
                   disabled={isSending}
                   className="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold cursor-pointer shrink-0"
                 >
-                  {isSending ? 'Sending...' : 'Dispatch'}
+                  {isSending ? 'Sending...' : t('outbox.dispatch_btn', 'Dispatch')}
                 </button>
               </div>
             </form>
@@ -219,7 +221,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
               className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-200 cursor-pointer"
             >
               <RefreshCw className="w-3 h-3" />
-              <span>Refresh Queue</span>
+              <span>{t('outbox.refresh_queue', 'Refresh Queue')}</span>
             </button>
           </div>
 
@@ -305,7 +307,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold cursor-pointer"
           >
-            Close Gateway
+            {t('outbox.close_gateway', 'Close Gateway')}
           </button>
         </div>
       </div>

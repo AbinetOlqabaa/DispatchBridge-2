@@ -11,6 +11,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { NotificationItem } from '../../types/dispatch.js';
 
 interface NotificationDrawerProps {
@@ -26,6 +27,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
 }) => {
   const { notifications, unreadNotifsCount, markNotificationAsRead, markAllNotificationsAsRead } =
     useAuth();
+  const { t } = useTranslation();
 
   if (!isOpen) return null;
 
@@ -51,10 +53,10 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
         <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-base font-bold text-white">Notifications</h2>
+            <h2 className="text-base font-bold text-white">{t('nav.notifications', 'Notifications')}</h2>
             {unreadNotifsCount > 0 && (
               <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-600 text-white">
-                {unreadNotifsCount} new
+                {t('notif.unread_count', { count: unreadNotifsCount })}
               </span>
             )}
           </div>
@@ -63,10 +65,10 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
               <button
                 onClick={markAllNotificationsAsRead}
                 className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 cursor-pointer"
-                title="Mark all as read"
+                title={t('notif.mark_all_read', 'Mark all as read')}
               >
                 <CheckCheck className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Mark all read</span>
+                <span className="hidden sm:inline">{t('notif.mark_all_read', 'Mark all read')}</span>
               </button>
             )}
             <button
@@ -84,7 +86,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
           {notifications.length === 0 ? (
             <div className="p-8 text-center text-slate-500 text-xs">
               <Bell className="w-8 h-8 mx-auto mb-2 opacity-40" />
-              No notifications yet. Activity alerts will appear here.
+              {t('notif.empty_desc', 'No notifications yet. Activity alerts will appear here.')}
             </div>
           ) : (
             notifications.map((notif) => (
@@ -120,7 +122,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
                         {notif.dispatchNumber}
                       </span>
                     )}
-                    <span className="text-[10px] text-slate-400">Channel: {notif.channel}</span>
+                    <span className="text-[10px] text-slate-400">{t('notif.channel_label', { channel: notif.channel })}</span>
                     <span className="text-[10px] text-emerald-400 font-medium ml-auto">
                       {notif.status}
                     </span>
