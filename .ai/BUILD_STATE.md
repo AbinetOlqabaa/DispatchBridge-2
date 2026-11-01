@@ -18,13 +18,13 @@
 | Phase 3 | `.ai/03_AUTH_AND_AUTHORIZATION.md` | **COMPLETE** | One-time random bootstrap secret (`/api/auth/bootstrap-superadmin`), HMAC signed session tokens, multi-tenant RBAC, quick role sandbox switcher for testing. |
 | Phase 4 | `.ai/04_DISPATCH_AND_RECONCILIATION.md` | **COMPLETE** | 2-step dispatch creation (draft + pre-submit review), unguessable share tokens (`/?token=...`), tamper-resistant immutable quantity enforcement, line-level discrepancy reporting (shortage, damaged, loss), signoffs, sender acknowledgement/resolution. |
 | Phase 5 | `.ai/05_NOTIFICATIONS_AND_AUDIT.md` | **COMPLETE** | Real-time in-app notification drawer with unread counter & read tracking; immutable audit trail logging actor, role, correlation ID, and metadata for every mutation. |
-| Phase 6 | `.ai/06_TABLET_FIRST_UI_UX_AND_ACCESSIBILITY.md` | **COMPLETE** | Comprehensive tablet portrait (768x1024, 820x1180) & landscape (1024x768, 1180x820) optimizations. Balanced 2-column card wrapping, unclipped filter pills, container-bounded tables with enhanced high-contrast scrollbars, and unclipped navigation. |
+| Phase 6 | `.ai/06_TABLET_FIRST_UI_UX_AND_ACCESSIBILITY.md` | **COMPLETE** | Comprehensive tablet portrait (768x1024, 820x1180) & landscape (1024x768, 1180x820) optimizations. Dedicated `TabletSidebar` for `md:landscape:flex`, minimum 44x44px touch targets across all interactive controls (buttons, filters, nav items), balanced 2-column card wrapping, and container-bounded tables with enhanced high-contrast scrollbars. |
 | Phase 7 | `.ai/07_SECURITY_PRIVACY_AND_FAILURES.md` | **COMPLETE** | Strict cross-tenant isolation on store and route levels (HTTP 403 on mismatched tenant/partner access), timingSafeEqual constant-time comparisons, idempotency key deduplication. |
 | Phase 8 | `.ai/08_TESTING_AND_ACCEPTANCE.md` | **COMPLETE** | 44 automated unit, security, integration, identity, and localization acceptance tests passing with 0 failures (`npm test`). `tsc --noEmit` passing with 0 type errors. |
 | Phase 9 | `.ai/09_RELEASE_CHECKLIST.md` | **COMPLETE** | Release checklist evaluated honestly. Verdict: **READY FOR STAGING**. |
 | Identity Update | `.ai/IDENTITY_UPDATE_EXECUTE.md` | **COMPLETE** | Fayda e-ID national ID adapter (FAN/FIN masking, simulation badge, production fail-closed), mobile-first E.164 auth, cryptographic 6-digit OTP challenges, password reset/change step-up, user profile photo upload, and `/api/admin/users` governance with suspension audit logs. |
 | Extension & Governance | `.ai/00_MASTER_PLAN.md` | **COMPLETE** | Team directory & cryptographic invitation tokens (`/api/memberships`, `TeamPage.tsx`), Executive Performance & Reconciliation Reports (`/api/reports/analytics`, `ReportsPage.tsx`), User Profile & Credentials manager (`ProfilePage.tsx`), Multi-Tenant Context Switcher. |
-| Localization & i18n | `.ai/00_MASTER_PLAN.md` | **COMPLETE** | Comprehensive end-to-end multi-language translation across all 5 national languages (English, Amharic, Afan Oromo, Tigrinya, Somali). 100% dictionary key parity, zero missing keys, parameter interpolation, and external recipient native language switcher. |
+| Localization & i18n | `.ai/00_MASTER_PLAN.md` | **COMPLETE** | Comprehensive end-to-end multi-language translation across all 5 national languages (English, Amharic, Afan Oromo, Tigrinya, Somali). 100% dictionary key parity (110+ keys), zero missing keys, parameter interpolation, charts, tables, partner manifests, and external recipient native language switcher. |
 
 ---
 
@@ -168,6 +168,15 @@ $ npm test
 ---
 
 ## 5. Changes Made in This Session & Acceptance Evidence
+- **Tablet First Navigation & Touch-Target Accessibility Enhancement**:
+  - Implemented dedicated left sidebar navigation for tablet landscape (`TabletSidebar.tsx` rendered with `md:landscape:flex`, while top `Navbar` is hidden on `md:landscape:hidden` and bottom nav hidden on `md:hidden`).
+  - Implemented a complete touch-target accessibility pass ensuring all buttons, filters, navigation items, and list actions strictly meet the WCAG 44x44px minimum target size:
+    - `Navbar.tsx`: All action buttons (theme toggle, language selector, notifications bell, profile trigger, role switcher, logout) configured with `min-w-[44px] min-h-[44px]`.
+    - `TabletSidebar.tsx`: Dedicated brand header, nav links with active state indicator, simulated role switcher, quick language selector, theme toggle, and logout button all exceeding 44px height/width touch targets.
+    - `DispatchListPage.tsx`: Status filter pills (`px-3.5 py-2.5 min-h-[44px]`), search input (`min-h-[44px]`), export triggers/options (`min-h-[44px]`), bulk upload button (`min-h-[44px]`), create dispatch button (`min-h-[44px]`), and table row action buttons (`w-11 h-11 min-w-[44px] min-h-[44px]`).
+    - `BottomNav.tsx`: Bottom bar navigation buttons upgraded to `min-w-[44px] min-h-[44px]`.
+    - `index.css`: Added `.touch-target-min` class, `touch-action: manipulation`, and tablet landscape 2-column flex/grid container rules.
+  - Ensured consistent 2-column card wrapping for tablet devices in both portrait and landscape orientations (`md:grid-cols-2 md:landscape:grid-cols-2`).
 - **Complete End-to-End Page Language Translation Enhancement Strategy**:
   - Conducted deep audit of all user-facing pages, views, dialogs, buttons, and notifications to identify remaining untranslated English strings.
   - Implemented full localization support across all 5 national languages:

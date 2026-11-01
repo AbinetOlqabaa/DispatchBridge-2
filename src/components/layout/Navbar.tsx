@@ -167,14 +167,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setLangDropdownOpen(false);
                   setRoleSwitchOpen(false);
                 }}
-                className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700 transition-colors cursor-pointer"
+                className="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700 transition-colors cursor-pointer"
                 title={`Theme: ${themeMode}`}
                 aria-label="Select theme mode"
               >
                 {effectiveTheme === 'dark' ? (
-                  <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                  <Moon className="w-4 h-4 text-indigo-400" />
                 ) : (
-                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <Sun className="w-4 h-4 text-amber-400" />
                 )}
               </button>
 
@@ -240,15 +240,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setThemeDropdownOpen(false);
                   setRoleSwitchOpen(false);
                 }}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700 text-xs font-medium transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700 text-xs font-medium transition-colors cursor-pointer min-h-[44px]"
                 title="Select language"
                 aria-label="Select language"
               >
-                <Globe className="w-3.5 h-3.5 text-sky-400" />
+                <Globe className="w-4 h-4 text-sky-400" />
                 <span className="font-semibold uppercase tracking-wider text-[11px]">
                   {currentLanguageOption.shortLabel}
                 </span>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
               {langDropdownOpen && (
@@ -299,16 +299,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               {user && (
                 <button
                   onClick={onOpenNotifications}
-                className="relative p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                title={t('nav.notifications', 'In-app notification alerts')}
-                aria-label="View notifications"
-              >
-                <Bell className="w-4 h-4" />
-                {unreadNotifsCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                )}
-              </button>
-            )}
+                  className="relative flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-700"
+                  title={t('nav.notifications', 'In-app notification alerts')}
+                  aria-label="View notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                  {unreadNotifsCount > 0 && (
+                    <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                  )}
+                </button>
+              )}
 
             {/* Demo Role Quick Switcher */}
             <div className="relative">
@@ -318,12 +318,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setThemeDropdownOpen(false);
                   setLangDropdownOpen(false);
                 }}
-                className="flex items-center gap-1.5 text-xs bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer transition-colors"
+                className="flex items-center gap-1.5 text-xs bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 px-3 py-2 rounded-xl border border-slate-700 cursor-pointer transition-colors min-h-[44px]"
                 title="Switch simulated role for testing"
               >
-                <UserCheck className="w-3.5 h-3.5 text-sky-400" />
+                <UserCheck className="w-4 h-4 text-sky-400" />
                 <span className="hidden xl:inline">{t('nav.simulate_role', 'Simulate Role')}</span>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
               {roleSwitchOpen && (
@@ -367,10 +367,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             {user ? (
-              <div className="flex items-center gap-1.5 xl:gap-2 pl-2 border-l border-slate-800">
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
                 <button
                   onClick={onOpenProfile}
-                  className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-800/80 transition-colors cursor-pointer group text-left"
+                  className="flex items-center gap-2 px-2 py-1 rounded-xl hover:bg-slate-800/80 transition-colors cursor-pointer group text-left min-h-[44px]"
                   title="View / Edit Profile"
                   aria-label="View or edit profile"
                 >
@@ -392,7 +392,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
                 <button
                   onClick={logout}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800/80 transition-colors cursor-pointer min-w-[34px] min-h-[34px] flex items-center justify-center"
+                  className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-slate-800/80 transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center border border-transparent hover:border-slate-700"
                   title={t('nav.signout', 'Sign Out')}
                   aria-label="Sign Out"
                 >
@@ -402,9 +402,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={onOpenAuth}
-                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm shadow-indigo-600/30 transition-all cursor-pointer whitespace-nowrap"
+                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm shadow-indigo-600/30 transition-all cursor-pointer whitespace-nowrap min-h-[44px]"
               >
-                <LogIn className="w-3.5 h-3.5" />
+                <LogIn className="w-4 h-4" />
                 <span>{t('nav.signin', 'Sign In')}</span>
               </button>
             )}
@@ -415,7 +415,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Quick theme toggle on mobile */}
             <button
               onClick={() => setThemeMode(effectiveTheme === 'dark' ? 'light' : 'dark')}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white"
+              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-white"
               aria-label="Toggle dark/light theme"
             >
               {effectiveTheme === 'dark' ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-400" />}
@@ -424,19 +424,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             {user && (
               <button
                 onClick={onOpenNotifications}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white relative"
+                className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-white relative"
                 aria-label="Notifications"
               >
                 <Bell className="w-5 h-5" />
                 {unreadNotifsCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-indigo-500" />
+                  <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-indigo-500" />
                 )}
               </button>
             )}
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none"
+              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -454,7 +454,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               key={item.id}
               onClick={() => onSelectTab(item.id)}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all cursor-pointer min-h-[38px] shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all cursor-pointer min-h-[44px] shrink-0 ${
                 isActive
                   ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'

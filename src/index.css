@@ -123,4 +123,39 @@ html.light textarea::placeholder {
   background-color: #64748b;
 }
 
+/* Tablet Device Ergonomics & Orientation Support (md: 768px - 1024px) */
+@media (min-width: 768px) and (orientation: landscape) {
+  /* Dedicated tablet landscape left sidebar layout */
+  .tablet-landscape-sidebar-container {
+    display: flex !important;
+    flex-direction: row !important;
+  }
+
+  /* Consistent 2-column view on tablets in landscape */
+  .tablet-2col {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+}
+
+@media (min-width: 768px) and (orientation: portrait) {
+  /* Consistent 2-column view on tablets in portrait */
+  .tablet-2col {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+}
+
+/* Accessibility Touch-Target Minimum Rules (44x44px) */
+.touch-target-min {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
 

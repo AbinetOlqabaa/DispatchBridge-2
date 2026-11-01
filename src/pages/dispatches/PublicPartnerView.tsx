@@ -205,10 +205,10 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
 
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer min-h-[44px]"
           >
-            <Printer className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Print</span>
+            <Printer className="w-4 h-4" />
+            <span className="hidden sm:inline">{t('manifest.print', 'Print')}</span>
           </button>
           {onExit && (
             <button
@@ -226,15 +226,15 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div>
             <div className="text-xs text-indigo-400 font-semibold uppercase tracking-wider">
-              Supplier Delivery Manifest
+              {t('manifest.supplier_title', 'Supplier Delivery Manifest')}
             </div>
             <h1 className="text-2xl font-bold font-mono text-white mt-0.5">{dispatch.dispatchNumber}</h1>
-            <p className="text-xs text-slate-400">Issued by {dispatch.senderBusinessName}</p>
+            <p className="text-xs text-slate-400">{t('manifest.issued_by', 'Issued by {name}', { name: dispatch.senderBusinessName })}</p>
           </div>
           <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1">
             <StatusBadge status={dispatch.status} />
             <span className="text-[11px] text-slate-400 font-mono">
-              Dispatched: {new Date(dispatch.dispatchedAt).toLocaleDateString()}
+              {t('table.dispatched', 'Dispatched')}: {new Date(dispatch.dispatchedAt).toLocaleDateString()}
             </span>
           </div>
         </div>
@@ -242,16 +242,16 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
         {/* Shipper & Receiver details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
-            <span className="text-slate-500 font-semibold block mb-1">Delivering Shipper:</span>
+            <span className="text-slate-500 font-semibold block mb-1">{t('manifest.delivering_shipper', 'Delivering Shipper')}:</span>
             <div className="font-bold text-white text-sm">{dispatch.senderBusinessName}</div>
-            <div className="text-slate-400 text-[11px] mt-0.5">Origin: {dispatch.originLocationSnapshot.label}</div>
+            <div className="text-slate-400 text-[11px] mt-0.5">{t('table.origin_label', 'Origin')}: {dispatch.originLocationSnapshot.label}</div>
             <div className="text-slate-400 text-[11px]">
-              Driver: {dispatch.driverName || 'Standard Freight'} ({dispatch.vehicleReg || 'TRK'})
+              {t('dispatch.carrier_driver', 'Driver')}: {dispatch.driverName || 'Standard Freight'} ({dispatch.vehicleReg || 'TRK'})
             </div>
           </div>
 
           <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
-            <span className="text-slate-500 font-semibold block mb-1">Receiving Destination:</span>
+            <span className="text-slate-500 font-semibold block mb-1">{t('manifest.receiving_destination', 'Receiving Destination')}:</span>
             <div className="font-bold text-white text-sm">{dispatch.destinationSnapshot.partnerName}</div>
             <div className="text-slate-400 text-[11px] mt-0.5 flex items-start gap-1">
               <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
@@ -264,7 +264,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
         <div className="bg-indigo-950/40 border border-indigo-900/60 p-3 rounded-xl flex items-center gap-2.5 text-xs text-indigo-200">
           <ShieldCheck className="w-4 h-4 text-indigo-400 shrink-0" />
           <div>
-            <span className="font-semibold text-white">Receipt Acknowledged:</span> Opening this delivery manifest confirmed receipt viewing on the shipper's dispatch audit board.
+            <span className="font-semibold text-white">{t('manifest.delivery_acknowledged_title', 'Receipt Acknowledged')}:</span> {t('manifest.receipt_view_notice', 'Opening this delivery manifest confirmed receipt viewing on the shipper\'s dispatch audit board.')}
           </div>
         </div>
       </div>
@@ -281,10 +281,10 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
             <Package className="w-4 h-4 text-sky-400" />
-            Cargo Checklist ({dispatch.lines.length} items)
+            {t('manifest.cargo_checklist', 'Cargo Checklist ({count} items)', { count: dispatch.lines.length })}
           </h2>
           <span className="text-xs font-mono font-semibold text-slate-300">
-            Total Dispatched: {dispatch.totalQuantityDispatched} units
+            {t('manifest.total_dispatched_units', 'Total Dispatched: {units} units', { units: dispatch.totalQuantityDispatched })}
           </span>
         </div>
 
@@ -294,12 +294,12 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
               <div>
                 <span className="font-mono text-[11px] text-indigo-300 font-semibold mr-2">{line.sku}</span>
                 <span className="font-semibold text-slate-200">{line.itemName}</span>
-                {line.notes && <p className="text-[11px] text-rose-300 mt-0.5">Note: {line.notes}</p>}
+                {line.notes && <p className="text-[11px] text-rose-300 mt-0.5">{t('table.notes', 'Note')}: {line.notes}</p>}
               </div>
 
               <div className="flex items-center gap-4 text-right shrink-0">
                 <div>
-                  <span className="text-[11px] text-slate-500 block">Sent</span>
+                  <span className="text-[11px] text-slate-500 block">{t('table.sent_col', 'Sent')}</span>
                   <span className="font-mono font-bold text-slate-200">
                     {line.quantitySent} {line.unit}
                   </span>
@@ -307,7 +307,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
 
                 {line.quantityReceived !== undefined && (
                   <div>
-                    <span className="text-[11px] text-slate-500 block">Received</span>
+                    <span className="text-[11px] text-slate-500 block">{t('table.received_col', 'Received')}</span>
                     <span className="font-mono font-bold text-emerald-400">
                       {line.quantityReceived} {line.unit}
                     </span>
@@ -316,7 +316,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
 
                 {line.lossQty && line.lossQty > 0 ? (
                   <div>
-                    <span className="text-[11px] text-rose-400 block font-semibold">Short</span>
+                    <span className="text-[11px] text-rose-400 block font-semibold">{t('table.short_col', 'Short')}</span>
                     <span className="font-mono font-bold text-rose-400">
                       -{line.lossQty} {line.unit}
                     </span>
@@ -334,26 +334,26 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-emerald-400 font-bold">
               <CheckCircle2 className="w-4 h-4" />
-              <span>Delivery Acknowledged & Signed</span>
+              <span>{t('manifest.delivery_acknowledged_title', 'Delivery Acknowledged & Signed')}</span>
             </div>
             <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-2.5 py-1 rounded-lg">
               <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-              <span>Dock Record Locked</span>
+              <span>{t('manifest.dock_record_locked', 'Dock Record Locked')}</span>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-slate-300">
             <div>
-              <span className="text-slate-500 block text-[11px]">Signer Name & Role:</span>
+              <span className="text-slate-500 block text-[11px]">{t('manifest.signer_info', 'Signer Name & Role:')}</span>
               <strong className="text-white">{dispatch.receiverSignoff.signerName}</strong>
               <div className="text-[11px] text-slate-400">{dispatch.receiverSignoff.signerRole}</div>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Signed At:</span>
+              <span className="text-slate-500 block text-[11px]">{t('manifest.signed_at', 'Signed At:')}</span>
               <span className="text-slate-200">{new Date(dispatch.receiverSignoff.signedAt).toLocaleString()}</span>
             </div>
             <div>
-              <span className="text-slate-500 block text-[11px]">Comments:</span>
-              <span className="text-slate-300 italic">{dispatch.receiverSignoff.comments || 'No remarks recorded.'}</span>
+              <span className="text-slate-500 block text-[11px]">{t('manifest.remarks', 'Remarks:')}</span>
+              <span className="text-slate-300 italic">{dispatch.receiverSignoff.comments || t('manifest.no_remarks', 'No remarks recorded.')}</span>
             </div>
           </div>
 

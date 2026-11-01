@@ -26,6 +26,7 @@ import { SystemStatusPage } from './pages/system/SystemStatusPage.js';
 import { RecommendationsView } from './components/recommendations/RecommendationsView.js';
 import { NotificationDrawer } from './components/notifications/NotificationDrawer.js';
 import { ProfileModal } from './components/auth/ProfileModal.js';
+import { TabletSidebar } from './components/layout/TabletSidebar.js';
 
 import { LoadingSpinner } from './components/common/LoadingSpinner.js';
 
@@ -150,9 +151,9 @@ function MainApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white pb-20 md:pb-8 w-full max-w-full overflow-x-hidden">
-      {/* Top Navigation */}
-      <Navbar
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:landscape:flex-row font-sans selection:bg-indigo-500 selection:text-white pb-20 md:pb-8 md:landscape:pb-0 w-full max-w-full overflow-x-hidden">
+      {/* Tablet Landscape Dedicated Left Sidebar */}
+      <TabletSidebar
         currentTab={currentTab}
         onSelectTab={(tab) => {
           setSelectedDispatchId(null);
@@ -166,56 +167,76 @@ function MainApp() {
         onOpenProfile={() => setIsProfileModalOpen(true)}
       />
 
-      {/* Sandbox Isolation & Notification Banners */}
-      <NotificationBanner
-        onOpenPhoneVerify={() => {
-          setAuthModalMode('verifyPhone');
-          setIsAuthModalOpen(true);
-        }}
-        onNavigateStatus={() => {
-          setSelectedDispatchId(null);
-          setCurrentTab('status');
-        }}
-      />
-
-      {/* Main View Area - With max-w-full and overflow containment */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-24 md:pb-8 max-w-full overflow-x-hidden">
-        {selectedDispatchId ? (
-          <DispatchDetailPage
-            dispatchId={selectedDispatchId}
-            onBack={() => setSelectedDispatchId(null)}
-            onOpenPublicLink={(token) => setPublicShareToken(token)}
+      {/* Main Content Column */}
+      <div className="flex-1 min-w-0 flex flex-col w-full max-w-full overflow-x-hidden">
+        {/* Top Navigation on Mobile and Tablet Portrait */}
+        <div className="md:landscape:hidden">
+          <Navbar
+            currentTab={currentTab}
+            onSelectTab={(tab) => {
+              setSelectedDispatchId(null);
+              setCurrentTab(tab);
+            }}
+            onOpenAuth={() => {
+              setAuthModalMode('signin');
+              setIsAuthModalOpen(true);
+            }}
+            onOpenNotifications={() => setIsNotificationsOpen(true)}
+            onOpenProfile={() => setIsProfileModalOpen(true)}
           />
-        ) : (
-          <>
-            {currentTab === 'dashboard' && renderDashboard()}
-            {currentTab === 'dispatches' && (
-              <DispatchListPage
-                onSelectDispatch={(id) => setSelectedDispatchId(id)}
-                onCreateDispatch={() => setIsCreateDispatchOpen(true)}
-                onOpenPublicLink={(token) => setPublicShareToken(token)}
-              />
-            )}
-            {currentTab === 'locations' && <LocationsPage />}
-            {currentTab === 'partners' && (
-              <PartnersPage
-                onCreateDispatchWithPartner={(partnerId) => {
-                  setIsCreateDispatchOpen(true);
-                }}
-              />
-            )}
-            {currentTab === 'recommendations' && (
-              <RecommendationsView
-                onCreateDispatchWithItem={(item) => {
-                  setIsCreateDispatchOpen(true);
-                }}
-              />
-            )}
-            {currentTab === 'audit' && <AuditPage />}
-            {currentTab === 'status' && <SystemStatusPage />}
-          </>
-        )}
-      </main>
+        </div>
+
+        {/* Sandbox Isolation & Notification Banners */}
+        <NotificationBanner
+          onOpenPhoneVerify={() => {
+            setAuthModalMode('verifyPhone');
+            setIsAuthModalOpen(true);
+          }}
+          onNavigateStatus={() => {
+            setSelectedDispatchId(null);
+            setCurrentTab('status');
+          }}
+        />
+
+        {/* Main View Area - With max-w-full and overflow containment */}
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-24 md:pb-8 max-w-full overflow-x-hidden">
+          {selectedDispatchId ? (
+            <DispatchDetailPage
+              dispatchId={selectedDispatchId}
+              onBack={() => setSelectedDispatchId(null)}
+              onOpenPublicLink={(token) => setPublicShareToken(token)}
+            />
+          ) : (
+            <>
+              {currentTab === 'dashboard' && renderDashboard()}
+              {currentTab === 'dispatches' && (
+                <DispatchListPage
+                  onSelectDispatch={(id) => setSelectedDispatchId(id)}
+                  onCreateDispatch={() => setIsCreateDispatchOpen(true)}
+                  onOpenPublicLink={(token) => setPublicShareToken(token)}
+                />
+              )}
+              {currentTab === 'locations' && <LocationsPage />}
+              {currentTab === 'partners' && (
+                <PartnersPage
+                  onCreateDispatchWithPartner={(partnerId) => {
+                    setIsCreateDispatchOpen(true);
+                  }}
+                />
+              )}
+              {currentTab === 'recommendations' && (
+                <RecommendationsView
+                  onCreateDispatchWithItem={(item) => {
+                    setIsCreateDispatchOpen(true);
+                  }}
+                />
+              )}
+              {currentTab === 'audit' && <AuditPage />}
+              {currentTab === 'status' && <SystemStatusPage />}
+            </>
+          )}
+        </main>
+      </div>
 
       {/* Mobile Bottom Navigation */}
       <BottomNav

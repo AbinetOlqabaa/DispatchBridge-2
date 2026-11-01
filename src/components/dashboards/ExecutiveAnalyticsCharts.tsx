@@ -361,6 +361,10 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                         ? t('condition.damaged')
                         : category === 'SHORTAGE'
                         ? t('discrepancy.shortage')
+                        : category === 'COUNT_MISMATCH'
+                        ? t('discrepancy.count_mismatch')
+                        : category === 'LOST'
+                        ? t('discrepancy.lost')
                         : category.replace(/_/g, ' ')}
                     </span>
                     <span className="font-mono text-rose-400 font-bold">{count} {t('unit.units')} ({pct}%)</span>

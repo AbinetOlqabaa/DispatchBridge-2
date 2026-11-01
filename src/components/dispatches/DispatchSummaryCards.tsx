@@ -77,7 +77,7 @@ export const DispatchSummaryCards: React.FC<DispatchSummaryCardsProps> = ({ disp
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 md:landscape:grid-cols-2 xl:grid-cols-3 gap-4">
       {/* Card 1: Pending Deliveries */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm hover:border-slate-700 transition-all flex flex-col justify-between">
         <div>
@@ -187,7 +187,7 @@ export const DispatchSummaryCards: React.FC<DispatchSummaryCardsProps> = ({ disp
       </div>
 
       {/* Card 3: Completed Today */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm hover:border-slate-700 transition-all flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm hover:border-slate-700 transition-all flex flex-col justify-between sm:col-span-2 md:col-span-2 xl:col-span-1">
         <div>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -237,7 +237,7 @@ export const DispatchSummaryCards: React.FC<DispatchSummaryCardsProps> = ({ disp
               <Area
                 type="monotone"
                 dataKey="completed"
-                name="Completed"
+                name={t('status.completed', 'Completed')}
                 stroke="#c084fc"
                 strokeWidth={2}
                 fillOpacity={1}

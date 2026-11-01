@@ -31,7 +31,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
           <button
             key={item.id}
             onClick={() => onSelectTab(item.id)}
-            className={`flex flex-col items-center justify-center py-1 px-2 rounded-lg transition-colors cursor-pointer ${
+            className={`flex flex-col items-center justify-center py-1 px-2 rounded-lg transition-colors cursor-pointer min-w-[44px] min-h-[44px] ${
               isActive ? 'text-sky-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
