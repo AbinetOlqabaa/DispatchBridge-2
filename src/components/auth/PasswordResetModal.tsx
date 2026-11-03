@@ -11,6 +11,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { api } from '../../services/api.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { SUPPORTED_COUNTRIES, normalizeToE164 } from '../../utils/phoneUtils.js';
 
 interface PasswordResetModalProps {
@@ -24,6 +25,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
   onClose,
   onBackToSignIn,
 }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<'IDENTITY' | 'OTP'>('IDENTITY');
   const [selectedCountry, setSelectedCountry] = useState(SUPPORTED_COUNTRIES[0]); // Ethiopia (+251)
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -130,11 +132,11 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
         <div className="mb-6">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold uppercase tracking-wider mb-2">
             <KeyRound className="w-3.5 h-3.5" />
-            <span>Identity-Protected Recovery</span>
+            <span>{t('auth.verified_badge')}</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white">Reset Account Password</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-white">{t('auth.reset_title')}</h2>
           <p className="text-sm text-slate-400 mt-1">
-            Authenticate your Fayda identity credentials to dispatch a recovery OTP to your bound phone number.
+            {t('auth.reset_subtitle')}
           </p>
         </div>
 
@@ -143,7 +145,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
             <div className="flex items-start gap-2.5">
               <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-emerald-200">Password Reset Complete</p>
+                <p className="font-semibold text-emerald-200">{t('auth.reset_success_title')}</p>
                 <p className="mt-1 text-slate-300">{statusMessage}</p>
               </div>
             </div>
@@ -151,7 +153,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
               onClick={onBackToSignIn}
               className="w-full mt-2 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition cursor-pointer"
             >
-              Return to Sign In
+              {t('auth.return_to_signin')}
             </button>
           </div>
         ) : (
@@ -168,7 +170,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
                 {/* Mobile Phone */}
                 <div>
                   <label className="block text-xs font-medium text-slate-300 mb-1">
-                    Registered Mobile Number <span className="text-rose-400">*</span>
+                    {t('auth.mobile_phone')} <span className="text-rose-400">*</span>
                   </label>
                   <div className="flex gap-2">
                     <select
@@ -204,7 +206,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-xs font-medium text-slate-300">
-                      FAN (Fayda Account Number - 16 digits) <span className="text-rose-400">*</span>
+                      {t('auth.fan_label')} <span className="text-rose-400">*</span>
                     </label>
                     <span className="text-[10px] text-slate-500">{cleanFan.length}/16</span>
                   </div>
@@ -226,7 +228,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-xs font-medium text-slate-300">
-                      FIN (Fayda Identification Number - 12 digits) <span className="text-rose-400">*</span>
+                      {t('auth.fin_label')} <span className="text-rose-400">*</span>
                     </label>
                     <span className="text-[10px] text-slate-500">{cleanFin.length}/12</span>
                   </div>
@@ -250,10 +252,10 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
                   className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition shadow-lg shadow-indigo-600/20 disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? (
-                    <span>Verifying Identity...</span>
+                    <span>{t('auth.submitting')}</span>
                   ) : (
                     <>
-                      <span>Verify & Send Recovery OTP</span>
+                      <span>{t('auth.verify_send_otp')}</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -265,7 +267,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
                   className="w-full inline-flex items-center justify-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 pt-2 transition cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back to Sign In</span>
+                  <span>{t('auth.back_to_signin')}</span>
                 </button>
               </form>
             ) : (
@@ -273,7 +275,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
               <form onSubmit={handleCompleteRecovery} className="space-y-4">
                 <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Recovery Phone:</span>
+                    <span className="text-slate-400">{t('auth.mobile_phone')}:</span>
                     <span className="font-mono text-white font-semibold">{maskedPhonePreview}</span>
                   </div>
                   {simulatedCode && (
@@ -288,7 +290,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
 
                 <div>
                   <label className="block text-xs font-medium text-slate-300 mb-1">
-                    Enter 6-Digit OTP Code <span className="text-rose-400">*</span>
+                    {t('auth.enter_sms_otp')} <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -303,7 +305,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
 
                 <div>
                   <label className="block text-xs font-medium text-slate-300 mb-1">
-                    New Password (min 8 chars) <span className="text-rose-400">*</span>
+                    {t('auth.new_password')} <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="password"
@@ -317,7 +319,7 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
 
                 <div>
                   <label className="block text-xs font-medium text-slate-300 mb-1">
-                    Confirm New Password <span className="text-rose-400">*</span>
+                    {t('auth.confirm_password')} <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="password"
@@ -335,14 +337,14 @@ export const PasswordResetModal: React.FC<PasswordResetModalProps> = ({
                     onClick={() => setStep('IDENTITY')}
                     className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition cursor-pointer"
                   >
-                    Back
+                    {t('action.back')}
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting || otpCode.length < 6 || newPassword.length < 8}
                     className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition shadow-lg shadow-emerald-600/20 disabled:opacity-50 cursor-pointer"
                   >
-                    {isSubmitting ? 'Updating...' : 'Reset Password'}
+                    {isSubmitting ? t('auth.submitting') : t('auth.complete_reset')}
                   </button>
                 </div>
               </form>

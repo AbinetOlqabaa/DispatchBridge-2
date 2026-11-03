@@ -184,15 +184,19 @@ $ npm test
   - `src/pages/dashboards/BusinessOwnerDashboard.tsx`: Upgraded recent dispatches table to `min-w-[700px] sm:min-w-[740px] lg:min-w-full` with >=40px touch target button (`px-3 py-2 min-h-[40px]`).
   - `src/pages/dashboards/ReceiverDashboard.tsx`: Upgraded detail slip button to >=40px touch target (`px-3 py-2 min-h-[40px]`).
   - `src/pages/dispatches/DispatchListPage.tsx` & `src/pages/dispatches/DispatchDetailPage.tsx`: Previously bounded to `min-w-[720px] sm:min-w-[760px] lg:min-w-full` and `min-w-[680px] sm:min-w-[720px] lg:min-w-full`.
+- **Authentication & Security Modals Complete Localization (`RegisterModal.tsx`, `PasswordResetModal.tsx`, `SignInModal.tsx`)**:
+  - `src/components/auth/RegisterModal.tsx`: Fully localized all form inputs, legal name labels, E.164 phone selector, FAN/FIN inputs, role selectors (`role.business_owner`, `role.sender`, `role.receiver`), consent checkboxes, simulation banners, and SMS OTP verification dialogue.
+  - `src/components/auth/PasswordResetModal.tsx`: Fully localized recovery title, subtitle, mobile input, FAN/FIN fields, OTP submission, new password inputs, status messages, and return to sign-in links.
+  - `src/components/auth/SignInModal.tsx`: Fully localized tabs, demo switcher cards, and identity prompts.
 - **Localization & Multi-Language Translation System Parity (`src/i18n/translations.ts`, `src/context/LanguageContext.tsx` & `test/runTests.ts`)**:
   - 100% dictionary bidirectional parity across all 5 national languages (English, Amharic, Afaan Oromoo, Tigrinya, Somali) with **1,185 unique keys** in each language and zero missing keys.
   - Added 23 new `seed.addr_*`, `seed.city_*`, and `seed.person_*` keys across all 5 languages and mapped all exact strings from `src/server/adapters/sandboxStore.ts` (including notifications, route waypoints, audit log details, addresses, cities, and dispatcher/driver/partner names) in `DYNAMIC_SEED_MAP`.
   - Wrapped dynamic fields (`senderName`, `destinationSnapshot.address`, `originLocationSnapshot.address`, `driverName`, `signerName`, `signerRole`, `openedByName`, `resolvedByName`, `loc.addressLines`, `loc.city`, `partner.deliveryAddress`, `log.actorName`, `member.name`, `user.name`) with `t(...)` across `DispatchListPage.tsx`, `BusinessOwnerDashboard.tsx`, `SenderDashboard.tsx`, `ReceiverDashboard.tsx`, `DispatchDetailPage.tsx`, `PublicPartnerView.tsx`, `LocationsPage.tsx`, `LocationsMapView.tsx`, `PartnersPage.tsx`, `AuditPage.tsx`, `TeamPage.tsx`, `SuperAdminDashboard.tsx`, and `ProfileSummaryCard.tsx`.
 - **Automated Acceptance & Quality Gate Verification**:
-  - `npm test`: **45/45 tests passed with 0 failures** (`tsx test/runTests.ts`) including unit, security, tenant isolation, workflow integration, Fayda e-ID, tablet structural contracts, and 5-language dictionary parity (1,185 keys/language).
+  - `npm test`: **45/45 tests passed with 0 failures** (`tsx test/runTests.ts`) including unit, security, tenant isolation, workflow integration, Fayda e-ID, tablet structural contracts, parameter interpolation, and 5-language dictionary parity (1,185 keys/language).
   - `npm run lint`: **0 errors** (`tsc --noEmit`).
   - `compile_applet`: **SUCCESS**.
-  - Verified in headless Chromium via `playwright-cli` across `390x844`, `768x1024`, `820x1180`, `1024x768`, `1180x820`, and `1440x900` with `scrollWidth === innerWidth` (`overflow: false`) and 100% localized table/page rendering.
+  - Verified in headless Chromium across `390x844`, `768x1024`, `820x1180`, `1024x768`, `1180x820`, and `1440x900` with `scrollWidth === innerWidth` (`overflow: false`) and 100% localized table/page rendering.
 
 ---
 

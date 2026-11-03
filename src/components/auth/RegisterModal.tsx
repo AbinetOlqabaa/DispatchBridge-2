@@ -17,6 +17,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { UserRole } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { SUPPORTED_COUNTRIES, normalizeToE164, isValidE164 } from '../../utils/phoneUtils.js';
@@ -34,6 +35,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
   onOpenSignIn,
 }) => {
   const { login } = useAuth();
+  const { t } = useTranslation();
 
   // Step 1: Registration Form State
   const [step, setStep] = useState<'FORM' | 'OTP'>('FORM');
@@ -185,11 +187,11 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
         <div className="mb-6">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Fayda e-ID Verified Enrollment</span>
+            <span>{t('auth.verified_badge')}</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white">Create an Account</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-white">{t('auth.register_title')}</h2>
           <p className="text-sm text-slate-400 mt-1">
-            Enroll with your national e-ID for cryptographically verifiable dispatch operations.
+            {t('auth.fayda_enroll_desc')}
           </p>
         </div>
 
@@ -199,7 +201,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
           <div>
             <span className="font-semibold text-sky-200">Simulation / Dev Mode Active:</span>
             <span className="text-slate-300 ml-1">
-              Fayda verification is executed against synthetic fixtures. Production fails closed without live authority credentials.
+              {t('auth.sim_mode_banner')}
             </span>
           </div>
         </div>
@@ -216,7 +218,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             {/* Full Name */}
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1">
-                Full Legal Name (as on Fayda e-ID) <span className="text-rose-400">*</span>
+                {t('auth.legal_name_label')} <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -235,7 +237,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs font-medium text-slate-300">
-                  Mobile Phone Number <span className="text-rose-400">*</span>
+                  {t('auth.mobile_phone')} <span className="text-rose-400">*</span>
                 </label>
                 {phoneNumber && (
                   <span className={`text-[11px] ${isPhoneValid ? 'text-emerald-400' : 'text-amber-400'}`}>
@@ -281,7 +283,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-medium text-slate-300">
-                    FAN (16 digits) <span className="text-rose-400">*</span>
+                    {t('auth.fan_label')} <span className="text-rose-400">*</span>
                   </label>
                   <span className={`text-[10px] ${cleanFan.length === 16 ? 'text-emerald-400' : 'text-slate-500'}`}>
                     {cleanFan.length}/16
@@ -304,7 +306,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-medium text-slate-300">
-                    FIN (12 digits) <span className="text-rose-400">*</span>
+                    {t('auth.fin_label')} <span className="text-rose-400">*</span>
                   </label>
                   <span className={`text-[10px] ${cleanFin.length === 12 ? 'text-emerald-400' : 'text-slate-500'}`}>
                     {cleanFin.length}/12
@@ -328,7 +330,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             {/* Role Selection (Strictly No Super-Admin) */}
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Select Operating Role <span className="text-rose-400">*</span>
+                {t('auth.select_operating_role')} <span className="text-rose-400">*</span>
               </label>
               <div className="grid grid-cols-3 gap-2">
                 <button
@@ -340,8 +342,8 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                       : 'border-slate-800 bg-slate-950/50 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <div className="text-xs font-semibold text-emerald-400">Business Owner</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Manage partner & ledger</div>
+                  <div className="text-xs font-semibold text-emerald-400">{t('role.business_owner')}</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">{t('auth.owner_role_desc')}</div>
                 </button>
 
                 <button
@@ -353,8 +355,8 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                       : 'border-slate-800 bg-slate-950/50 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <div className="text-xs font-semibold text-blue-400">Sender Agent</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Create & dispatch items</div>
+                  <div className="text-xs font-semibold text-blue-400">{t('role.sender')}</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">{t('auth.sender_role_desc')}</div>
                 </button>
 
                 <button
@@ -366,8 +368,8 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                       : 'border-slate-800 bg-slate-950/50 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <div className="text-xs font-semibold text-amber-400">Receiver Agent</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Verify & reconcile</div>
+                  <div className="text-xs font-semibold text-amber-400">{t('role.receiver')}</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">{t('auth.receiver_role_desc')}</div>
                 </button>
               </div>
             </div>
@@ -375,7 +377,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             {/* Business Legal Name */}
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1">
-                Company / Organization Legal Name <span className="text-rose-400">*</span>
+                {t('auth.business_name')} <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -394,7 +396,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Password (min 8 chars) <span className="text-rose-400">*</span>
+                  {t('auth.password')} <span className="text-rose-400">*</span>
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -419,7 +421,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
 
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Confirm Password <span className="text-rose-400">*</span>
+                  {t('auth.confirm_password')} <span className="text-rose-400">*</span>
                 </label>
                 <input
                   type="password"
@@ -442,7 +444,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                   className="mt-0.5 rounded border-slate-700 bg-slate-800 text-indigo-600 focus:ring-indigo-500"
                 />
                 <span className="text-xs text-slate-400 leading-relaxed">
-                  I consent to the verification of my Fayda Account Number (FAN) and Identification Number (FIN) with the National ID Authority gateway, and agree to receive SMS verification codes on my mobile phone.
+                  {t('auth.consent_terms')}
                 </span>
               </label>
             </div>
@@ -453,10 +455,10 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
               className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition shadow-lg shadow-indigo-600/25 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
-                <span>Verifying e-ID & Dispatching OTP...</span>
+                <span>{t('auth.submitting')}</span>
               ) : (
                 <>
-                  <span>Verify Identity & Send OTP</span>
+                  <span>{t('auth.verify_send_otp')}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -467,7 +469,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
           <form onSubmit={handleComplete} className="space-y-4">
             <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Mobile Recipient:</span>
+                <span className="text-slate-400">{t('auth.mobile_phone')}:</span>
                 <span className="font-mono text-white font-semibold">{maskedPhonePreview}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
@@ -487,7 +489,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
 
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5 text-center">
-                Enter 6-Digit SMS Verification Code
+                {t('auth.enter_sms_otp')}
               </label>
               <input
                 type="text"
@@ -506,14 +508,14 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
                 onClick={() => setStep('FORM')}
                 className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition cursor-pointer"
               >
-                Back to Details
+                {t('auth.back_to_details')}
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting || otpCode.length < 6}
                 className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition shadow-lg shadow-emerald-600/20 disabled:opacity-50 cursor-pointer"
               >
-                {isSubmitting ? 'Verifying...' : 'Complete Registration'}
+                {isSubmitting ? t('auth.submitting') : t('auth.complete_enrollment')}
               </button>
             </div>
           </form>
@@ -521,13 +523,13 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
 
         <div className="mt-6 pt-6 border-t border-slate-800">
           <p className="text-center text-xs text-slate-400">
-            Already have an active account?{' '}
+            {t('auth.has_account')}{' '}
             <button
               type="button"
               onClick={onOpenSignIn}
               className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer ml-1"
             >
-              Sign In
+              {t('auth.signin_tab')}
             </button>
           </p>
         </div>

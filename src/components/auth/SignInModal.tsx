@@ -12,6 +12,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useTranslation } from '../../context/LanguageContext.js';
 import { UserRole } from '../../types/dispatch.js';
 import { SUPPORTED_COUNTRIES, normalizeToE164 } from '../../utils/phoneUtils.js';
 
@@ -31,6 +32,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
   onOpenBootstrap,
 }) => {
   const { signIn, quickLoginDemoRole } = useAuth();
+  const { t } = useTranslation();
   const [authMode, setAuthMode] = useState<'MOBILE' | 'EMAIL'>('MOBILE');
   const [selectedCountry, setSelectedCountry] = useState(SUPPORTED_COUNTRIES[0]); // Ethiopia (+251)
   const [phoneNumber, setPhoneNumber] = useState('911019283');
@@ -105,11 +107,11 @@ export const SignInModal: React.FC<SignInModalProps> = ({
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium mb-2">
             <Lock className="w-3.5 h-3.5" />
-            <span>Secure Dispatch Gateway</span>
+            <span>{t('auth.secure_gateway')}</span>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white">Sign In</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-white">{t('nav.signin')}</h2>
           <p className="text-sm text-slate-400 mt-1">
-            Access dispatches, partner receipts, and reconciliation ledger.
+            {t('auth.access_desc')}
           </p>
         </div>
 
@@ -128,7 +130,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
             }`}
           >
             <Smartphone className="w-3.5 h-3.5" />
-            <span>Mobile Number</span>
+            <span>{t('auth.mode_mobile')}</span>
           </button>
           <button
             type="button"
@@ -143,7 +145,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
             }`}
           >
             <Mail className="w-3.5 h-3.5" />
-            <span>Work Email</span>
+            <span>{t('auth.mode_email')}</span>
           </button>
         </div>
 
@@ -158,7 +160,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
           {authMode === 'MOBILE' ? (
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Mobile Number <span className="text-rose-400">*</span>
+                {t('auth.mobile_phone')} <span className="text-rose-400">*</span>
               </label>
               <div className="flex gap-2">
                 {/* Country Code Selector */}
@@ -191,13 +193,13 @@ export const SignInModal: React.FC<SignInModalProps> = ({
                 </div>
               </div>
               <p className="text-[11px] text-slate-500 mt-1">
-                E.164 preview: {normalizeToE164(phoneNumber, selectedCountry.dialCode) || '—'}
+                E.164: {normalizeToE164(phoneNumber, selectedCountry.dialCode) || '—'}
               </p>
             </div>
           ) : (
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Work Email Address <span className="text-rose-400">*</span>
+                {t('auth.email_address')} <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -216,14 +218,14 @@ export const SignInModal: React.FC<SignInModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-medium text-slate-300">
-                Password <span className="text-rose-400">*</span>
+                {t('auth.password')} <span className="text-rose-400">*</span>
               </label>
               <button
                 type="button"
                 onClick={onOpenForgotPassword}
                 className="text-xs text-indigo-400 hover:text-indigo-300 hover:underline cursor-pointer"
               >
-                Forgot password?
+                {t('auth.forgot_password')}
               </button>
             </div>
             <div className="relative">
@@ -255,7 +257,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="rounded border-slate-700 bg-slate-800 text-indigo-600 focus:ring-indigo-500"
               />
-              <span>Remember session securely</span>
+              <span>{t('auth.remember_me')}</span>
             </label>
           </div>
 
@@ -265,10 +267,10 @@ export const SignInModal: React.FC<SignInModalProps> = ({
             className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition shadow-lg shadow-indigo-600/20 disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? (
-              <span>Authenticating...</span>
+              <span>{t('auth.authenticating')}</span>
             ) : (
               <>
-                <span>Sign In</span>
+                <span>{t('nav.signin')}</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -277,13 +279,13 @@ export const SignInModal: React.FC<SignInModalProps> = ({
 
         <div className="mt-6 pt-6 border-t border-slate-800">
           <p className="text-center text-xs text-slate-400">
-            Don't have an enrolled business account?{' '}
+            {t('auth.no_account')}{' '}
             <button
               type="button"
               onClick={onOpenRegister}
               className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer ml-1"
             >
-              Enroll with Fayda e-ID
+              {t('auth.enroll_fayda')}
             </button>
           </p>
         </div>
@@ -292,7 +294,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
         <div className="mt-5 p-3 rounded-xl bg-slate-950/60 border border-slate-800">
           <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <UserCheck className="w-3.5 h-3.5 text-sky-400" />
-            <span>Quick Sandbox Switch</span>
+            <span>{t('auth.demo_login_title')}</span>
           </div>
           <div className="grid grid-cols-2 gap-1.5 text-xs">
             <button
@@ -300,7 +302,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
               onClick={() => handleQuickRole('BUSINESS_OWNER')}
               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-left border border-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
             >
-              <span className="font-semibold text-emerald-400 block text-[11px]">Business Owner</span>
+              <span className="font-semibold text-emerald-400 block text-[11px]">{t('role.business_owner')}</span>
               <span className="text-[10px] text-slate-400 truncate block">Eleanor Vance</span>
             </button>
             <button
@@ -308,7 +310,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
               onClick={() => handleQuickRole('SENDER')}
               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-left border border-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
             >
-              <span className="font-semibold text-blue-400 block text-[11px]">Sender Agent</span>
+              <span className="font-semibold text-blue-400 block text-[11px]">{t('role.sender')}</span>
               <span className="text-[10px] text-slate-400 truncate block">Carlos Ruiz</span>
             </button>
             <button
@@ -316,7 +318,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
               onClick={() => handleQuickRole('RECEIVER')}
               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-left border border-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
             >
-              <span className="font-semibold text-amber-400 block text-[11px]">Receiver Agent</span>
+              <span className="font-semibold text-amber-400 block text-[11px]">{t('role.receiver')}</span>
               <span className="text-[10px] text-slate-400 truncate block">David Miller</span>
             </button>
             <button
@@ -324,7 +326,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
               onClick={() => handleQuickRole('SUPER_ADMIN')}
               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-left border border-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
             >
-              <span className="font-semibold text-purple-400 block text-[11px]">Super Admin</span>
+              <span className="font-semibold text-purple-400 block text-[11px]">{t('role.super_admin')}</span>
               <span className="text-[10px] text-slate-400 truncate block">System Admin</span>
             </button>
           </div>
