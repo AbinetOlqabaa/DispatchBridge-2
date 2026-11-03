@@ -71,7 +71,7 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
     );
   });
 
-  if (loading) return <LoadingSpinner label="Loading active dispatches..." />;
+  if (loading) return <LoadingSpinner label={t('dashboard.loading_active_dispatches')} />;
 
   return (
     <div className="space-y-6">
@@ -85,7 +85,7 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-950 px-2.5 py-0.5 rounded-full border border-blue-800">
               {t('role.sender')}
             </span>
-            <span className="text-xs text-slate-400">Dispatcher: {user?.name}</span>
+            <span className="text-xs text-slate-400">{t('dashboard.dispatcher_label', { name: t(user?.name || '') })}</span>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">{t('nav.dispatches')}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -156,22 +156,22 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
-          <table className="w-full text-left text-xs min-w-[760px] lg:min-w-full">
+          <table className="w-full text-left text-xs min-w-[700px] sm:min-w-[740px] lg:min-w-full">
             <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/40 border-b border-slate-800">
               <tr>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.dispatch_number', 'Dispatch #')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.destination_partner', 'Destination')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.status', 'Status')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.partner_view', 'Partner View')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.driver_cargo', 'Driver & Cargo')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap">{t('table.share_link', 'Share Link')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap pr-3.5">{t('action.details', 'Detail')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.dispatch_number', 'Dispatch #')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.destination_partner', 'Destination')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.status', 'Status')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.partner_view', 'Partner View')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.driver_cargo', 'Driver & Cargo')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap">{t('table.share_link', 'Share Link')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap pr-3.5">{t('action.details', 'Detail')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {filteredDispatches.map((d) => (
                 <tr key={d.id} className="hover:bg-slate-800/40 transition-colors">
-                  <td className="px-3.5 py-3.5 font-mono font-semibold text-indigo-300 whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3.5 py-3.5 font-mono font-semibold text-indigo-300 whitespace-nowrap">
                     <button
                       onClick={() => onSelectDispatch(d.id)}
                       className="hover:underline text-left cursor-pointer"
@@ -182,14 +182,14 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
                       {new Date(d.createdAt).toLocaleDateString()}
                     </div>
                   </td>
-                  <td className="px-3.5 py-3.5 text-slate-200">
-                    <div className="font-semibold">{d.partnerName}</div>
-                    <div className="text-[11px] text-slate-400 truncate max-w-xs">{d.destinationSnapshot.address}</div>
+                  <td className="px-2.5 sm:px-3.5 py-3.5 text-slate-200">
+                    <div className="font-semibold">{t(d.partnerName)}</div>
+                    <div className="text-[11px] text-slate-400 truncate max-w-xs">{t(d.destinationSnapshot.address)}</div>
                   </td>
-                  <td className="px-3.5 py-3.5 whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3.5 py-3.5 whitespace-nowrap">
                     <StatusBadge status={d.status} size="sm" />
                   </td>
-                  <td className="px-3.5 py-3.5 whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3.5 py-3.5 whitespace-nowrap">
                     {d.firstViewedAt ? (
                       <div className="flex items-center gap-1.5 text-indigo-300">
                         <Eye className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
@@ -207,34 +207,38 @@ export const SenderDashboard: React.FC<SenderDashboardProps> = ({
                       </div>
                     )}
                   </td>
-                  <td className="px-3.5 py-3.5 text-slate-300 whitespace-nowrap">
-                    <div>{d.driverName ? `${d.driverName} (${d.vehicleReg || 'Truck'})` : t('dispatch.carrier_unassigned', 'Carrier Unassigned')}</div>
+                  <td className="px-2.5 sm:px-3.5 py-3.5 text-slate-300 whitespace-nowrap">
+                    <div>
+                      {d.driverName
+                        ? `${t(d.driverName)} (${d.vehicleReg || t('dispatch.truck_fallback')})`
+                        : t('dispatch.carrier_unassigned', 'Carrier Unassigned')}
+                    </div>
                     <div className="text-[11px] text-slate-500">
                       {t('dispatch.line_items_summary', { count: d.lines.length, units: d.totalQuantityDispatched })}
                     </div>
                   </td>
-                  <td className="px-3.5 py-3.5 text-right whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3.5 py-3.5 text-right whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => handleCopyLink(d.shareToken, d.id)}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                        className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
                         title={t('table.share_link', 'Copy receiver access link')}
                       >
                         {copiedId === d.id ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                       <button
                         onClick={() => onOpenPublicLink(d.shareToken)}
-                        className="p-1.5 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 cursor-pointer"
-                        title="Simulate partner viewing delivery list"
+                        className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 cursor-pointer flex items-center justify-center"
+                        title={t('dispatch.simulate_partner_view', 'Simulate partner viewing delivery manifest')}
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </td>
-                  <td className="px-3.5 py-3.5 text-right whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3.5 py-3.5 text-right whitespace-nowrap">
                     <button
                       onClick={() => onSelectDispatch(d.id)}
-                      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium cursor-pointer"
+                      className="px-3 py-2 min-h-[40px] rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium cursor-pointer inline-flex items-center justify-center"
                     >
                       {t('action.inspect', 'Inspect')}
                     </button>

@@ -81,7 +81,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
       const data = await api.getDispatches(filter);
       setDispatches(data);
     } catch (err: any) {
-      setError(err?.message || 'Unable to load shipments.');
+      setError(err?.message || t('msg.error'));
     } finally {
       setLoading(false);
     }
@@ -97,14 +97,14 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
   const handleExportCsv = () => {
     exportDispatchesToCsv(filteredDispatches);
     setExportDropdownOpen(false);
-    setExportSuccessMsg(`Exported ${filteredDispatches.length} dispatches to CSV.`);
+    setExportSuccessMsg(t('export.csv_success', { count: filteredDispatches.length }));
     setTimeout(() => setExportSuccessMsg(null), 3000);
   };
 
   const handleExportPdf = () => {
     exportDispatchesToPdf(filteredDispatches, statusFilter);
     setExportDropdownOpen(false);
-    setExportSuccessMsg(`Generated official reconciliation report PDF (${filteredDispatches.length} records).`);
+    setExportSuccessMsg(t('export.pdf_success', { count: filteredDispatches.length }));
     setTimeout(() => setExportSuccessMsg(null), 3000);
   };
 
@@ -152,7 +152,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
               <button
                 onClick={() => setIsBulkUploadOpen(true)}
                 className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl shadow-sm transition-all cursor-pointer"
-                title="Bulk upload dispatches via CSV format"
+                title={t('dispatch.bulk_upload_tooltip', 'Bulk upload dispatches via CSV format')}
               >
                 <Upload className="w-4 h-4 text-sky-400" />
                 <span>{t('action.bulk_upload_csv', 'Bulk Upload CSV')}</span>
@@ -272,7 +272,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
               <button
                 onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
                 className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors shadow-sm min-h-[44px]"
-                title="Export filtered dispatches"
+                title={t('dispatch.export_tooltip', 'Export filtered dispatches')}
               >
                 <Download className="w-4 h-4 text-indigo-400" />
                 <span>{t('action.export', 'Export')}</span>
@@ -288,7 +288,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                     <FileSpreadsheet className="w-4 h-4 text-emerald-400 shrink-0" />
                     <div>
                       <div className="font-medium">{t('action.export_csv', 'Export CSV')}</div>
-                      <div className="text-[10px] text-slate-400">Excel / Spreadsheet</div>
+                      <div className="text-[10px] text-slate-400">{t('export.csv_sub')}</div>
                     </div>
                   </button>
                   <button
@@ -298,7 +298,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                     <FileText className="w-4 h-4 text-rose-400 shrink-0" />
                     <div>
                       <div className="font-medium">{t('action.export_pdf', 'Export PDF')}</div>
-                      <div className="text-[10px] text-slate-400">Reconciliation Report</div>
+                      <div className="text-[10px] text-slate-400">{t('export.pdf_sub')}</div>
                     </div>
                   </button>
                 </div>
@@ -317,20 +317,18 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
 
         {/* Content Table / Cards */}
         {loading ? (
-          <LoadingSpinner label="Fetching manifests..." />
+          <LoadingSpinner label={t('dispatch.loading_registry')} />
         ) : filteredDispatches.length === 0 ? (
           <div className="py-12 text-center text-slate-400 space-y-2">
             <Truck className="w-10 h-10 text-slate-600 mx-auto" />
             <div className="text-sm font-semibold text-slate-300">{t('empty.no_dispatches_match', 'No dispatches match this filter')}</div>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              {statusFilter !== 'ALL'
-                ? `No shipments found with status "${statusFilter}". Try selecting "${t('status.all')}".`
-                : 'No delivery manifests registered yet. Click "Create Dispatch" to send your first shipment.'}
+              {t('empty.no_dispatches_desc')}
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
-            <table className="w-full text-left text-xs min-w-[860px]">
+            <table className="w-full text-left text-xs min-w-[720px] sm:min-w-[760px] lg:min-w-full">
               <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/40 border-b border-slate-800">
                 <tr>
                   <th className="px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.dispatch_number')}</th>
@@ -358,12 +356,12 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                       </div>
                     </td>
                     <td className="px-3.5 py-3.5 text-slate-300">
-                      <div className="font-medium text-slate-200">{d.senderBusinessName}</div>
-                      <div className="text-[10px] text-slate-500">{t('table.by_sender', 'By {name}', { name: d.senderName })}</div>
+                      <div className="font-medium text-slate-200">{t(d.senderBusinessName)}</div>
+                      <div className="text-[10px] text-slate-500">{t('table.by_sender', 'By {name}', { name: t(d.senderName) })}</div>
                     </td>
                     <td className="px-3.5 py-3.5 text-slate-200">
-                      <div className="font-semibold">{d.partnerName}</div>
-                      <div className="text-[10px] text-slate-400 truncate max-w-xs">{d.destinationSnapshot?.address || 'Partner Destination'}</div>
+                      <div className="font-semibold">{t(d.partnerName)}</div>
+                      <div className="text-[10px] text-slate-400 truncate max-w-xs">{t(d.destinationSnapshot?.address || t('table.destination_partner'))}</div>
                     </td>
                     <td className="px-3.5 py-3.5 whitespace-nowrap">
                       <StatusBadge status={d.status} size="sm" />
@@ -403,7 +401,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                         <button
                           onClick={() => handleCopyLink(d.shareToken, d.id)}
                           className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center justify-center border border-transparent hover:border-slate-700"
-                          title="Copy delivery tracking link"
+                          title={t('dispatch.copy_tracking_tooltip', 'Copy delivery tracking link')}
                         >
                           {copiedId === d.id ? (
                             <CheckCircle className="w-4 h-4 text-emerald-400" />
@@ -414,7 +412,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                         <button
                           onClick={() => onOpenPublicLink(d.shareToken)}
                           className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 cursor-pointer flex items-center justify-center"
-                          title="Simulate partner viewing delivery list"
+                          title={t('dispatch.simulate_partner_tooltip', 'Simulate partner viewing delivery list')}
                         >
                           <ExternalLink className="w-4 h-4" />
                         </button>

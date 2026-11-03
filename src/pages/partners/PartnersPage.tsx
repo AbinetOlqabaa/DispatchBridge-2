@@ -85,7 +85,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
     }
   };
 
-  if (loading) return <LoadingSpinner label="Loading partner directory..." />;
+  if (loading) return <LoadingSpinner label={t('msg.loading')} />;
 
   const canAddPartner = user && ['BUSINESS_OWNER', 'SUPER_ADMIN'].includes(user.role);
 
@@ -126,16 +126,26 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
           >
             <div>
               <div className="flex items-start justify-between gap-2 mb-2">
-                <h3 className="font-bold text-white text-base">{partner.name}</h3>
+                <h3 className="font-bold text-white text-base">{t(partner.name)}</h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-sky-300 border border-slate-700 uppercase">
-                  {partner.type}
+                  {partner.type === 'RETAILER'
+                    ? t('partner.type_retailer')
+                    : partner.type === 'WHOLESALER'
+                    ? t('partner.type_wholesaler')
+                    : partner.type === 'DISTRIBUTOR'
+                    ? t('partner.type_distributor')
+                    : partner.type === 'FRANCHISE'
+                    ? t('partner.type_franchise')
+                    : partner.type === 'CONSTRUCTION_SITE'
+                    ? t('partner.type_construction')
+                    : partner.type}
                 </span>
               </div>
 
               <div className="space-y-2 text-xs text-slate-300 pt-2 border-t border-slate-800/80">
                 <div className="flex items-center gap-2 text-slate-400">
                   <Building className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  <span>Contact: {partner.contactPerson}</span>
+                  <span>{t('table.contact')}: {t(partner.contactPerson)}</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-400">
                   <Phone className="w-3.5 h-3.5 text-slate-500 shrink-0" />
@@ -147,7 +157,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
                 </div>
                 <div className="flex items-start gap-2 text-slate-400">
                   <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
-                  <span className="line-clamp-2">{partner.deliveryAddress}</span>
+                  <span className="line-clamp-2">{t(partner.deliveryAddress)}</span>
                 </div>
               </div>
             </div>
@@ -158,7 +168,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
                 className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer mt-3"
               >
                 <Truck className="w-3.5 h-3.5 text-sky-400" />
-                <span>{t('rec.quick_dispatch', 'Create Dispatch to Partner')}</span>
+                <span>{t('action.create_dispatch', 'Create Dispatch')}</span>
               </button>
             )}
           </div>
@@ -167,8 +177,8 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
 
       {/* Add Partner Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-100 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 text-slate-100 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto scrollbar-thin">
             <h3 className="text-base font-bold text-white">{t('action.add_partner', 'Add New Receiving Partner')}</h3>
 
             {errorMessage && (
@@ -186,7 +196,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Metro Retail South Bay"
+                  placeholder={t('ptn.placeholder_name', 'e.g. Metro Retail South Bay')}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
                 />
               </div>
@@ -213,7 +223,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
                   required
                   value={contactPerson}
                   onChange={(e) => setContactPerson(e.target.value)}
-                  placeholder="e.g. David Miller (Receiving Lead)"
+                  placeholder={t('ptn.placeholder_contact', 'e.g. David Miller (Receiving Lead)')}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
                 />
               </div>
@@ -226,7 +236,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="dock@partner.com"
+                    placeholder={t('ptn.placeholder_email', 'dock@partner.com')}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
                   />
                 </div>
@@ -250,7 +260,7 @@ export const PartnersPage: React.FC<PartnersPageProps> = ({ onCreateDispatchWith
                   rows={2}
                   value={deliveryAddress}
                   onChange={(e) => setDeliveryAddress(e.target.value)}
-                  placeholder="Street Address, Receiving Dock, City, State, Zip"
+                  placeholder={t('ptn.placeholder_address', 'Street Address, Receiving Dock, City, State, Zip')}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
                 />
               </div>

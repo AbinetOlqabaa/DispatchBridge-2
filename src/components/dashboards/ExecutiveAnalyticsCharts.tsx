@@ -317,17 +317,17 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                 <div key={idx} className="p-3 bg-slate-900 rounded-lg border border-slate-800/80 text-xs space-y-1.5">
                   <div className="flex justify-between items-center">
                     <span className="font-mono font-bold text-sky-400">{item.dispatchNumber}</span>
-                    <span className="text-slate-400">{item.partnerName}</span>
+                    <span className="text-slate-400">{t(item.partnerName)}</span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-300">
                     <div className="bg-slate-800/60 px-2 py-1 rounded">
-                      {t('analytics.viewed_in')} <span className="font-mono font-semibold text-white">{item.viewHours || '-'}h</span>
+                      {t('analytics.viewed_in')} <span className="font-mono font-semibold text-white">{item.viewHours || '-'}{t('unit.h_short')}</span>
                     </div>
                     <div className="bg-slate-800/60 px-2 py-1 rounded">
-                      {t('analytics.received_in')} <span className="font-mono font-semibold text-white">{item.receiptHours || '-'}h</span>
+                      {t('analytics.received_in')} <span className="font-mono font-semibold text-white">{item.receiptHours || '-'}{t('unit.h_short')}</span>
                     </div>
                     <div className="bg-slate-800/60 px-2 py-1 rounded">
-                      {t('analytics.reconciled_in')} <span className="font-mono font-semibold text-white">{item.reconciledHours || '-'}h</span>
+                      {t('analytics.reconciled_in')} <span className="font-mono font-semibold text-white">{item.reconciledHours || '-'}{t('unit.h_short')}</span>
                     </div>
                   </div>
                 </div>
@@ -365,7 +365,13 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                         ? t('discrepancy.count_mismatch')
                         : category === 'LOST'
                         ? t('discrepancy.lost')
-                        : category.replace(/_/g, ' ')}
+                        : category === 'OVERAGE'
+                        ? t('discrepancy.overage')
+                        : category === 'NOT_RECEIVED'
+                        ? t('discrepancy.not_received')
+                        : category === 'OTHER'
+                        ? t('discrepancy.other')
+                        : t('discrepancy.' + category.toLowerCase(), category.replace(/_/g, ' '))}
                     </span>
                     <span className="font-mono text-rose-400 font-bold">{count} {t('unit.units')} ({pct}%)</span>
                   </div>
@@ -380,6 +386,10 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                       ? t('analytics.desc_damaged')
                       : category === 'SHORTAGE'
                       ? t('analytics.desc_shortage')
+                      : category === 'LOST'
+                      ? t('analytics.desc_lost')
+                      : category === 'OVERAGE'
+                      ? t('discrepancy.overage')
                       : t('analytics.desc_mismatch')}
                   </div>
                 </div>

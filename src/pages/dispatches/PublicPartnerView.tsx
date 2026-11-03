@@ -77,7 +77,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
         }))
       );
     } catch (err: any) {
-      setError(err.message || 'Delivery manifest not found or link has expired.');
+      setError(err.message || t('manifest.load_error_msg', 'Delivery manifest not found or link has expired.'));
     } finally {
       setLoading(false);
     }
@@ -142,28 +142,28 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
 
       setDispatch(updated);
       setIsVerifying(false);
-      setSubmitSuccess('Official delivery receipt verified! Shipper has been notified, signature locked, and audit entry recorded.');
+      setSubmitSuccess(t('manifest.submit_success_msg', 'Official delivery receipt verified! Shipper has been notified, signature locked, and audit entry recorded.'));
     } catch (err: any) {
-      setSubmitError(err.message || 'Failed to submit receipt confirmation.');
+      setSubmitError(err.message || t('manifest.submit_error_msg', 'Failed to submit receipt confirmation.'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) return <LoadingSpinner label="Retrieving secure delivery manifest..." />;
+  if (loading) return <LoadingSpinner label={t('dispatch.loading_manifest')} />;
 
   if (error || !dispatch) {
     return (
       <div className="max-w-xl mx-auto my-12 p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center space-y-4">
         <AlertTriangle className="w-12 h-12 text-rose-400 mx-auto" />
-        <h2 className="text-lg font-bold text-white">Invalid or Expired Link</h2>
-        <p className="text-xs text-slate-400">{error || 'This delivery link could not be verified.'}</p>
+        <h2 className="text-lg font-bold text-white">{t('public.invalid_link_title')}</h2>
+        <p className="text-xs text-slate-400">{error || t('msg.error')}</p>
         {onExit && (
           <button
             onClick={onExit}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold cursor-pointer"
           >
-            Return to App
+            {t('public.return_to_app')}
           </button>
         )}
       </div>
@@ -229,7 +229,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
               {t('manifest.supplier_title', 'Supplier Delivery Manifest')}
             </div>
             <h1 className="text-2xl font-bold font-mono text-white mt-0.5">{dispatch.dispatchNumber}</h1>
-            <p className="text-xs text-slate-400">{t('manifest.issued_by', 'Issued by {name}', { name: dispatch.senderBusinessName })}</p>
+            <p className="text-xs text-slate-400">{t('manifest.issued_by', 'Issued by {name}', { name: t(dispatch.senderBusinessName) })}</p>
           </div>
           <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1">
             <StatusBadge status={dispatch.status} />
@@ -243,19 +243,19 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
             <span className="text-slate-500 font-semibold block mb-1">{t('manifest.delivering_shipper', 'Delivering Shipper')}:</span>
-            <div className="font-bold text-white text-sm">{dispatch.senderBusinessName}</div>
-            <div className="text-slate-400 text-[11px] mt-0.5">{t('table.origin_label', 'Origin')}: {dispatch.originLocationSnapshot.label}</div>
+            <div className="font-bold text-white text-sm">{t(dispatch.senderBusinessName)}</div>
+            <div className="text-slate-400 text-[11px] mt-0.5">{t('table.origin_label', 'Origin')}: {t(dispatch.originLocationSnapshot.label)}</div>
             <div className="text-slate-400 text-[11px]">
-              {t('dispatch.carrier_driver', 'Driver')}: {dispatch.driverName || 'Standard Freight'} ({dispatch.vehicleReg || 'TRK'})
+              {t('dispatch.carrier_driver', 'Driver')}: {dispatch.driverName ? t(dispatch.driverName) : t('dispatch.standard_freight', 'Standard Freight')} ({dispatch.vehicleReg || 'TRK'})
             </div>
           </div>
 
           <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
             <span className="text-slate-500 font-semibold block mb-1">{t('manifest.receiving_destination', 'Receiving Destination')}:</span>
-            <div className="font-bold text-white text-sm">{dispatch.destinationSnapshot.partnerName}</div>
+            <div className="font-bold text-white text-sm">{t(dispatch.destinationSnapshot.partnerName)}</div>
             <div className="text-slate-400 text-[11px] mt-0.5 flex items-start gap-1">
               <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
-              <span>{dispatch.destinationSnapshot.address}</span>
+              <span>{t(dispatch.destinationSnapshot.address)}</span>
             </div>
           </div>
         </div>
@@ -293,15 +293,15 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
             <div key={line.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
               <div>
                 <span className="font-mono text-[11px] text-indigo-300 font-semibold mr-2">{line.sku}</span>
-                <span className="font-semibold text-slate-200">{line.itemName}</span>
-                {line.notes && <p className="text-[11px] text-rose-300 mt-0.5">{t('table.notes', 'Note')}: {line.notes}</p>}
+                <span className="font-semibold text-slate-200">{t(line.itemName)}</span>
+                {line.notes && <p className="text-[11px] text-rose-300 mt-0.5">{t('table.notes', 'Note')}: {t(line.notes)}</p>}
               </div>
 
               <div className="flex items-center gap-4 text-right shrink-0">
                 <div>
                   <span className="text-[11px] text-slate-500 block">{t('table.sent_col', 'Sent')}</span>
                   <span className="font-mono font-bold text-slate-200">
-                    {line.quantitySent} {line.unit}
+                    {line.quantitySent} {t('unit.' + line.unit.toLowerCase(), line.unit)}
                   </span>
                 </div>
 
@@ -309,7 +309,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                   <div>
                     <span className="text-[11px] text-slate-500 block">{t('table.received_col', 'Received')}</span>
                     <span className="font-mono font-bold text-emerald-400">
-                      {line.quantityReceived} {line.unit}
+                      {line.quantityReceived} {t('unit.' + line.unit.toLowerCase(), line.unit)}
                     </span>
                   </div>
                 )}
@@ -318,7 +318,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                   <div>
                     <span className="text-[11px] text-rose-400 block font-semibold">{t('table.short_col', 'Short')}</span>
                     <span className="font-mono font-bold text-rose-400">
-                      -{line.lossQty} {line.unit}
+                      -{line.lossQty} {t('unit.' + line.unit.toLowerCase(), line.unit)}
                     </span>
                   </div>
                 ) : null}
@@ -344,8 +344,8 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-slate-300">
             <div>
               <span className="text-slate-500 block text-[11px]">{t('manifest.signer_info', 'Signer Name & Role:')}</span>
-              <strong className="text-white">{dispatch.receiverSignoff.signerName}</strong>
-              <div className="text-[11px] text-slate-400">{dispatch.receiverSignoff.signerRole}</div>
+              <strong className="text-white">{t(dispatch.receiverSignoff.signerName)}</strong>
+              <div className="text-[11px] text-slate-400">{t(dispatch.receiverSignoff.signerRole)}</div>
             </div>
             <div>
               <span className="text-slate-500 block text-[11px]">{t('manifest.signed_at', 'Signed At:')}</span>
@@ -353,7 +353,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
             </div>
             <div>
               <span className="text-slate-500 block text-[11px]">{t('manifest.remarks', 'Remarks:')}</span>
-              <span className="text-slate-300 italic">{dispatch.receiverSignoff.comments || t('manifest.no_remarks', 'No remarks recorded.')}</span>
+              <span className="text-slate-300 italic">{dispatch.receiverSignoff.comments ? t(dispatch.receiverSignoff.comments) : t('manifest.no_remarks', 'No remarks recorded.')}</span>
             </div>
           </div>
 
@@ -366,7 +366,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                 <div className="mt-1 bg-slate-950 p-2 rounded-xl border border-slate-800 inline-block">
                   <img
                     src={dispatch.receiverSignoff.signatureSvgOrBase64}
-                    alt="Receiver Signature"
+                    alt={t('dispatch.receiver_signature_alt', 'Receiver Signature')}
                     className="h-14 w-auto max-w-xs object-contain"
                   />
                 </div>
@@ -390,12 +390,12 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
             {dispatch.discrepancyCases.map((c) => (
               <div key={c.id} className="bg-slate-800/50 p-3 rounded-xl border border-slate-700 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-white">{c.itemName}</span>
+                  <span className="font-semibold text-white">{t(c.itemName || '')}</span>
                   <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-800">
-                    {c.type} (-{c.shortfallQuantity})
+                    {t('discrepancy.' + c.type.toLowerCase(), c.type)} (-{c.shortfallQuantity})
                   </span>
                 </div>
-                {c.notes && <p className="text-[11px] text-slate-400">{t('table.notes', 'Note')}: {c.notes}</p>}
+                {c.notes && <p className="text-[11px] text-slate-400">{t('table.notes', 'Note')}: {t(c.notes)}</p>}
                 {c.evidence && c.evidence.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                     {c.evidence.map((ev) => (
@@ -452,13 +452,13 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
               {dispatch.lines.map((line, idx) => (
                 <div key={line.id} className="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-xs space-y-2">
                   <div className="flex justify-between font-semibold">
-                    <span className="text-white">{line.itemName}</span>
-                    <span className="text-slate-400 font-mono">Dispatched: {line.quantitySent} {line.unit}</span>
+                    <span className="text-white">{t(line.itemName)}</span>
+                    <span className="text-slate-400 font-mono">{t('table.dispatched')}: {line.quantitySent} {t('unit.' + line.unit.toLowerCase(), line.unit)}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                     <div>
-                      <label className="block text-[11px] text-slate-400 mb-1">Received ({line.unit})</label>
+                      <label className="block text-[11px] text-slate-400 mb-1">{t('table.received')} ({t('unit.' + line.unit.toLowerCase(), line.unit)})</label>
                       <input
                         type="number"
                         min={0}
@@ -470,7 +470,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                     </div>
 
                     <div>
-                      <label className="block text-[11px] text-slate-400 mb-1">Condition</label>
+                      <label className="block text-[11px] text-slate-400 mb-1">{t('table.condition')}</label>
                       <select
                         value={lineReceipts[idx]?.condition || 'GOOD'}
                         onChange={(e) => {
@@ -517,7 +517,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                           updated[idx].notes = e.target.value;
                           setLineReceipts(updated);
                         }}
-                        placeholder="e.g. 2 boxes crushed"
+                        placeholder={t('dispatch.placeholder_discrepancy_reason', 'e.g. 2 boxes crushed')}
                         className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                       />
                     </div>
@@ -545,7 +545,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                   required
                   value={signerName}
                   onChange={(e) => setSignerName(e.target.value)}
-                  placeholder="e.g. David Miller"
+                  placeholder={t('dispatch.placeholder_full_name', 'e.g. David Miller')}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
                 />
               </div>
@@ -556,7 +556,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                   required
                   value={signerRole}
                   onChange={(e) => setSignerRole(e.target.value)}
-                  placeholder="e.g. Receiving Dock Lead"
+                  placeholder={t('dispatch.placeholder_role_title', 'e.g. Receiving Dock Lead')}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
                 />
               </div>
@@ -568,7 +568,7 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
                 rows={2}
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
-                placeholder="Optional comments regarding vehicle cleanliness, pallet condition..."
+                placeholder={t('dispatch.placeholder_signoff_remarks', 'Optional comments regarding vehicle cleanliness, pallet condition...')}
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
               />
             </div>

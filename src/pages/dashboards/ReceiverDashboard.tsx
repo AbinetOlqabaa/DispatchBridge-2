@@ -45,7 +45,7 @@ export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDi
     }
   };
 
-  if (loading) return <LoadingSpinner label="Loading partner receiving portal..." />;
+  if (loading) return <LoadingSpinner label={t('dashboard.loading_receiver_portal')} />;
 
   const pendingVerification = inboundDispatches.filter((d) => ['DISPATCHED', 'VIEWED', 'IN_TRANSIT'].includes(d.status));
   const completedReceipts = inboundDispatches.filter((d) => ['PARTIALLY_RECEIVED', 'RECEIVED', 'RECONCILED'].includes(d.status));
@@ -61,9 +61,9 @@ export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDi
           <span className="text-xs font-semibold uppercase tracking-wider text-amber-400 bg-amber-950 px-2.5 py-0.5 rounded-full border border-amber-800">
             {t('role.receiver')}
           </span>
-          <span className="text-xs text-slate-400">Station Lead: {user?.name}</span>
+          <span className="text-xs text-slate-400">{t('dashboard.station_lead_label', { name: t(user?.name || '') })}</span>
         </div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">{user?.businessName}</h1>
+        <h1 className="text-2xl font-bold text-white tracking-tight">{t(user?.businessName || '')}</h1>
         <p className="text-xs text-slate-400 mt-0.5">
           {t('app.enterprise')}
         </p>
@@ -102,19 +102,24 @@ export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDi
                 <div className="space-y-1.5 text-xs text-slate-300 mb-4">
                   <div className="flex justify-between">
                     <span className="text-slate-500">{t('table.sender_supplier')}:</span>
-                    <span className="font-semibold text-slate-200">{d.senderBusinessName}</span>
+                    <span className="font-semibold text-slate-200">{t(d.senderBusinessName)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">{t('dispatch.carrier_driver', 'Carrier / Driver')}:</span>
-                    <span>{d.driverName || t('dispatch.carrier_unassigned', 'Not specified')}</span>
+                    <span>{d.driverName ? t(d.driverName) : t('dispatch.carrier_unassigned', 'Not specified')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">{t('table.items')}:</span>
-                    <span>{d.lines.length} lines ({d.totalQuantityDispatched} {t('unit.units')})</span>
+                    <span>
+                      {t('dispatch.lines_units_summary', {
+                        lines: d.lines.length,
+                        units: d.totalQuantityDispatched,
+                      })}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">{t('system.timestamp', 'Sent Date')}:</span>
-                    <span>{d.dispatchedAt ? new Date(d.dispatchedAt).toLocaleDateString() : 'Today'}</span>
+                    <span>{d.dispatchedAt ? new Date(d.dispatchedAt).toLocaleDateString() : t('day.today')}</span>
                   </div>
                 </div>
 
@@ -155,7 +160,7 @@ export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDi
               {completedReceipts.map((d) => (
                 <tr key={d.id} className="hover:bg-slate-800/40">
                   <td className="px-2.5 sm:px-3.5 py-3 font-mono font-semibold text-indigo-300 whitespace-nowrap">{d.dispatchNumber}</td>
-                  <td className="px-2.5 sm:px-3.5 py-3 text-slate-300">{d.senderBusinessName}</td>
+                  <td className="px-2.5 sm:px-3.5 py-3 text-slate-300">{t(d.senderBusinessName)}</td>
                   <td className="px-2.5 sm:px-3.5 py-3 whitespace-nowrap">
                     <StatusBadge status={d.status} size="sm" />
                   </td>
@@ -172,7 +177,7 @@ export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDi
                     )}
                   </td>
                   <td className="px-2.5 sm:px-3.5 py-3 text-slate-300 whitespace-nowrap">
-                    <div>{d.receiverSignoff?.signerName || t('profile.verified_identity', 'Verified')}</div>
+                    <div>{d.receiverSignoff?.signerName ? t(d.receiverSignoff.signerName) : t('profile.verified_identity', 'Verified')}</div>
                     <div className="text-[10px] text-slate-500">
                       {d.receivedAt ? new Date(d.receivedAt).toLocaleDateString() : ''}
                     </div>
@@ -180,7 +185,7 @@ export const ReceiverDashboard: React.FC<ReceiverDashboardProps> = ({ onSelectDi
                   <td className="px-2.5 sm:px-3.5 py-3 text-right whitespace-nowrap pr-3 sm:pr-4">
                     <button
                       onClick={() => onSelectDispatch(d.id)}
-                      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs cursor-pointer"
+                      className="px-3 py-2 min-h-[40px] rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium cursor-pointer inline-flex items-center justify-center"
                     >
                       {t('action.inspect', 'View Slip')}
                     </button>

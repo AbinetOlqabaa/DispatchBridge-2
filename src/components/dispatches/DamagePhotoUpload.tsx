@@ -194,7 +194,7 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
                   type="button"
                   onClick={() => removeEvidence(item.id)}
                   className="absolute top-1 right-1 p-1 rounded-md bg-black/70 hover:bg-rose-600 text-white cursor-pointer opacity-90 transition-colors"
-                  title="Remove attachment"
+                  title={t('action.remove_photo_title', 'Remove attachment')}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>

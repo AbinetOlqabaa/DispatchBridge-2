@@ -35,8 +35,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
               isActive ? 'text-sky-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Icon className={`w-5 h-5 ${isActive ? 'scale-110 text-sky-400' : ''}`} />
-            <span className="text-[10px] mt-0.5">{item.label}</span>
+            <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'scale-110 text-sky-400' : ''}`} />
+            <span className="text-[10px] mt-0.5 truncate max-w-[68px]">{item.label}</span>
           </button>
         );
       })}

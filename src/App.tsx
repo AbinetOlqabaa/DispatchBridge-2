@@ -23,6 +23,8 @@ import { PartnersPage } from './pages/partners/PartnersPage.js';
 import { LocationsPage } from './pages/locations/LocationsPage.js';
 import { AuditPage } from './pages/audit/AuditPage.js';
 import { SystemStatusPage } from './pages/system/SystemStatusPage.js';
+import { ReportsPage } from './pages/reports/ReportsPage.js';
+import { TeamPage } from './pages/team/TeamPage.js';
 import { RecommendationsView } from './components/recommendations/RecommendationsView.js';
 import { NotificationDrawer } from './components/notifications/NotificationDrawer.js';
 import { ProfileModal } from './components/auth/ProfileModal.js';
@@ -65,7 +67,7 @@ function MainApp() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <LoadingSpinner text="Initializing DispatchBridge..." />
+        <LoadingSpinner text={t('msg.loading')} />
       </div>
     );
   }
@@ -153,7 +155,7 @@ function MainApp() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:landscape:flex-row font-sans selection:bg-indigo-500 selection:text-white pb-20 md:pb-8 md:landscape:pb-0 w-full max-w-full overflow-x-hidden">
-      {/* Tablet Landscape Dedicated Left Sidebar */}
+      {/* Landscape Navigation Sidebar (Tablet Landscape & Desktop) */}
       <TabletSidebar
         currentTab={currentTab}
         onSelectTab={(tab) => {
@@ -170,7 +172,7 @@ function MainApp() {
 
       {/* Main Content Column */}
       <div className="flex-1 min-w-0 flex flex-col w-full max-w-full overflow-x-hidden">
-        {/* Top Navigation on Mobile and Tablet Portrait */}
+        {/* Top Navigation on Portrait (Mobile & Tablet Portrait) */}
         <div className="md:landscape:hidden">
           <Navbar
             currentTab={currentTab}
@@ -232,6 +234,8 @@ function MainApp() {
                   }}
                 />
               )}
+              {currentTab === 'reports' && <ReportsPage />}
+              {currentTab === 'team' && <TeamPage />}
               {currentTab === 'audit' && <AuditPage />}
               {currentTab === 'status' && <SystemStatusPage />}
             </>

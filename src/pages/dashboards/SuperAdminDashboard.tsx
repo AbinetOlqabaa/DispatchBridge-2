@@ -190,7 +190,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
     }
   };
 
-  if (loading) return <LoadingSpinner label="Loading system oversight logs & telemetry..." />;
+  if (loading) return <LoadingSpinner label={t('admin.loading_telemetry')} />;
 
   const filteredLogs = logs.filter((log) => {
     const matchesSearch =
@@ -330,22 +330,22 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <KeyRound className="w-4 h-4 text-purple-400" />
-                <h2 className="text-sm font-bold text-white">One-Time Super-Admin Bootstrap Verification</h2>
+                <h2 className="text-sm font-bold text-white">{t('admin.bootstrap_title')}</h2>
               </div>
               {statusInfo?.superAdminBootstrapAvailable ? (
                 <span className="text-[11px] font-semibold text-amber-400 bg-amber-950 px-2 py-0.5 rounded-full border border-amber-800">
-                  One-Time Token Active on Server
+                  {t('admin.token_active_badge')}
                 </span>
               ) : (
                 <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800 flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3" />
-                  Bootstrap Consumed & Closed
+                  {t('admin.token_consumed_badge')}
                 </span>
               )}
             </div>
 
             <p className="text-xs text-slate-400 mb-3 leading-relaxed">
-              In compliance with the security constitution, there are no hardcoded backdoor credentials. The server generates a single-use random token upon initialization. It can only be redeemed once via <code className="text-slate-300">POST /api/auth/bootstrap-superadmin</code>.
+              {t('admin.bootstrap_desc')} <code className="text-slate-300">POST /api/auth/bootstrap-superadmin</code>.
             </p>
 
             {statusInfo?.superAdminBootstrapAvailable && (
@@ -356,7 +356,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     required
                     value={bootstrapTokenInput}
                     onChange={(e) => setBootstrapTokenInput(e.target.value)}
-                    placeholder="Server Bootstrap Token"
+                    placeholder={t('admin.token_placeholder')}
                     className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                   />
                   <input
@@ -364,7 +364,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     required
                     value={bootstrapName}
                     onChange={(e) => setBootstrapName(e.target.value)}
-                    placeholder="Admin Full Name"
+                    placeholder={t('admin.admin_name_placeholder')}
                     className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                   />
                   <input
@@ -372,7 +372,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     required
                     value={bootstrapEmail}
                     onChange={(e) => setBootstrapEmail(e.target.value)}
-                    placeholder="admin@domain.com"
+                    placeholder={t('admin.placeholder_email', 'admin@domain.com')}
                     className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                   />
                   <input
@@ -381,7 +381,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     minLength={8}
                     value={bootstrapPassword}
                     onChange={(e) => setBootstrapPassword(e.target.value)}
-                    placeholder="Set Admin Password"
+                    placeholder={t('admin.admin_pass_placeholder')}
                     className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                   />
                 </div>
@@ -404,7 +404,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   disabled={isBootstrapping}
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 text-white text-xs font-semibold rounded-lg cursor-pointer"
                 >
-                  {isBootstrapping ? 'Verifying...' : 'Redeem & Provision Administrator'}
+                  {isBootstrapping ? t('admin.redeeming') : t('admin.redeem_btn')}
                 </button>
               </form>
             )}
@@ -415,7 +415,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-indigo-400" />
-                <h2 className="text-sm font-bold text-white">Tamper-Resistant Audit Trail ({filteredLogs.length})</h2>
+                <h2 className="text-sm font-bold text-white">{t('system.audit_title')} ({filteredLogs.length})</h2>
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -425,7 +425,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     type="text"
                     value={auditFilter}
                     onChange={(e) => setAuditFilter(e.target.value)}
-                    placeholder="Search audit events..."
+                    placeholder={t('audit.search_placeholder')}
                     className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-8 pr-3 py-1 text-xs text-white"
                   />
                 </div>
@@ -434,30 +434,30 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   onChange={(e) => setActionFilter(e.target.value)}
                   className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
                 >
-                  <option value="ALL">All Actions</option>
-                  <option value="DISPATCH_CREATED">Dispatch Created</option>
-                  <option value="DISPATCH_VIEWED">Dispatch Viewed</option>
-                  <option value="RECEIPT_RECORDED">Receipt Recorded</option>
-                  <option value="RECEIPT_DISCREPANCY_RECORDED">Discrepancy Recorded</option>
-                  <option value="RECONCILIATION_FINALIZED">Reconciliation Finalized</option>
-                  <option value="USER_LOGIN">User Login</option>
-                  <option value="USER_REGISTERED">User Registered</option>
-                  <option value="ADMIN_USER_SUSPENDED">User Suspended</option>
-                  <option value="ADMIN_USER_REACTIVATED">User Reactivated</option>
-                  <option value="ADMIN_USER_ROLE_CHANGED">Role Changed</option>
+                  <option value="ALL">{t('audit.all_event_types')}</option>
+                  <option value="DISPATCH_CREATED">{t('audit.action_dispatch_created', 'DISPATCH_CREATED')}</option>
+                  <option value="DISPATCH_VIEWED">{t('audit.action_dispatch_viewed', 'DISPATCH_VIEWED')}</option>
+                  <option value="RECEIPT_RECORDED">{t('audit.action_receipt_recorded', 'RECEIPT_RECORDED')}</option>
+                  <option value="RECEIPT_DISCREPANCY_RECORDED">{t('audit.action_receipt_discrepancy_recorded', 'RECEIPT_DISCREPANCY_RECORDED')}</option>
+                  <option value="RECONCILIATION_FINALIZED">{t('audit.action_reconciliation_finalized', 'RECONCILIATION_FINALIZED')}</option>
+                  <option value="USER_LOGIN">{t('audit.action_user_login', 'USER_LOGIN')}</option>
+                  <option value="USER_REGISTERED">{t('audit.action_user_registered', 'USER_REGISTERED')}</option>
+                  <option value="ADMIN_USER_SUSPENDED">{t('audit.action_admin_user_suspended', 'ADMIN_USER_SUSPENDED')}</option>
+                  <option value="ADMIN_USER_REACTIVATED">{t('audit.action_admin_user_reactivated', 'ADMIN_USER_REACTIVATED')}</option>
+                  <option value="ADMIN_USER_ROLE_CHANGED">{t('audit.action_admin_user_role_changed', 'ADMIN_USER_ROLE_CHANGED')}</option>
                 </select>
               </div>
             </div>
 
             <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
-              <table className="w-full text-left text-xs min-w-[760px]">
+              <table className="w-full text-left text-xs min-w-[680px] sm:min-w-[720px] lg:min-w-full">
                 <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/40 border-b border-slate-800">
                   <tr>
-                    <th className="px-3.5 py-3 font-semibold whitespace-nowrap">Timestamp</th>
-                    <th className="px-3.5 py-3 font-semibold whitespace-nowrap">Actor / Entity</th>
-                    <th className="px-3.5 py-3 font-semibold whitespace-nowrap">Action</th>
-                    <th className="px-3.5 py-3 font-semibold whitespace-nowrap">Target Entity</th>
-                    <th className="px-3.5 py-3 font-semibold">Details & Integrity Trail</th>
+                    <th className="px-3.5 py-3 font-semibold whitespace-nowrap">{t('system.timestamp')}</th>
+                    <th className="px-3.5 py-3 font-semibold whitespace-nowrap">{t('system.actor')}</th>
+                    <th className="px-3.5 py-3 font-semibold whitespace-nowrap">{t('system.event_action')}</th>
+                    <th className="px-3.5 py-3 font-semibold whitespace-nowrap">{t('audit.entity_col')}</th>
+                    <th className="px-3.5 py-3 font-semibold">{t('system.details')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
@@ -467,19 +467,19 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                         {new Date(log.timestamp).toLocaleString()}
                       </td>
                       <td className="px-3.5 py-2.5 whitespace-nowrap">
-                        <span className="font-semibold text-slate-200">{log.actorName}</span>
-                        <span className="text-[10px] text-slate-500 block">Role: {log.actorRole}</span>
+                        <span className="font-semibold text-slate-200">{t(log.actorName)}</span>
+                        <span className="text-[10px] text-slate-500 block">{t('table.role')}: {t('role.' + log.actorRole.toLowerCase(), log.actorRole)}</span>
                       </td>
                       <td className="px-3.5 py-2.5">
                         <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                          {log.action}
+                          {t('audit.action_' + log.action.toLowerCase(), log.action)}
                         </span>
                       </td>
                       <td className="px-3.5 py-2.5 text-indigo-300 whitespace-nowrap">
-                        {log.entityType}: {log.entityId}
+                        {t('audit.entity_' + log.entityType.toLowerCase(), log.entityType)}: {log.entityId}
                       </td>
                       <td className="px-3.5 py-2.5 text-slate-300 font-sans text-xs">
-                        {log.details}
+                        {t(log.details)}
                       </td>
                     </tr>
                   ))}
@@ -520,7 +520,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
 
               <div className="flex items-center gap-2">
                 <select
-                  aria-label="Filter users by role"
+                  aria-label={t('admin.filter_by_role', 'Filter users by role')}
                   value={userRoleFilter}
                   onChange={(e) => {
                     setUserRoleFilter(e.target.value as UserRole | '');
@@ -535,7 +535,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                 </select>
 
                 <select
-                  aria-label="Filter users by account status"
+                  aria-label={t('admin.filter_by_status', 'Filter users by account status')}
                   value={userStatusFilter}
                   onChange={(e) => {
                     setUserStatusFilter(e.target.value as 'ACTIVE' | 'SUSPENDED' | '');
@@ -550,7 +550,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                 <button
                   onClick={loadUsers}
                   className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer transition shrink-0"
-                  title="Apply Filter"
+                  title={t('admin.apply_filter', 'Apply Filter')}
                 >
                   <RefreshCw className={`w-4 h-4 ${usersLoading ? 'animate-spin' : ''}`} />
                 </button>
@@ -560,16 +560,16 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
 
           {/* User Accounts Table */}
           <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
-            <table className="w-full text-left text-xs min-w-[860px] lg:min-w-full">
+            <table className="w-full text-left text-xs min-w-[700px] sm:min-w-[740px] lg:min-w-full">
               <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/60 border-b border-slate-800">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">{t('admin.col_user', 'User')}</th>
-                  <th className="px-4 py-3 font-semibold">{t('admin.col_phone', 'Verified Phone')}</th>
-                  <th className="px-4 py-3 font-semibold">{t('admin.col_fayda', 'Fayda e-ID (Masked)')}</th>
-                  <th className="px-4 py-3 font-semibold">{t('admin.col_business', 'Business Entity')}</th>
-                  <th className="px-4 py-3 font-semibold">{t('admin.col_role', 'Assigned Role')}</th>
-                  <th className="px-4 py-3 font-semibold">{t('table.status', 'Status')}</th>
-                  <th className="px-4 py-3 font-semibold text-right">{t('table.actions', 'Actions')}</th>
+                  <th className="px-2.5 sm:px-4 py-3 font-semibold">{t('admin.col_user', 'User')}</th>
+                  <th className="px-2.5 sm:px-4 py-3 font-semibold">{t('admin.col_phone', 'Verified Phone')}</th>
+                  <th className="px-2.5 sm:px-4 py-3 font-semibold">{t('admin.col_fayda', 'Fayda e-ID (Masked)')}</th>
+                  <th className="px-2.5 sm:px-4 py-3 font-semibold">{t('admin.col_business', 'Business Entity')}</th>
+                  <th className="px-2.5 sm:px-4 py-3 font-semibold">{t('admin.col_role', 'Assigned Role')}</th>
+                  <th className="px-2.5 sm:px-4 py-3 font-semibold">{t('table.status', 'Status')}</th>
+                  <th className="px-2.5 sm:px-4 py-3 font-semibold text-right">{t('table.actions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
@@ -584,7 +584,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   return (
                     <tr key={u.id} className="hover:bg-slate-800/40 transition">
                       {/* User Info with Avatar */}
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-2.5">
                           {u.avatarUrl ? (
                             <img
@@ -598,24 +598,24 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                             </div>
                           )}
                           <div>
-                            <div className="font-semibold text-white">{u.name}</div>
+                            <div className="font-semibold text-white">{t(u.name)}</div>
                             <div className="text-[10px] text-slate-500 font-mono">{u.id}</div>
                           </div>
                         </div>
                       </td>
 
                       {/* Phone */}
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                         <span className="font-mono text-slate-300">
                           {u.maskedPhone || u.phoneNumber}
                         </span>
                         {u.phoneVerified && (
-                          <span className="block text-[10px] text-emerald-400">Verified</span>
+                          <span className="block text-[10px] text-emerald-400">{t('auth.verified_badge')}</span>
                         )}
                       </td>
 
                       {/* Fayda National ID */}
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                         <div className="space-y-0.5">
                           <div className="font-mono text-[11px] text-sky-400">
                             FAN: {u.maskedFan || '•••• •••• •••• 4444'}
@@ -627,42 +627,42 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                       </td>
 
                       {/* Business Entity */}
-                      <td className="px-4 py-3 whitespace-nowrap text-slate-300">
-                        {u.businessName}
+                      <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-slate-300">
+                        {t(u.businessName)}
                       </td>
 
                       {/* Role Selector */}
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                         <select
                           value={u.role}
                           onChange={(e) => handleRoleChange(u, e.target.value as UserRole)}
                           className="bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-purple-500 cursor-pointer"
                         >
-                          <option value="BUSINESS_OWNER">Business Owner</option>
-                          <option value="SENDER">Sender / Dispatcher</option>
-                          <option value="RECEIVER">Receiver / Partner</option>
-                          <option value="SUPER_ADMIN">Super Administrator</option>
+                          <option value="BUSINESS_OWNER">{t('role.business_owner')}</option>
+                          <option value="SENDER">{t('role.sender')}</option>
+                          <option value="RECEIVER">{t('role.receiver')}</option>
+                          <option value="SUPER_ADMIN">{t('role.super_admin')}</option>
                         </select>
                       </td>
 
                       {/* Status */}
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                         {u.status === 'ACTIVE' ? (
                           <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            ACTIVE
+                            {t('admin.status_active')}
                           </span>
                         ) : (
                           <span
                             className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                            title={u.suspendedReason ? `Reason: ${u.suspendedReason}` : undefined}
+                            title={u.suspendedReason ? `${u.suspendedReason}` : undefined}
                           >
-                            SUSPENDED
+                            {t('admin.status_suspended')}
                           </span>
                         )}
                       </td>
 
                       {/* Actions */}
-                      <td className="px-4 py-3 whitespace-nowrap text-right">
+                      <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-right">
                         {u.status === 'ACTIVE' ? (
                           <button
                             onClick={() => {
@@ -709,10 +709,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
             </div>
 
             <p className="text-xs text-slate-300 mb-2 leading-relaxed">
-              You are about to suspend <span className="font-semibold text-white">{suspendTarget.name}</span> (<code className="text-slate-400">{suspendTarget.id}</code>).
+              <span className="font-semibold text-white">{t(suspendTarget.name)}</span> (<code className="text-slate-400">{suspendTarget.id}</code>)
             </p>
             <p className="text-[11px] text-amber-400/90 mb-4 bg-amber-950/40 p-2.5 rounded-xl border border-amber-900/40">
-              Suspended users cannot authenticate, create dispatches, or access tenant ledgers. All active session tokens will be rejected.
+              {t('admin.suspend_modal_desc')}
             </p>
 
             <form onSubmit={handleConfirmSuspend} className="space-y-4">
@@ -725,7 +725,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   rows={3}
                   value={suspendReason}
                   onChange={(e) => setSuspendReason(e.target.value)}
-                  placeholder="e.g. Audit policy violation, pending investigation into fraudulent manifest report..."
+                  placeholder={t('admin.suspend_reason_placeholder')}
                   className="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-500"
                 />
               </div>
@@ -743,7 +743,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   disabled={isSubmittingSuspend || !suspendReason.trim()}
                   className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 transition cursor-pointer disabled:opacity-50"
                 >
-                  {isSubmittingSuspend ? 'Suspending...' : t('admin.confirm_suspend_btn', 'Confirm Suspension')}
+                  {isSubmittingSuspend ? t('msg.loading') : t('admin.confirm_suspend_btn', 'Confirm Suspension')}
                 </button>
               </div>
             </form>

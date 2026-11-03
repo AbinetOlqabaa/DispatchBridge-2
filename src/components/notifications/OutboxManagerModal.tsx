@@ -112,7 +112,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
                 </span>
               </h2>
               <p className="text-xs text-slate-400">
-                Multi-channel queue tracking for SMS, Email, WhatsApp, and Webhook dispatch adapters (.ai/05_NOTIFICATIONS_AND_AUDIT.md)
+                {t('outbox.subtitle', 'Multi-channel queue tracking for SMS, Email, WhatsApp, and Webhook dispatch adapters (.ai/05_NOTIFICATIONS_AND_AUDIT.md)')}
               </p>
             </div>
           </div>
@@ -141,7 +141,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
                 <Send className="w-3.5 h-3.5 text-sky-400" />
                 {t('outbox.test_dispatch_title', 'Dispatch Test Outbound Alert')}
               </span>
-              <span className="text-[11px] text-slate-500">Staging sandbox delivery simulator</span>
+              <span className="text-[11px] text-slate-500">{t('outbox.sim_label', 'Staging sandbox delivery simulator')}</span>
             </div>
 
             <form onSubmit={handleSendTest} className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
@@ -158,10 +158,10 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
                   }}
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white"
                 >
-                  <option value="SMS">SMS (Twilio Gateway)</option>
-                  <option value="EMAIL">Email (SMTP Relayer)</option>
-                  <option value="WHATSAPP">WhatsApp (Meta Sandbox)</option>
-                  <option value="WEBHOOK">Webhook (HTTPS Signed)</option>
+                  <option value="SMS">{t('outbox.opt_sms', 'SMS (Twilio Gateway)')}</option>
+                  <option value="EMAIL">{t('outbox.opt_email', 'Email (SMTP Relayer)')}</option>
+                  <option value="WHATSAPP">{t('outbox.opt_whatsapp', 'WhatsApp (Meta Sandbox)')}</option>
+                  <option value="WEBHOOK">{t('outbox.opt_webhook', 'Webhook (HTTPS Signed)')}</option>
                 </select>
               </div>
 
@@ -192,7 +192,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
                   disabled={isSending}
                   className="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold cursor-pointer shrink-0"
                 >
-                  {isSending ? 'Sending...' : t('outbox.dispatch_btn', 'Dispatch')}
+                  {isSending ? t('outbox.sending', 'Sending...') : t('outbox.dispatch_btn', 'Dispatch')}
                 </button>
               </div>
             </form>
@@ -211,7 +211,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  {tab}
+                  {tab === 'ALL' ? t('reports.period_all', 'ALL') : tab}
                 </button>
               ))}
             </div>
@@ -228,10 +228,10 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
           {/* Outbox queue items */}
           <div className="space-y-3">
             {loading ? (
-              <div className="p-8 text-center text-xs text-slate-400">Loading delivery outbox...</div>
+              <div className="p-8 text-center text-xs text-slate-400">{t('outbox.loading', 'Loading delivery outbox...')}</div>
             ) : filteredItems.length === 0 ? (
               <div className="p-8 text-center text-xs text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800">
-                No outbound notifications recorded in this channel filter.
+                {t('outbox.empty_channel', 'No outbound notifications recorded in this channel filter.')}
               </div>
             ) : (
               filteredItems.map((item) => (
@@ -257,7 +257,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
                           </span>
                         </div>
                         <div className="text-[11px] text-slate-400">
-                          Recipient: <span className="text-slate-300">{item.recipientUserId}</span>
+                          {t('outbox.recipient_label', 'Recipient:')} <span className="text-slate-300">{item.recipientUserId}</span>
                         </div>
                       </div>
                     </div>
@@ -273,7 +273,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
                           onClick={() => handleRetry(item.id)}
                           className="px-2 py-0.5 rounded bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 text-[10px] font-semibold cursor-pointer"
                         >
-                          Retry
+                          {t('action.retry', 'Retry')}
                         </button>
                       )}
                     </div>
@@ -285,10 +285,10 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
 
                   <div className="flex flex-wrap items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-900">
                     <div className="flex items-center gap-3">
-                      <span>Provider: {item.providerInfo || 'Standard Delivery Adapter'}</span>
-                      <span>Attempts: {item.deliveryAttempts || 1}</span>
+                      <span>{t('outbox.provider_label', 'Provider:')} {item.providerInfo || 'Standard Delivery Adapter'}</span>
+                      <span>{t('outbox.attempts_label', 'Attempts:')} {item.deliveryAttempts || 1}</span>
                     </div>
-                    <div>Sent: {new Date(item.createdAt).toLocaleString()}</div>
+                    <div>{t('outbox.sent_label', 'Sent:')} {new Date(item.createdAt).toLocaleString()}</div>
                   </div>
                 </div>
               ))
@@ -300,7 +300,7 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
         <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between text-xs">
           <div className="flex items-center gap-1.5 text-slate-400">
             <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
-            <span>Idempotent queue execution with bounded retry policy</span>
+            <span>{t('outbox.footer_note', 'Idempotent queue execution with bounded retry policy')}</span>
           </div>
 
           <button

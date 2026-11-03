@@ -23,6 +23,8 @@ import {
   Wifi,
   WifiOff,
   RefreshCw,
+  BarChart3,
+  UserPlus,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
 import { useTheme, ThemeMode } from '../../context/ThemeContext.js';
@@ -104,6 +106,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'dispatches', label: t('nav.dispatches', 'Dispatches'), icon: Truck, show: true },
     { id: 'locations', label: t('nav.locations', 'Origins & Docks'), icon: Warehouse, show: !!user && user.role !== 'RECEIVER' },
     { id: 'partners', label: t('nav.partners', 'Partners'), icon: Users, show: !!user && user.role !== 'RECEIVER' },
+    { id: 'reports', label: t('nav.reports', 'Reports & Analytics'), icon: BarChart3, show: !!user },
+    { id: 'team', label: t('nav.team', 'Team & Members'), icon: UserPlus, show: !!user && (user.role === 'BUSINESS_OWNER' || user.role === 'SUPER_ADMIN') },
     { id: 'recommendations', label: t('nav.recommendations', 'Recommendations'), icon: Sparkles, show: true },
     { id: 'audit', label: t('nav.audit', 'Audit Trail'), icon: FileText, show: !!user && (user.role === 'SUPER_ADMIN' || user.role === 'BUSINESS_OWNER') },
     { id: 'status', label: t('nav.status', 'System Status'), icon: Shield, show: true },
@@ -136,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Desktop Nav Items (xl: >= 1280px) */}
-          <div className="hidden xl:flex items-center gap-1.5 py-1 flex-1 justify-center max-w-2xl px-2">
+          <div className="hidden xl:flex items-center gap-1 py-1 flex-1 justify-center max-w-4xl px-2 overflow-x-auto scrollbar-none">
             {navItems.filter((i) => i.show).map((item) => {
               const Icon = item.icon;
               const isActive = currentTab === item.id;
@@ -241,8 +245,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setRoleSwitchOpen(false);
                 }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700 text-xs font-medium transition-colors cursor-pointer min-h-[44px]"
-                title="Select language"
-                aria-label="Select language"
+                title={t('nav.select_language', 'Select language')}
+                aria-label={t('nav.select_language', 'Select language')}
               >
                 <Globe className="w-4 h-4 text-sky-400" />
                 <span className="font-semibold uppercase tracking-wider text-[11px]">
@@ -288,7 +292,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => replayNow()}
                   className="flex items-center gap-1 px-2 py-1 rounded-lg bg-teal-950/80 hover:bg-teal-900/80 text-teal-300 border border-teal-800 text-[11px] font-semibold cursor-pointer"
-                  title="Click to sync queued actions with server"
+                  title={t('nav.sync_queued_title', 'Click to sync queued actions with server')}
                 >
                   <RefreshCw className="w-3 h-3 text-teal-400 animate-spin" />
                   <span>{t('nav.sync', 'Sync ({count})', { count: queueCount })}</span>
@@ -319,7 +323,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setLangDropdownOpen(false);
                 }}
                 className="flex items-center gap-1.5 text-xs bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 px-3 py-2 rounded-xl border border-slate-700 cursor-pointer transition-colors min-h-[44px]"
-                title="Switch simulated role for testing"
+                title={t('nav.switch_role_title', 'Switch simulated role for testing')}
               >
                 <UserCheck className="w-4 h-4 text-sky-400" />
                 <span className="hidden xl:inline">{t('nav.simulate_role', 'Simulate Role')}</span>
@@ -339,28 +343,28 @@ export const Navbar: React.FC<NavbarProps> = ({
                     className="w-full text-left px-2.5 py-2 rounded-lg text-xs hover:bg-slate-800 flex flex-col gap-0.5 cursor-pointer"
                   >
                     <span className="font-semibold text-emerald-400">{t('role.business_owner', 'Business Owner')}</span>
-                    <span className="text-[11px] text-slate-400">Apex Supply Logistics (Eleanor Vance)</span>
+                    <span className="text-[11px] text-slate-400">{t('role.desc_owner', 'Apex Supply Logistics (Eleanor Vance)')}</span>
                   </button>
                   <button
                     onClick={() => quickLoginDemoRole('SENDER')}
                     className="w-full text-left px-2.5 py-2 rounded-lg text-xs hover:bg-slate-800 flex flex-col gap-0.5 cursor-pointer"
                   >
                     <span className="font-semibold text-blue-400">{t('role.sender', 'Sender / Dispatcher')}</span>
-                    <span className="text-[11px] text-slate-400">Create & dispatch items (Carlos Ruiz)</span>
+                    <span className="text-[11px] text-slate-400">{t('role.desc_sender', 'Create & dispatch items (Carlos Ruiz)')}</span>
                   </button>
                   <button
                     onClick={() => quickLoginDemoRole('RECEIVER')}
                     className="w-full text-left px-2.5 py-2 rounded-lg text-xs hover:bg-slate-800 flex flex-col gap-0.5 cursor-pointer"
                   >
                     <span className="font-semibold text-amber-400">{t('role.receiver', 'Receiver / Partner')}</span>
-                    <span className="text-[11px] text-slate-400">Metro Retail Receiving (David Miller)</span>
+                    <span className="text-[11px] text-slate-400">{t('role.desc_receiver', 'Metro Retail Receiving (David Miller)')}</span>
                   </button>
                   <button
                     onClick={() => quickLoginDemoRole('SUPER_ADMIN')}
                     className="w-full text-left px-2.5 py-2 rounded-lg text-xs hover:bg-slate-800 flex flex-col gap-0.5 cursor-pointer border-t border-slate-800 mt-1 pt-1.5"
                   >
                     <span className="font-semibold text-purple-400">{t('role.super_admin', 'Super Administrator')}</span>
-                    <span className="text-[11px] text-slate-400">System operator, audit & tenant oversight</span>
+                    <span className="text-[11px] text-slate-400">{t('role.desc_admin', 'System operator, audit & tenant oversight')}</span>
                   </button>
                 </div>
               )}
@@ -371,8 +375,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={onOpenProfile}
                   className="flex items-center gap-2 px-2 py-1 rounded-xl hover:bg-slate-800/80 transition-colors cursor-pointer group text-left min-h-[44px]"
-                  title="View / Edit Profile"
-                  aria-label="View or edit profile"
+                  title={t('nav.view_profile_title', 'View / Edit Profile')}
+                  aria-label={t('nav.view_profile_title', 'View / Edit Profile')}
                 >
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
                     {user.avatarUrl ? (
@@ -445,26 +449,29 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Tablet First-Class Navigation Strip (Covers Tablet Portrait & Landscape: 768px - 1279px) */}
-      <div className="hidden md:flex xl:hidden border-t border-slate-800/80 bg-slate-900/95 px-2.5 sm:px-4 py-1.5 items-center gap-1.5 overflow-x-auto scrollbar-thin w-full shadow-inner">
-        {navItems.filter((i) => i.show).map((item) => {
-          const Icon = item.icon;
-          const isActive = currentTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => onSelectTab(item.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all cursor-pointer min-h-[44px] shrink-0 ${
-                isActive
-                  ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5 shrink-0 text-sky-400" />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
+      {/* Tablet Portrait First-Class Navigation Strip (Tablet Landscape uses TabletSidebar) */}
+      <div className="relative hidden md:block md:landscape:hidden xl:hidden border-t border-slate-800/80 bg-slate-900/95 shadow-inner">
+        <div className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 overflow-x-auto scrollbar-thin w-full">
+          {navItems.filter((i) => i.show).map((item) => {
+            const Icon = item.icon;
+            const isActive = currentTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onSelectTab(item.id)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all cursor-pointer min-h-[44px] shrink-0 ${
+                  isActive
+                    ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5 shrink-0 text-sky-400" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-900 to-transparent" />
       </div>
 
       {/* Mobile Menu Dropdown */}
@@ -511,7 +518,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
                 <div>
                   <div className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">{user.name}</div>
-                  <div className="text-xs text-slate-400">{user.businessName}</div>
+                  <div className="text-xs text-slate-400">{t(user.businessName)}</div>
                   <div className="mt-1">{getRoleBadge(user.role)}</div>
                 </div>
               </button>

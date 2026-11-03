@@ -190,7 +190,7 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
     if (!selected) return;
 
     if (!selected.name.endsWith('.csv')) {
-      setUploadError('Please select a valid .csv file format.');
+      setUploadError(t('bulk.err_format', 'Please select a valid .csv file format.'));
       return;
     }
 
@@ -201,7 +201,7 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
         const text = event.target?.result as string;
         const parsed = parseCsvText(text);
         if (parsed.length === 0) {
-          setUploadError('The selected CSV file contains no valid dispatch data rows.');
+          setUploadError(t('bulk.err_empty', 'The selected CSV file contains no valid dispatch data rows.'));
           setParsedDispatches([]);
         } else {
           setParsedDispatches(parsed);
@@ -232,13 +232,17 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
 
       const response = await api.bulkCreateDispatches(payloads);
 
-      setUploadSuccess(`Successfully imported ${response.createdCount} dispatches into active logistics registry.`);
+      setUploadSuccess(
+        t('bulk.success_imported', 'Successfully imported {count} dispatches into active logistics registry.', {
+          count: response.createdCount,
+        })
+      );
       setTimeout(() => {
         onSuccess(response.createdCount);
         onClose();
       }, 1200);
     } catch (err: any) {
-      setUploadError(err.message || 'Failed to process bulk dispatch creation.');
+      setUploadError(err.message || t('msg.error'));
     } finally {
       setIsProcessing(false);
     }
@@ -278,7 +282,7 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
         {/* Action / Helper Bar */}
         <div className="mt-4 p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div>
-            <span className="font-semibold text-slate-200">Standard CSV Column Schema:</span>
+            <span className="font-semibold text-slate-200">{t('bulk.schema_label', 'Standard CSV Column Schema:')}</span>
             <p className="text-slate-400 text-[11px] mt-0.5 font-mono">
               dispatch_reference, partner_name, destination_address, driver_name, sku, item_name, unit, quantity
             </p>
@@ -356,7 +360,7 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
                     <tr key={idx} className="hover:bg-slate-800/40">
                       <td className="py-2 px-3 font-mono font-bold text-sky-400">{d.reference}</td>
                       <td className="py-2 px-3">
-                        <div className="font-semibold text-white">{d.partnerName || 'Unknown Partner'}</div>
+                        <div className="font-semibold text-white">{d.partnerName || t('dispatch.unknown_partner', 'Unknown Partner')}</div>
                         {d.destinationAddress && (
                           <div className="text-[10px] text-slate-500 truncate max-w-[180px]">
                             {d.destinationAddress}
@@ -364,10 +368,10 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
                         )}
                       </td>
                       <td className="py-2 px-3 text-slate-300 text-[11px]">
-                        {d.driverName || 'Standard Freight'} {d.vehicleReg ? `(${d.vehicleReg})` : ''}
+                        {d.driverName || t('dispatch.standard_freight', 'Standard Freight')} {d.vehicleReg ? `(${d.vehicleReg})` : ''}
                       </td>
                       <td className="py-2 px-3">
-                        <span className="text-slate-300 font-mono">{d.lines.length} items</span>
+                        <span className="text-slate-300 font-mono">{d.lines.length} {t('table.items', 'items')}</span>
                         <div className="text-[10px] text-slate-500 truncate max-w-[150px]">
                           {d.lines.map((l) => `${l.quantitySent}x ${l.sku}`).join(', ')}
                         </div>
@@ -390,7 +394,7 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 rounded-xl cursor-pointer"
           >
-            {t('common.cancel', 'Cancel')}
+            {t('action.cancel', 'Cancel')}
           </button>
 
           <button

@@ -134,21 +134,26 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
   const validateInput = (): boolean => {
     setErrorMessage(null);
     if (!selectedPartnerId) {
-      setErrorMessage('Please select a receiving partner.');
+      setErrorMessage(t('dispatch.err_select_partner', 'Please select a receiving partner.'));
       return false;
     }
     if (lines.length === 0) {
-      setErrorMessage('Please add at least one line item to the dispatch.');
+      setErrorMessage(t('dispatch.err_add_line', 'Please add at least one line item to the dispatch.'));
       return false;
     }
     for (let i = 0; i < lines.length; i++) {
       const l = lines[i];
       if (!l.itemName.trim()) {
-        setErrorMessage(`Item line #${i + 1} is missing a description.`);
+        setErrorMessage(t('dispatch.err_missing_desc', 'Item line #{index} is missing a description.', { index: i + 1 }));
         return false;
       }
       if (typeof l.quantitySent !== 'number' || isNaN(l.quantitySent) || l.quantitySent <= 0) {
-        setErrorMessage(`Item line #${i + 1} (${l.itemName}) must have quantity > 0.`);
+        setErrorMessage(
+          t('dispatch.err_quantity_invalid', 'Item line #{index} ({name}) must have quantity > 0.', {
+            index: i + 1,
+            name: l.itemName || `#${i + 1}`,
+          })
+        );
         return false;
       }
     }
@@ -265,7 +270,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 >
                   {locations.map((loc) => (
                     <option key={loc.id} value={loc.id}>
-                      {loc.label} ({loc.city})
+                      {t(loc.label)} ({loc.city})
                     </option>
                   ))}
                 </select>
@@ -284,7 +289,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 >
                   {partners.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} ({p.type})
+                      {t(p.name)} ({t(`partner.type_${p.type.toLowerCase()}`, p.type)})
                     </option>
                   ))}
                 </select>
@@ -298,7 +303,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 required
                 value={destinationAddress}
                 onChange={(e) => setDestinationAddress(e.target.value)}
-                placeholder="Street address, Dock number, City"
+                placeholder={t('dispatch.placeholder_dest_address', 'Street address, Dock number, City')}
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
               />
             </div>
@@ -311,7 +316,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                   type="text"
                   value={driverName}
                   onChange={(e) => setDriverName(e.target.value)}
-                  placeholder="e.g. Robert Lang"
+                  placeholder={t('dispatch.placeholder_driver_name', 'e.g. Robert Lang')}
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                 />
               </div>
@@ -331,7 +336,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                   type="text"
                   value={vehicleReg}
                   onChange={(e) => setVehicleReg(e.target.value)}
-                  placeholder="TRK-4921"
+                  placeholder={t('dispatch.placeholder_vehicle_plate', 'TRK-4921')}
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
                 />
               </div>
@@ -358,7 +363,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                         type="text"
                         value={item.sku}
                         onChange={(e) => handleLineChange(index, 'sku', e.target.value)}
-                        placeholder="SKU"
+                        placeholder={t('dispatch.placeholder_sku', 'SKU')}
                         className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-200 font-mono text-[11px]"
                       />
                     </div>
@@ -369,7 +374,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                         required
                         value={item.itemName}
                         onChange={(e) => handleLineChange(index, 'itemName', e.target.value)}
-                        placeholder="Item name / description"
+                        placeholder={t('dispatch.placeholder_item_name', 'Item name / description')}
                         className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-200"
                       />
                     </div>
@@ -380,14 +385,14 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                         onChange={(e) => handleLineChange(index, 'unit', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-slate-200"
                       >
-                        <option value="cases">cases</option>
-                        <option value="boxes">boxes</option>
-                        <option value="cartons">cartons</option>
-                        <option value="bags">bags</option>
-                        <option value="units">units</option>
-                        <option value="kg">kg</option>
-                        <option value="pallets">pallets</option>
-                        <option value="sacks">sacks</option>
+                        <option value="cases">{t('unit.cases')}</option>
+                        <option value="boxes">{t('unit.boxes')}</option>
+                        <option value="cartons">{t('unit.cartons')}</option>
+                        <option value="bags">{t('unit.bags')}</option>
+                        <option value="units">{t('unit.units')}</option>
+                        <option value="kg">{t('unit.kg')}</option>
+                        <option value="pallets">{t('unit.pallets')}</option>
+                        <option value="sacks">{t('unit.sacks')}</option>
                       </select>
                     </div>
 
@@ -399,7 +404,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                         step="any"
                         value={item.quantitySent}
                         onChange={(e) => handleLineChange(index, 'quantitySent', parseFloat(e.target.value) || 0)}
-                        placeholder="Qty"
+                        placeholder={t('dispatch.placeholder_qty', 'Qty')}
                         className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-mono text-right"
                       />
                     </div>
@@ -434,7 +439,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Handling notes, temperature limits, delivery dock instructions..."
+                placeholder={t('dispatch.placeholder_dispatch_instructions', 'Handling notes, temperature limits, delivery dock instructions...')}
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
               />
             </div>
@@ -446,7 +451,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white rounded-xl cursor-pointer"
               >
-                {t('common.cancel', 'Cancel')}
+                {t('action.cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
@@ -471,12 +476,12 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
 
                 <div className="grid grid-cols-2 gap-3 text-slate-300">
                   <div>
-                    <span className="text-slate-500 font-semibold block">{t('table.origin_location', 'Origin Terminal')}:</span>
-                    <div className="font-semibold text-white">{selectedLocation?.label || 'Main Dock'}</div>
+                    <span className="text-slate-500 font-semibold block">{t('dispatch.origin_terminal', 'Origin Terminal')}:</span>
+                    <div className="font-semibold text-white">{t(selectedLocation?.label || 'Main Dock')}</div>
                   </div>
                   <div>
                     <span className="text-slate-500 font-semibold block">{t('table.destination_partner', 'Destination Partner')}:</span>
-                    <div className="font-semibold text-white">{selectedPartner?.name}</div>
+                    <div className="font-semibold text-white">{t(selectedPartner?.name || '')}</div>
                     <div className="text-[11px] text-slate-400">{destinationAddress}</div>
                   </div>
                   <div>
@@ -485,7 +490,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                     {driverPhone && <div className="text-[11px] text-slate-400">{driverPhone}</div>}
                   </div>
                   <div>
-                    <span className="text-slate-500 font-semibold block">{t('dispatch.total_manifest_qty')}:</span>
+                    <span className="text-slate-500 font-semibold block">{t('dispatch.total_manifest_qty')}</span>
                     <div className="font-mono font-bold text-indigo-300 text-sm">
                       {t('dispatch.units_across_lines', { units: totalUnits, lines: lines.length })}
                     </div>
@@ -504,7 +509,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                         <span className="text-slate-200">{l.itemName}</span>
                       </div>
                       <div className="font-mono font-bold text-slate-200">
-                        {l.quantitySent} {l.unit}
+                        {l.quantitySent} {t(`unit.${l.unit}`, l.unit)}
                       </div>
                     </div>
                   ))}

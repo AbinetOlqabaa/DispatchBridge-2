@@ -21,6 +21,8 @@ import {
   Wifi,
   WifiOff,
   RefreshCw,
+  BarChart3,
+  UserPlus,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
 import { useTheme } from '../../context/ThemeContext.js';
@@ -99,6 +101,8 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
     { id: 'dispatches', label: t('nav.dispatches', 'Dispatches'), icon: Truck, show: true },
     { id: 'locations', label: t('nav.locations', 'Origins & Docks'), icon: Warehouse, show: !!user && user.role !== 'RECEIVER' },
     { id: 'partners', label: t('nav.partners', 'Partners'), icon: Users, show: !!user && user.role !== 'RECEIVER' },
+    { id: 'reports', label: t('nav.reports', 'Reports & Analytics'), icon: BarChart3, show: !!user },
+    { id: 'team', label: t('nav.team', 'Team & Members'), icon: UserPlus, show: !!user && (user.role === 'BUSINESS_OWNER' || user.role === 'SUPER_ADMIN') },
     { id: 'recommendations', label: t('nav.recommendations', 'Recommendations'), icon: Sparkles, show: true },
     { id: 'audit', label: t('nav.audit', 'Audit Trail'), icon: FileText, show: !!user && (user.role === 'SUPER_ADMIN' || user.role === 'BUSINESS_OWNER') },
     { id: 'status', label: t('nav.status', 'System Status'), icon: Shield, show: true },
@@ -108,7 +112,7 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
     <aside
       ref={sidebarRef}
       className="hidden md:landscape:flex flex-col w-64 shrink-0 bg-slate-900/95 border-r border-slate-800 h-screen sticky top-0 z-30 select-none shadow-xl"
-      aria-label="Tablet Landscape Navigation Sidebar"
+      aria-label="Landscape Navigation Sidebar"
     >
       {/* Brand Header */}
       <div className="p-4 border-b border-slate-800 shrink-0">
@@ -184,7 +188,7 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
               className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-slate-800 flex flex-col min-h-[44px] justify-center cursor-pointer"
             >
               <span className="font-semibold text-emerald-400">{t('role.business_owner', 'Business Owner')}</span>
-              <span className="text-[10px] text-slate-400">Apex Supply (Eleanor)</span>
+              <span className="text-[10px] text-slate-400">{t('role.desc_owner', 'Apex Supply (Eleanor)')}</span>
             </button>
             <button
               onClick={() => {
@@ -194,7 +198,7 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
               className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-slate-800 flex flex-col min-h-[44px] justify-center cursor-pointer"
             >
               <span className="font-semibold text-blue-400">{t('role.sender', 'Sender / Dispatcher')}</span>
-              <span className="text-[10px] text-slate-400">Carlos Ruiz</span>
+              <span className="text-[10px] text-slate-400">{t('role.desc_sender', 'Carlos Ruiz')}</span>
             </button>
             <button
               onClick={() => {
@@ -204,7 +208,7 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
               className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-slate-800 flex flex-col min-h-[44px] justify-center cursor-pointer"
             >
               <span className="font-semibold text-amber-400">{t('role.receiver', 'Receiver / Partner')}</span>
-              <span className="text-[10px] text-slate-400">Metro Retail (David Miller)</span>
+              <span className="text-[10px] text-slate-400">{t('role.desc_receiver', 'Metro Retail (David Miller)')}</span>
             </button>
             <button
               onClick={() => {
@@ -214,7 +218,7 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
               className="w-full text-left px-2.5 py-2 rounded-lg hover:bg-slate-800 flex flex-col min-h-[44px] justify-center cursor-pointer border-t border-slate-800 mt-1 pt-1.5"
             >
               <span className="font-semibold text-purple-400">{t('role.super_admin', 'Super Administrator')}</span>
-              <span className="text-[10px] text-slate-400">System Operator</span>
+              <span className="text-[10px] text-slate-400">{t('role.desc_admin', 'System Operator')}</span>
             </button>
           </div>
         )}
@@ -231,7 +235,8 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
               setThemeDropdownOpen(false);
             }}
             className="w-full flex items-center justify-center gap-1.5 px-2 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700/80 text-xs font-semibold cursor-pointer min-h-[44px]"
-            title="Change Language"
+            title={t('nav.select_language', 'Select language')}
+            aria-label={t('nav.select_language', 'Select language')}
           >
             <Globe className="w-3.5 h-3.5 text-sky-400 shrink-0" />
             <span className="uppercase text-[11px]">{currentLanguageOption.shortLabel}</span>
@@ -300,7 +305,8 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
             <button
               onClick={onOpenProfile}
               className="w-full flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-800/80 text-left transition-colors cursor-pointer group min-h-[44px]"
-              title="View / Edit Profile"
+              title={t('nav.view_profile_title', 'View / Edit Profile')}
+              aria-label={t('nav.view_profile_title', 'View / Edit Profile')}
             >
               <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
                 {user.avatarUrl ? (

@@ -65,7 +65,7 @@ export const ProfileSummaryCard: React.FC<ProfileSummaryCardProps> = ({ onOpenPr
         {/* User Identity Details (Safe: No Raw FAN/FIN) */}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-base font-bold text-white truncate">{user.name}</h2>
+            <h2 className="text-base font-bold text-white truncate">{t(user.name)}</h2>
             <span
               className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${getRoleBadgeColor()}`}
             >
@@ -80,7 +80,7 @@ export const ProfileSummaryCard: React.FC<ProfileSummaryCardProps> = ({ onOpenPr
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 mt-1">
             <span className="flex items-center gap-1 truncate">
               <Building className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-              <span className="truncate">{user.businessName}</span>
+              <span className="truncate">{t(user.businessName)}</span>
             </span>
             <span className="flex items-center gap-1 font-mono text-slate-300">
               <Smartphone className="w-3.5 h-3.5 text-slate-500 shrink-0" />

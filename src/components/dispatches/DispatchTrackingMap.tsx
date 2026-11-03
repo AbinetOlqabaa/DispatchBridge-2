@@ -161,7 +161,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
         updatedAt: cachedRecord.currentCoordinates.updatedAt || cachedRecord.cachedAt,
         speedKmh: cachedRecord.currentCoordinates.speedKmh ?? 80,
         heading: cachedRecord.currentCoordinates.heading ?? 310,
-        checkpointName: cachedRecord.currentCoordinates.checkpointName || 'Offline Waypoint Cache',
+        checkpointName: t(cachedRecord.currentCoordinates.checkpointName || '') || t('map.offline_waypoint_cache'),
         source: 'CHECKPOINT' as const,
       };
     }
@@ -172,7 +172,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
         updatedAt: dispatch.currentCoordinates.updatedAt || dispatch.updatedAt,
         speedKmh: dispatch.currentCoordinates.speedKmh ?? (dispatch.status === 'IN_TRANSIT' ? 84 : 0),
         heading: dispatch.currentCoordinates.heading ?? 315,
-        checkpointName: dispatch.currentCoordinates.checkpointName || 'Active Transit Corridor',
+        checkpointName: t(dispatch.currentCoordinates.checkpointName || '') || t('map.active_transit_corridor'),
         source: dispatch.currentCoordinates.source || 'GPS',
       };
     }
@@ -183,7 +183,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
         updatedAt: dispatch.receivedAt || dispatch.updatedAt,
         speedKmh: 0,
         heading: 0,
-        checkpointName: `${dispatch.partnerName} Receiving Dock`,
+        checkpointName: `${t(dispatch.partnerName)} (${t('map.dest_terminal_pin')})`,
         source: 'CHECKPOINT' as const,
       };
     }
@@ -193,10 +193,10 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
       updatedAt: dispatch.dispatchedAt,
       speedKmh: 0,
       heading: 0,
-      checkpointName: dispatch.originLocationSnapshot?.label || 'Dispatch Dock',
+      checkpointName: t(dispatch.originLocationSnapshot?.label || '') || t('map.origin_dock_pin'),
       source: 'CHECKPOINT' as const,
     };
-  }, [dispatch, originCoords, destCoords, isEffectivelyOffline, cachedRecord]);
+  }, [dispatch, originCoords, destCoords, isEffectivelyOffline, cachedRecord, t]);
 
   // 4. Resolve Planned Waypoints
   const plannedWaypoints: RouteWaypoint[] = useMemo(() => {
@@ -358,7 +358,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
   const handlePrecacheRoute = () => {
     const saved = saveMapCache(dispatch);
     setCachedRecord(saved);
-    setCacheNotification(`Route & tile grid cached offline (${(saved.sizeBytes / 1024).toFixed(1)} KB). Available without signal.`);
+    setCacheNotification(t('map.cache_saved_toast', { size: (saved.sizeBytes / 1024).toFixed(1) }));
     setTimeout(() => setCacheNotification(null), 4000);
   };
 
@@ -371,7 +371,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
       const nextLat = currentCoords.lat + (destCoords.lat - currentCoords.lat) * advanceFraction;
       const nextLng = currentCoords.lng + (destCoords.lng - currentCoords.lng) * advanceFraction;
       const newSpeed = Math.floor(75 + Math.random() * 20);
-      const nextWaypointName = `En Route Waypoint Mile ${(coveredDistanceKm + 45).toFixed(0)}`;
+      const nextWaypointName = `${t('map.waypoints')} ${(coveredDistanceKm + 45).toFixed(0)} km`;
 
       if (isEffectivelyOffline) {
         // Queue locally when offline
@@ -400,7 +400,12 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
         };
         const saved = saveMapCache(updatedOffline);
         setCachedRecord(saved);
-        setPingSuccessMsg(`Offline waypoint queued locally: ${nextLat.toFixed(4)}° N, ${Math.abs(nextLng).toFixed(4)}° W (will sync upon reconnection).`);
+        setPingSuccessMsg(
+          t('map.ping_offline_queued', {
+            lat: nextLat.toFixed(4),
+            lng: Math.abs(nextLng).toFixed(4),
+          })
+        );
       } else {
         const updated = await api.updateDispatchTelemetry(dispatch.id, {
           latitude: parseFloat(nextLat.toFixed(5)),
@@ -417,7 +422,12 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
         if (onTelemetryUpdate) {
           onTelemetryUpdate(updated);
         }
-        setPingSuccessMsg(`Telemetry GPS ping recorded: ${nextLat.toFixed(4)}° N, ${Math.abs(nextLng).toFixed(4)}° W`);
+        setPingSuccessMsg(
+          t('map.ping_recorded_toast', {
+            lat: nextLat.toFixed(4),
+            lng: Math.abs(nextLng).toFixed(4),
+          })
+        );
       }
       setTimeout(() => setPingSuccessMsg(null), 4000);
     } catch (err: any) {
@@ -483,7 +493,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
                   ? 'bg-amber-950 text-amber-300 border border-amber-800'
                   : 'bg-slate-800 text-slate-400 hover:text-white border border-slate-700'
               }`}
-              title="Toggle simulated low-signal/offline transit mode"
+              title={t('map.toggle_offline_title', 'Toggle simulated low-signal/offline transit mode')}
             >
               {isSimulatedOffline ? <WifiOff className="w-3 h-3 text-amber-400" /> : <Wifi className="w-3 h-3 text-emerald-400" />}
               <span>{isSimulatedOffline ? t('map.simulating_offline_btn', 'Simulating Offline') : t('map.online_conn_btn', 'Online Connection')}</span>
@@ -507,7 +517,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           <button
             onClick={handlePrecacheRoute}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors"
-            title="Pre-cache map tiles, waypoints and vector paths for offline transit"
+            title={t('map.precache_title', 'Pre-cache map tiles, waypoints and vector paths for offline transit')}
           >
             <Database className="w-3.5 h-3.5 text-emerald-400" />
             <span>{t('map.precache')}</span>
@@ -519,7 +529,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               onClick={handleSimulateGpsPing}
               disabled={isSimulatingPing}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-950/70 hover:bg-sky-900 text-sky-300 border border-sky-800/60 text-xs font-semibold cursor-pointer transition-colors"
-              title="Record next live GPS telemetry waypoint"
+              title={t('map.record_telemetry_title', 'Record next live GPS telemetry waypoint')}
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSimulatingPing ? 'animate-spin' : ''}`} />
               <span>{isSimulatingPing ? t('map.pinging') : t('map.simulate_ping')}</span>
@@ -530,7 +540,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           <button
             onClick={handleCopyCoordinates}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors"
-            title="Copy latitude and longitude coordinates"
+            title={t('map.copy_coords_title', 'Copy latitude and longitude coordinates')}
           >
             {copiedCoords ? (
               <>
@@ -551,7 +561,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors"
-            title="View exact geo-coordinates on Google Maps"
+            title={t('map.view_gmaps_title', 'View exact geo-coordinates on Google Maps')}
           >
             <ExternalLink className="w-3.5 h-3.5 text-indigo-400" />
             <span>{t('map.open_in_maps')}</span>
@@ -787,7 +797,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               textAnchor="middle"
               className="fill-slate-300 font-sans font-semibold text-[11px] drop-shadow"
             >
-              {dispatch.originLocationSnapshot?.label || t('map.origin_dock_pin', 'Origin Dock')}
+              {t(dispatch.originLocationSnapshot?.label || '') || t('map.origin_dock_pin', 'Origin Dock')}
             </text>
           </g>
 
@@ -800,7 +810,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
                 id: 'dest_pin',
                 latitude: destCoords.lat,
                 longitude: destCoords.lng,
-                label: dispatch.destinationSnapshot?.partnerName || t('map.dest_terminal_pin', 'Destination Terminal'),
+                label: t(dispatch.destinationSnapshot?.partnerName || '') || t('map.dest_terminal_pin', 'Destination Terminal'),
               })
             }
           >
@@ -811,7 +821,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               textAnchor="middle"
               className="fill-emerald-300 font-sans font-semibold text-[11px] drop-shadow"
             >
-              {dispatch.partnerName}
+              {t(dispatch.partnerName)}
             </text>
           </g>
 
@@ -893,7 +903,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
                 ×
               </button>
             </div>
-            <div className="font-medium text-white">{activeWaypointTooltip.label}</div>
+            <div className="font-medium text-white">{t(activeWaypointTooltip.label || '')}</div>
             <div className="text-[11px] font-mono text-slate-300">
               {activeWaypointTooltip.latitude.toFixed(5)}° N, {Math.abs(activeWaypointTooltip.longitude).toFixed(5)}° W
             </div>

@@ -57,14 +57,14 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
               <Smartphone className="w-3.5 h-3.5" />
             </span>
             <div>
-              <span className="font-semibold text-indigo-100">Phone Verification Required:</span> Verify your mobile number ({user.phoneNumber}) to receive automated SMS dispatch alerts.
+              {t('banner.phone_verify_req', { phone: user.phoneNumber })}
             </div>
           </div>
           <button
             onClick={onOpenPhoneVerify}
-            className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer transition-colors"
+            className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer transition-colors shrink-0"
           >
-            Verify Code
+            {t('banner.verify_code_btn')}
           </button>
         </div>
       )}

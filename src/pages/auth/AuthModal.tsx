@@ -101,32 +101,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     let identifier = '';
     if (signInMode === 'MOBILE') {
       if (!signInPhone.trim()) {
-        setErrorMessage('Please enter your mobile phone number.');
+        setErrorMessage(t('auth.err_phone_req', 'Please enter your mobile phone number.'));
         return;
       }
       identifier = normalizeToE164(signInPhone, signInCountry.dialCode);
     } else {
       if (!signInEmail.trim() || !signInEmail.includes('@')) {
-        setErrorMessage('Please enter a valid work email address.');
+        setErrorMessage(t('auth.err_email_invalid', 'Please enter a valid work email address.'));
         return;
       }
       identifier = signInEmail.trim();
     }
 
     if (!signInPassword) {
-      setErrorMessage('Please enter your account password.');
+      setErrorMessage(t('auth.err_pass_req', 'Please enter your account password.'));
       return;
     }
 
     setIsLoading(true);
     try {
       await login(identifier, signInPassword);
-      setSuccessMessage('Successfully signed in.');
+      setSuccessMessage(t('auth.msg_signin_success', 'Successfully signed in.'));
       setTimeout(() => {
         onClose();
       }, 500);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Invalid credentials. Please verify your details.');
+      setErrorMessage(err.message || t('auth.err_invalid_creds', 'Invalid credentials. Please verify your details.'));
     } finally {
       setIsLoading(false);
     }
@@ -145,19 +145,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     const normPhone = normalizeToE164(regPhone, regCountry.dialCode);
 
     if (!regName.trim() || regName.trim().length < 2) {
-      setErrorMessage('Please provide your full legal name.');
+      setErrorMessage(t('auth.err_name_req', 'Please provide your full legal name.'));
       return;
     }
     if (!isValidE164(normPhone)) {
-      setErrorMessage('Please provide a valid mobile number in international standard format.');
+      setErrorMessage(t('auth.err_phone_invalid', 'Please provide a valid mobile number in international standard format.'));
       return;
     }
     if (cleanFan.length !== 16) {
-      setErrorMessage('FAN (Fayda Account Number) must be exactly 16 numeric digits.');
+      setErrorMessage(t('auth.err_fan_invalid', 'FAN (Fayda Account Number) must be exactly 16 numeric digits.'));
       return;
     }
     if (cleanFin.length !== 12) {
-      setErrorMessage('FIN (Fayda Identification Number) must be exactly 12 numeric digits.');
+      setErrorMessage(t('auth.err_fin_invalid', 'FIN (Fayda Identification Number) must be exactly 12 numeric digits.'));
       return;
     }
     if (regRole === 'SUPER_ADMIN') {
@@ -358,7 +358,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-          aria-label="Close dialog"
+          aria-label={t('action.close')}
         >
           <X className="w-5 h-5" />
         </button>
@@ -456,7 +456,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </label>
                 <div className="flex gap-2">
                   <select
-                    aria-label="Country dial code"
+                    aria-label={t('auth.country_dial_code', 'Country dial code')}
                     value={signInCountry.code}
                     onChange={(e) => {
                       const found = SUPPORTED_COUNTRIES.find((c) => c.code === e.target.value);
@@ -497,7 +497,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     required
                     value={signInEmail}
                     onChange={(e) => setSignInEmail(e.target.value)}
-                    placeholder="name@company.com"
+                    placeholder={t('auth.placeholder_email', 'name@company.com')}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -599,7 +599,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {/* Simulation label badge */}
             <div className="mb-4 p-2.5 rounded-xl bg-sky-950/70 border border-sky-800/70 text-sky-300 text-xs flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
-              <span>Fayda e-ID Gateway Simulator Active (Dev Mode)</span>
+              <span>{t('auth.fayda_sim_banner', 'Fayda e-ID Gateway Simulator Active (Dev Mode)')}</span>
             </div>
 
             {regStep === 'FORM' ? (
@@ -616,7 +616,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       required
                       value={regName}
                       onChange={(e) => setRegName(e.target.value)}
-                      placeholder="e.g. Abebe Bikila"
+                      placeholder={t('auth.placeholder_full_name', 'e.g. Abebe Bikila')}
                       className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
@@ -629,7 +629,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </label>
                   <div className="flex gap-2">
                     <select
-                      aria-label="Country dial code"
+                      aria-label={t('auth.country_dial_code', 'Country dial code')}
                       value={regCountry.code}
                       onChange={(e) => {
                         const found = SUPPORTED_COUNTRIES.find((c) => c.code === e.target.value);
@@ -639,7 +639,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     >
                       {SUPPORTED_COUNTRIES.map((c) => (
                         <option key={c.code} value={c.code} className="bg-slate-900 text-white">
-                          {c.flag} {c.dialCode}
+                           {c.flag} {c.dialCode}
                         </option>
                       ))}
                     </select>
@@ -671,7 +671,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         maxLength={16}
                         value={regFan}
                         onChange={(e) => setRegFan(e.target.value.replace(/\D/g, ''))}
-                        placeholder="16 numeric digits"
+                        placeholder={t('auth.placeholder_fan', '16 numeric digits')}
                         className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-2 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
                       />
                     </div>
@@ -689,7 +689,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         maxLength={12}
                         value={regFin}
                         onChange={(e) => setRegFin(e.target.value.replace(/\D/g, ''))}
-                        placeholder="12 numeric digits"
+                        placeholder={t('auth.placeholder_fin', '12 numeric digits')}
                         className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-2 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                       />
                     </div>
@@ -724,7 +724,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       required
                       value={regBusiness}
                       onChange={(e) => setRegBusiness(e.target.value)}
-                      placeholder="e.g. Apex Supply Freight Ltd"
+                      placeholder={t('auth.placeholder_biz_name', 'e.g. Apex Supply Freight Ltd')}
                       className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
@@ -857,7 +857,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </label>
                   <div className="flex gap-2">
                     <select
-                      aria-label="Country dial code"
+                      aria-label={t('auth.country_dial_code', 'Country dial code')}
                       value={forgotCountry.code}
                       onChange={(e) => {
                         const found = SUPPORTED_COUNTRIES.find((c) => c.code === e.target.value);
@@ -892,7 +892,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     maxLength={16}
                     value={forgotFan}
                     onChange={(e) => setForgotFan(e.target.value.replace(/\D/g, ''))}
-                    placeholder="16 numeric digits"
+                    placeholder={t('auth.placeholder_fan', '16 numeric digits')}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -907,7 +907,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     maxLength={12}
                     value={forgotFin}
                     onChange={(e) => setForgotFin(e.target.value.replace(/\D/g, ''))}
-                    placeholder="12 numeric digits"
+                    placeholder={t('auth.placeholder_fin', '12 numeric digits')}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -1046,7 +1046,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onClick={onClose}
               className="text-xs text-slate-400 hover:text-white underline block text-center mt-2 cursor-pointer"
             >
-              Skip verification for now
+              {t('auth.skip_verification')}
             </button>
           </form>
         )}

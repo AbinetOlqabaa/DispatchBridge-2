@@ -73,7 +73,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
       setDispatches(dList);
       setPartners(pList);
     } catch (err: any) {
-      setError(err.message || 'Failed to load business overview.');
+      setError(err.message || t('msg.error'));
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
   const handleCreateBusinessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bizForm.name.trim() || !bizForm.contactEmail.trim() || !bizForm.contactPhone.trim() || !bizForm.address.trim()) {
-      setBizModalError('Entity Name, Contact Email, Phone, and Address are required.');
+      setBizModalError(t('biz.err_required_fields', 'Entity Name, Contact Email, Phone, and Address are required.'));
       return;
     }
     setSubmittingBiz(true);
@@ -100,13 +100,13 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
       });
       await loadData();
     } catch (err: any) {
-      setBizModalError(err.message || 'Failed to register business entity.');
+      setBizModalError(err.message || t('biz.err_register_failed', 'Failed to register business entity.'));
     } finally {
       setSubmittingBiz(false);
     }
   };
 
-  if (loading) return <LoadingSpinner label="Compiling executive dispatch metrics..." />;
+  if (loading) return <LoadingSpinner label={t('dashboard.loading_exec_metrics')} />;
   if (error) {
     return (
       <div className="p-8 text-center">
@@ -149,26 +149,26 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
             <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
               {t('role.business_owner')}
             </span>
-            <span className="text-xs text-slate-400">Company ID: {user?.businessId}</span>
+            <span className="text-xs text-slate-400">{t('biz.company_id', { id: user?.businessId || '' })}</span>
           </div>
 
           <div className="flex items-center gap-2.5 mt-1">
             <button
               onClick={() => setShowBusinessDropdown(!showBusinessDropdown)}
               className="flex items-center gap-2 text-left group cursor-pointer focus:outline-none"
-              title="Switch Business Entity"
-              aria-label="Switch Business Entity"
+              title={t('action.switch_entity')}
+              aria-label={t('action.switch_entity')}
             >
               <Building2 className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
               <h1 className="text-2xl font-bold text-white tracking-tight group-hover:text-indigo-200 transition-colors">
-                {user?.businessName}
+                {t(user?.businessName || '')}
               </h1>
               <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-white transition-transform ${showBusinessDropdown ? 'rotate-180' : ''}`} />
             </button>
 
             {user?.memberships && user.memberships.length > 1 && (
               <span className="text-[11px] font-semibold text-indigo-300 bg-indigo-950/80 border border-indigo-800/60 px-2 py-0.5 rounded-full">
-                {user.memberships.length} Entities
+                {t('biz.entities_count', { count: user.memberships.length })}
               </span>
             )}
           </div>
@@ -202,7 +202,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                             await switchBusiness(m.businessId);
                             setShowBusinessDropdown(false);
                           } catch (e: any) {
-                            setError(e.message || 'Failed to switch entity.');
+                            setError(e.message || t('biz.err_switch_failed', 'Failed to switch entity.'));
                           } finally {
                             setIsSwitching(false);
                           }
@@ -214,8 +214,10 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                         }`}
                       >
                         <div className="truncate mr-2">
-                          <div className="font-semibold truncate">{m.businessName}</div>
-                          <div className="text-[10px] text-slate-400">ID: {m.businessId} • {m.role}</div>
+                          <div className="font-semibold truncate">{t(m.businessName)}</div>
+                          <div className="text-[10px] text-slate-400">
+                            ID: {m.businessId} • {t('role.' + m.role.toLowerCase(), m.role)}
+                          </div>
                         </div>
                         {isActive ? (
                           <Check className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -361,8 +363,8 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
               return (
                 <div key={p.id} className="py-3 flex items-center justify-between text-xs">
                   <div>
-                    <div className="font-semibold text-white">{p.name}</div>
-                    <div className="text-slate-400 text-[11px]">{p.contactPerson} • {p.phone}</div>
+                    <div className="font-semibold text-white">{t(p.name)}</div>
+                    <div className="text-slate-400 text-[11px]">{t(p.contactPerson)} • {p.phone}</div>
                   </div>
                   <div className="text-right">
                     <span className="font-mono text-slate-300">
@@ -399,32 +401,41 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
-          <table className="w-full text-left text-xs min-w-[760px] lg:min-w-full">
+          <table className="w-full text-left text-xs min-w-[700px] sm:min-w-[740px] lg:min-w-full">
             <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/40 border-b border-slate-800">
               <tr>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.dispatch_number', 'Dispatch Number')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.destination_partner', 'Partner Destination')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.status', 'Status')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.items', 'Items')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.recon_outcome', 'Reconciliation Outcome')}</th>
-                <th className="px-3 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap">{t('table.action', 'Action')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.dispatch_number', 'Dispatch Number')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.destination_partner', 'Partner Destination')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.status', 'Status')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.items', 'Items')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.recon_outcome', 'Reconciliation Outcome')}</th>
+                <th className="px-2.5 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap">{t('table.action', 'Action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {dispatches.slice(0, 5).map((d) => (
                 <tr key={d.id} className="hover:bg-slate-800/40 transition-colors">
-                  <td className="px-3 py-3 font-mono font-semibold text-indigo-300 whitespace-nowrap">{d.dispatchNumber}</td>
-                  <td className="px-3 py-3 text-slate-200">
-                    <div className="font-medium">{d.partnerName}</div>
-                    <div className="text-[11px] text-slate-500 truncate max-w-xs">{d.destinationSnapshot.address}</div>
+                  <td className="px-2.5 sm:px-3 py-3 font-mono font-semibold text-indigo-300 whitespace-nowrap">
+                    <button
+                      onClick={() => onSelectDispatch(d.id)}
+                      className="hover:underline text-indigo-300 hover:text-indigo-200 cursor-pointer text-left"
+                      title={t('action.details', 'View dispatch details')}
+                    >
+                      {d.dispatchNumber}
+                    </button>
                   </td>
-                  <td className="px-3 py-3 whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3 py-3 text-slate-200">
+                    <div className="font-medium">{t(d.partnerName)}</div>
+                    <div className="text-[11px] text-slate-500 truncate max-w-xs">{t(d.destinationSnapshot.address)}</div>
+                  </td>
+                  <td className="px-2.5 sm:px-3 py-3 whitespace-nowrap">
                     <StatusBadge status={d.status} size="sm" />
                   </td>
-                  <td className="px-3 py-3 text-slate-300 whitespace-nowrap">
-                    {d.totalQuantityDispatched} {d.lines[0]?.unit || t('unit.units', 'units')}
+                  <td className="px-2.5 sm:px-3 py-3 text-slate-300 whitespace-nowrap">
+                    {d.totalQuantityDispatched}{' '}
+                    {d.lines[0]?.unit ? t('unit.' + d.lines[0].unit.toLowerCase(), d.lines[0].unit) : t('unit.units', 'units')}
                   </td>
-                  <td className="px-3 py-3 whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3 py-3 whitespace-nowrap">
                     {d.totalQuantityLost !== undefined ? (
                       d.totalQuantityLost > 0 ? (
                         <span className="text-rose-400 font-semibold flex items-center gap-1">
@@ -441,10 +452,10 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                       <span className="text-slate-500">{t('status.pending_receipt', 'Pending Receipt')}</span>
                     )}
                   </td>
-                  <td className="px-3 py-3 text-right whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3 py-3 text-right whitespace-nowrap">
                     <button
                       onClick={() => onSelectDispatch(d.id)}
-                      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium cursor-pointer"
+                      className="px-3 py-2 min-h-[40px] rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium cursor-pointer inline-flex items-center justify-center"
                     >
                       {t('action.details', 'Details')}
                     </button>
@@ -463,8 +474,8 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
             <button
               onClick={() => setShowCreateBizModal(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Close modal"
-              aria-label="Close modal"
+              title={t('action.close', 'Close')}
+              aria-label={t('action.close', 'Close')}
             >
               <X className="w-5 h-5" />
             </button>
@@ -494,7 +505,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Great Lakes Cold Freight Ltd."
+                  placeholder={t('biz.placeholder_name', 'e.g. Great Lakes Cold Freight Ltd.')}
                   value={bizForm.name}
                   onChange={(e) => setBizForm({ ...bizForm, name: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
@@ -508,7 +519,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. REG-88421-US"
+                    placeholder={t('biz.placeholder_tax_id', 'e.g. REG-88421-US')}
                     value={bizForm.registrationNumber}
                     onChange={(e) => setBizForm({ ...bizForm, registrationNumber: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
@@ -536,7 +547,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                   <input
                     type="email"
                     required
-                    placeholder="ops@company.com"
+                    placeholder={t('biz.placeholder_email', 'ops@company.com')}
                     value={bizForm.contactEmail}
                     onChange={(e) => setBizForm({ ...bizForm, contactEmail: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
@@ -549,7 +560,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                   <input
                     type="tel"
                     required
-                    placeholder="+1-555-019-0000"
+                    placeholder={t('biz.placeholder_phone', '+1-555-019-0000')}
                     value={bizForm.contactPhone}
                     onChange={(e) => setBizForm({ ...bizForm, contactPhone: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
@@ -564,7 +575,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                 <textarea
                   required
                   rows={2}
-                  placeholder="e.g. 500 Industrial Parkway, Dock 1, Milwaukee, WI 53202"
+                  placeholder={t('biz.placeholder_address', 'e.g. 500 Industrial Parkway, Dock 1, Milwaukee, WI 53202')}
                   value={bizForm.address}
                   onChange={(e) => setBizForm({ ...bizForm, address: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none"

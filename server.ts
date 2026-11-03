@@ -13,6 +13,8 @@ import systemRoutes from './src/server/routes/systemRoutes.js';
 import locationRoutes from './src/server/routes/locationRoutes.js';
 import notificationRoutes from './src/server/routes/notificationRoutes.js';
 import adminRoutes from './src/server/routes/adminRoutes.js';
+import membershipRoutes from './src/server/routes/membershipRoutes.js';
+import reportRoutes from './src/server/routes/reportRoutes.js';
 
 dotenv.config();
 
@@ -48,6 +50,8 @@ async function startServer() {
   app.use('/api/audit', auditRoutes);
   app.use('/api/system', systemRoutes);
   app.use('/api/admin', adminRoutes);
+  app.use('/api/memberships', membershipRoutes);
+  app.use('/api/reports', reportRoutes);
 
   // Health check endpoint
   app.get('/api/health', (req, res) => {

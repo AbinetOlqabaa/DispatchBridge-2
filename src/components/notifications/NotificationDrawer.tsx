@@ -109,12 +109,12 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-xs font-semibold text-white truncate">{notif.title}</span>
+                    <span className="text-xs font-semibold text-white truncate">{t(notif.title)}</span>
                     <span className="text-[10px] text-slate-500 shrink-0">
                       {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-0.5 line-clamp-2">{notif.message}</p>
+                  <p className="text-xs text-slate-300 mt-0.5 line-clamp-2">{t(notif.message)}</p>
 
                   <div className="flex items-center gap-2 mt-2">
                     {notif.dispatchNumber && (
