@@ -29,6 +29,7 @@ import { RecommendationsView } from './components/recommendations/Recommendation
 import { NotificationDrawer } from './components/notifications/NotificationDrawer.js';
 import { ProfileModal } from './components/auth/ProfileModal.js';
 import { TabletSidebar } from './components/layout/TabletSidebar.js';
+import { OfflineSyncDrawer } from './components/common/OfflineSyncDrawer.js';
 
 import { LoadingSpinner } from './components/common/LoadingSpinner.js';
 
@@ -46,7 +47,15 @@ function MainApp() {
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'register' | 'forgot' | 'verifyPhone'>('signin');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isCreateDispatchOpen, setIsCreateDispatchOpen] = useState(false);
+  const [preselectedPartnerId, setPreselectedPartnerId] = useState<string | undefined>(undefined);
+  const [preselectedItem, setPreselectedItem] = useState<{
+    sku: string;
+    name: string;
+    unit: string;
+    unitPrice: number;
+  } | null>(null);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isOfflineDrawerOpen, setIsOfflineDrawerOpen] = useState(false);
 
   // Check URL search params for public delivery share token (?token=...)
   useEffect(() => {
@@ -168,6 +177,7 @@ function MainApp() {
         }}
         onOpenNotifications={() => setIsNotificationsOpen(true)}
         onOpenProfile={() => setIsProfileModalOpen(true)}
+        onOpenOfflineSync={() => setIsOfflineDrawerOpen(true)}
       />
 
       {/* Main Content Column */}
@@ -186,6 +196,7 @@ function MainApp() {
             }}
             onOpenNotifications={() => setIsNotificationsOpen(true)}
             onOpenProfile={() => setIsProfileModalOpen(true)}
+            onOpenOfflineSync={() => setIsOfflineDrawerOpen(true)}
           />
         </div>
 
@@ -223,6 +234,7 @@ function MainApp() {
               {currentTab === 'partners' && (
                 <PartnersPage
                   onCreateDispatchWithPartner={(partnerId) => {
+                    setPreselectedPartnerId(partnerId);
                     setIsCreateDispatchOpen(true);
                   }}
                 />
@@ -230,6 +242,12 @@ function MainApp() {
               {currentTab === 'recommendations' && (
                 <RecommendationsView
                   onCreateDispatchWithItem={(item) => {
+                    setPreselectedItem({
+                      sku: item.sku,
+                      name: item.name,
+                      unit: item.unit,
+                      unitPrice: item.unitPrice,
+                    });
                     setIsCreateDispatchOpen(true);
                   }}
                 />
@@ -262,6 +280,12 @@ function MainApp() {
         }}
       />
 
+      {/* Local-First IndexedDB Storage & Auto-Sync Drawer */}
+      <OfflineSyncDrawer
+        isOpen={isOfflineDrawerOpen}
+        onClose={() => setIsOfflineDrawerOpen(false)}
+      />
+
       {/* Authentication Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
@@ -278,7 +302,13 @@ function MainApp() {
       {/* Create Dispatch Manifest Modal */}
       <CreateDispatchModal
         isOpen={isCreateDispatchOpen}
-        onClose={() => setIsCreateDispatchOpen(false)}
+        preselectedPartnerId={preselectedPartnerId}
+        preselectedItem={preselectedItem}
+        onClose={() => {
+          setIsCreateDispatchOpen(false);
+          setPreselectedPartnerId(undefined);
+          setPreselectedItem(null);
+        }}
         onSuccess={(createdId) => {
           setSelectedDispatchId(createdId);
         }}

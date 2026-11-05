@@ -712,7 +712,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
               <span className="font-semibold text-white">{t(suspendTarget.name)}</span> (<code className="text-slate-400">{suspendTarget.id}</code>)
             </p>
             <p className="text-[11px] text-amber-400/90 mb-4 bg-amber-950/40 p-2.5 rounded-xl border border-amber-900/40">
-              {t('admin.suspend_modal_desc')}
+              {t('admin.suspend_modal_desc', {
+                name: suspendTarget.name,
+                phone: suspendTarget.phoneNumber || suspendTarget.email,
+              })}
             </p>
 
             <form onSubmit={handleConfirmSuspend} className="space-y-4">

@@ -26,6 +26,22 @@ import {
   clearOfflineTelemetryQueue,
 } from '../src/utils/mapCache.js';
 import {
+  parseIntakeBarcode,
+  mergeScannedItemsIntoDispatchLines,
+} from '../src/utils/barcodeParser.js';
+import {
+  createMemoryStorageBackend,
+  setStorageBackendForTesting,
+  resetStorageBackend,
+  cacheDispatchesInDb,
+  getCachedDispatchByIdFromDb,
+} from '../src/utils/indexedDbStore.js';
+import {
+  enqueueOfflineDeliveryUpdate,
+  replayOfflineQueue,
+  setSimulatedOffline,
+} from '../src/utils/offlineSync.js';
+import {
   maskFan,
   maskFin,
   maskPhoneNumber,
@@ -1637,7 +1653,7 @@ async function runTestSuite() {
 
   await test('Localization & Internationalization', 'Dictionary Parity Across All 5 Languages (Zero Missing Keys & Bidirectional Parity)', () => {
     const enKeys = Object.keys(translations.en);
-    assertEqual(enKeys.length, 1185, `English dictionary contains exact expected count of 1,185 translation keys`);
+    assertEqual(enKeys.length, 1228, `English dictionary contains exact expected count of 1,228 translation keys`);
 
     const targetLanguages: SupportedLanguage[] = ['am', 'om', 'ti', 'so'];
     for (const lang of targetLanguages) {
@@ -1736,6 +1752,99 @@ async function runTestSuite() {
       translations.so['role.business_owner'].includes('Ganacsiga'),
       'Somali utilizes authentic business role terminology'
     );
+  });
+
+  // -------------------------------------------------------------------------
+  // Barcode / QR Item Intake & Local-First IndexedDB Sync Acceptance Tests
+  // -------------------------------------------------------------------------
+  await test('Barcode Intake & IndexedDB Sync', 'Create Dispatch Barcode & QR Item Intake Parsing & Line Merging', () => {
+    const initialLines = [
+      { sku: 'SKU-001', itemName: '', unit: 'cases', unitPrice: 0, quantitySent: 10 },
+    ];
+
+    const singleScan = parseIntakeBarcode('SKU-GLS-101');
+    assert(singleScan.ok, 'Known catalog barcode parses cleanly');
+    assertEqual(singleScan.items[0].sku, 'SKU-GLS-101', 'Resolves catalog SKU');
+
+    const step1 = mergeScannedItemsIntoDispatchLines(initialLines, singleScan.items);
+    assertEqual(step1.lines.length, 1, 'Replaces blank starter line instead of leaving empty row');
+    assertEqual(step1.lines[0].sku, 'SKU-GLS-101', 'Starter row populated with scanned SKU');
+    assertEqual(step1.lines[0].quantitySent, 1, 'Quantity initialized from scan');
+
+    const qrPayload = JSON.stringify({
+      items: [
+        { sku: 'SKU-GLS-101', itemName: 'Glass Olive Oil Bottles 750ml', unit: 'boxes', quantity: 4 },
+        { sku: 'SKU-COLD-501', itemName: 'Insulated Thermal Pallet Blankets', unit: 'units', quantity: 2 },
+      ],
+    });
+    const batchScan = parseIntakeBarcode(qrPayload, 'QR_CODE');
+    assertEqual(batchScan.format, 'QR_JSON', 'Detects multi-item QR JSON format');
+    assertEqual(batchScan.items.length, 2, 'Extracts both pallet items');
+
+    const step2 = mergeScannedItemsIntoDispatchLines(step1.lines, batchScan.items);
+    assertEqual(step2.lines.length, 2, 'Merges duplicate SKU and appends new SKU');
+    assertEqual(step2.lines[0].quantitySent, 5, 'Duplicate SKU quantity incremented (1 + 4 = 5)');
+    assertEqual(step2.lines[1].sku, 'SKU-COLD-501', 'Second QR item appended');
+  });
+
+  await test('Barcode Intake & IndexedDB Sync', 'Local-First IndexedDB Caching & Auto-Sync Outbox Replay', async () => {
+    const memBackend = createMemoryStorageBackend();
+    setStorageBackendForTesting(memBackend);
+    setSimulatedOffline(true, { autoSync: false });
+
+    try {
+      const seedList = await sandboxStore.getDispatches();
+      assert(seedList.length > 0, 'Seed dispatches available for IndexedDB caching');
+      const target =
+        seedList.find((d) => ['DISPATCHED', 'VIEWED', 'IN_TRANSIT'].includes(d.status)) ||
+        seedList[0];
+
+      await cacheDispatchesInDb(seedList, memBackend);
+      const cached = await getCachedDispatchByIdFromDb(target.id, memBackend);
+      assert(Boolean(cached), 'Dispatch persisted into IndexedDB store');
+
+      await enqueueOfflineDeliveryUpdate({
+        type: 'TRANSIT_SCAN',
+        dispatchId: target.id,
+        dispatchNumber: target.dispatchNumber,
+        method: 'POST',
+        url: `/api/dispatches/${target.id}/transit-scan`,
+        payload: {
+          barcode: target.dispatchNumber,
+          statusUpdate: 'OUT_FOR_DELIVERY',
+          checkpointLocation: 'North Metro Gate 2',
+          actorName: 'Field Driver',
+        },
+        actionSummary: 'Transit Scan: Out for Delivery',
+      });
+
+      const projected = await getCachedDispatchByIdFromDb(target.id, memBackend);
+      assertEqual(projected?.status, 'OUT_FOR_DELIVERY', 'IndexedDB projects optimistic offline delivery status immediately');
+
+      let replayedUrl = '';
+      setSimulatedOffline(false, { autoSync: false });
+      const syncResult = await replayOfflineQueue({
+        fetchFn: async (url: RequestInfo | URL) => {
+          replayedUrl = String(url);
+          return {
+            ok: true,
+            status: 200,
+            json: async () => ({
+              ...target,
+              status: 'OUT_FOR_DELIVERY',
+              updatedAt: new Date().toISOString(),
+            }),
+          } as unknown as Response;
+        },
+      });
+
+      assertEqual(syncResult.synced, 1, 'Replays 1 queued offline delivery update on reconnect');
+      assertEqual(syncResult.failed, 0, 'Zero sync failures');
+      assert(replayedUrl.includes(`/api/dispatches/${target.id}/transit-scan`), 'Dispatches replay to transit-scan endpoint');
+    } finally {
+      setSimulatedOffline(false, { autoSync: false });
+      resetStorageBackend();
+    }
   });
   console.log('\n========================================================================');
   const total = testResults.length;

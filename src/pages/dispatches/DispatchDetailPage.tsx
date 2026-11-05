@@ -23,6 +23,8 @@ import {
   Download,
   Camera,
   PenTool,
+  Database,
+  RefreshCw,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
 import { useTranslation } from '../../context/LanguageContext.js';
@@ -35,6 +37,7 @@ import { QrScannerModal } from '../../components/dispatches/QrScannerModal.js';
 import { SignaturePad } from '../../components/dispatches/SignaturePad.js';
 import { DamagePhotoUpload } from '../../components/dispatches/DamagePhotoUpload.js';
 import { DispatchTrackingMap } from '../../components/dispatches/DispatchTrackingMap.js';
+import { useOfflineSync } from '../../utils/offlineSync.js';
 
 interface DispatchDetailPageProps {
   dispatchId: string;
@@ -49,6 +52,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
 }) => {
   const { user, quickLoginDemoRole } = useAuth();
   const { t } = useTranslation();
+  const { isOnline, pendingDispatchIds, isSyncing } = useOfflineSync();
   const [dispatch, setDispatch] = useState<Dispatch | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,12 +110,42 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
 
   const handleScanSuccess = (updated: Dispatch) => {
     setDispatch(updated);
-    setActionSuccess(`Transit status updated to ${updated.status.replace(/_/g, ' ')} via driver QR verification.`);
-    setTimeout(() => setActionSuccess(null), 4000);
+    if (!isOnline) {
+      setActionSuccess(
+        t(
+          'offline_sync.saved_offline_msg',
+          'Delivery update saved locally in IndexedDB and will sync automatically when connectivity returns.'
+        )
+      );
+    } else {
+      setActionSuccess(`Transit status updated to ${updated.status.replace(/_/g, ' ')} via driver QR verification.`);
+    }
+    setTimeout(() => setActionSuccess(null), 4500);
   };
 
   useEffect(() => {
     loadDetail();
+  }, [dispatchId]);
+
+  useEffect(() => {
+    const handleSyncDone = (ev: Event) => {
+      const detail = (ev as CustomEvent)?.detail;
+      if (detail?.synced > 0) {
+        if (!detail.syncedDispatchIds || detail.syncedDispatchIds.includes(dispatchId)) {
+          loadDetail();
+          setActionSuccess(
+            t(
+              'offline_sync.synced_toast',
+              'Automatically synchronized {count} queued update(s) from IndexedDB to server.',
+              { count: detail.synced }
+            )
+          );
+          setTimeout(() => setActionSuccess(null), 4500);
+        }
+      }
+    };
+    window.addEventListener('dispatchbridge_sync_completed', handleSyncDone);
+    return () => window.removeEventListener('dispatchbridge_sync_completed', handleSyncDone);
   }, [dispatchId]);
 
   const loadDetail = async () => {
@@ -197,7 +231,16 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
       });
       setDispatch(updated);
       setIsReconciling(false);
-      setActionSuccess('Delivery receipt verified and reconciliation recorded with digital signature & evidence.');
+      if (!isOnline) {
+        setActionSuccess(
+          t(
+            'offline_sync.saved_offline_msg',
+            'Delivery update saved locally in IndexedDB and will sync automatically when connectivity returns.'
+          )
+        );
+      } else {
+        setActionSuccess('Delivery receipt verified and reconciliation recorded with digital signature & evidence.');
+      }
     } catch (err: any) {
       setActionError(err.message || 'Failed to record reconciliation.');
     } finally {
@@ -350,9 +393,22 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div>
-            <div className="flex items-center gap-2.5 mb-1">
+            <div className="flex flex-wrap items-center gap-2.5 mb-1">
               <span className="font-mono text-xl font-bold text-white">{dispatch.dispatchNumber}</span>
               <StatusBadge status={dispatch.status} />
+              {pendingDispatchIds.has(dispatch.id) && (
+                <span
+                  data-testid="pending-indexeddb-sync-badge"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-950/90 text-amber-200 border border-amber-700/80"
+                >
+                  {isSyncing ? (
+                    <RefreshCw className="w-3 h-3 text-amber-400 animate-spin" />
+                  ) : (
+                    <Database className="w-3 h-3 text-amber-400" />
+                  )}
+                  <span>{t('offline_sync.pending_badge', 'Saved Locally in IndexedDB • Pending Auto-Sync')}</span>
+                </span>
+              )}
             </div>
             <p className="text-xs text-slate-400">
               {t('dispatch.dispatched_on_by', {

@@ -1,11 +1,11 @@
 # Build State — Business Dispatch & Delivery Reconciliation (DispatchBridge)
 
-- **Last Updated:** 2026-11-03T14:47:00-08:00
+- **Last Updated:** 2026-11-05T04:26:00-08:00
 - **Runtime / Platform:** Node.js v22.14.0 on Linux container with Express 4 backend & Vite 8 React 19 Frontend. Configured as an installable mobile-first Progressive Web App (PWA). *Note: Native Android build tooling (Gradle / Android SDK) is not supported in this runtime environment.*
 - **Stack:**
   - Backend: Node.js, Express 4, TypeScript, HMAC SHA-256 session tokens, timing-safe one-time bootstrap tokens, Fayda e-ID verification adapter, OTP gateway adapter, in-memory domain adapter (`sandboxStore`) with full multi-tenant isolation.
-  - Frontend: React 19, Tailwind CSS v4, Lucide React, Recharts, jsPDF, Context API (`AuthContext`, `LanguageContext`, `ThemeContext`), clean component and page architecture.
-  - Test Suite: Node.js TypeScript test runner (`npm test` -> `tsx test/runTests.ts`) — **45/45 automated tests passing with 0 failures**.
+  - Frontend: React 19, Tailwind CSS v4, Lucide React, Recharts, jsPDF, IndexedDB local-first persistence (`dispatchbridge_local_first_db`), Context API (`AuthContext`, `LanguageContext`, `ThemeContext`), clean component and page architecture.
+  - Test Suite: Pure-domain unit runner (`tsx --test src/utils/barcodeParser.test.ts src/utils/offlineSync.test.ts` — **10/10 passing**) & Node.js acceptance/integration runner (`npm test` -> `tsx test/runTests.ts` — **47/47 automated tests passing with 0 failures**).
 
 ---
 
@@ -20,11 +20,11 @@
 | Phase 5 | `.ai/05_NOTIFICATIONS_AND_AUDIT.md` | **COMPLETE** | Real-time in-app notification drawer with unread counter & read tracking; immutable audit trail logging actor, role, correlation ID, and metadata for every mutation. |
 | Phase 6 | `.ai/06_TABLET_FIRST_UI_UX_AND_ACCESSIBILITY.md` | **COMPLETE** | Comprehensive tablet portrait (768x1024, 820x1180) & landscape (1024x768, 1180x820) optimizations. Landscape orientation mounts dedicated `TabletSidebar` with full navigation, language, theme, and profile controls. Portrait orientation mounts top `Navbar` with horizontal scrolling navigation strip and visual right fade indicator. Metric cards balanced into 3-column grid (`lg:grid-cols-3`) on tablet landscape and desktop. Tables bounded with responsive cell padding and high-contrast scrollbars. Minimum 44x44px touch targets across all interactive controls. |
 | Phase 7 | `.ai/07_SECURITY_PRIVACY_AND_FAILURES.md` | **COMPLETE** | Strict cross-tenant isolation on store and route levels (HTTP 403 on mismatched tenant/partner access), timingSafeEqual constant-time comparisons, idempotency key deduplication. |
-| Phase 8 | `.ai/08_TESTING_AND_ACCEPTANCE.md` | **COMPLETE** | 45 automated unit, security, integration, identity, tablet structure, and localization acceptance tests passing with 0 failures (`npm test`). `tsc --noEmit` passing with 0 type errors. |
+| Phase 8 | `.ai/08_TESTING_AND_ACCEPTANCE.md` | **COMPLETE** | 10 pure-domain unit tests + 47 automated unit, security, integration, identity, barcode intake, IndexedDB local-first sync, tablet structure, and localization acceptance tests passing with 0 failures. `tsc --noEmit` passing with 0 type errors. |
 | Phase 9 | `.ai/09_RELEASE_CHECKLIST.md` | **COMPLETE** | Release checklist evaluated honestly. Verdict: **READY FOR STAGING**. |
 | Identity Update | `.ai/IDENTITY_UPDATE_EXECUTE.md` | **COMPLETE** | Fayda e-ID national ID adapter (FAN/FIN masking, simulation badge, production fail-closed), mobile-first E.164 auth, cryptographic 6-digit OTP challenges, password reset/change step-up, user profile photo upload, and `/api/admin/users` governance with suspension audit logs. |
 | Extension & Governance | `.ai/00_MASTER_PLAN.md` | **COMPLETE** | Team directory & cryptographic invitation tokens (`/api/memberships`, `TeamPage.tsx`), Executive Performance & Reconciliation Reports (`/api/reports/analytics`, `ReportsPage.tsx`), User Profile & Credentials manager (`ProfilePage.tsx`), Multi-Tenant Context Switcher. |
-| Localization & i18n | `.ai/00_MASTER_PLAN.md` | **COMPLETE** | Comprehensive end-to-end multi-language translation across all 5 national languages (English, Amharic, Afan Oromo, Tigrinya, Somali). 100% dictionary bidirectional parity (exactly 1,185 keys/language, 6,559 lines), zero missing keys, parameter placeholder consistency, complete `DYNAMIC_SEED_MAP` resolution for all server-seeded business/partner/cargo/map/waypoint/notification/audit/address/city/actor records, charts, tables, partner manifests, and external recipient native language switcher. |
+| Localization & i18n | `.ai/00_MASTER_PLAN.md` | **COMPLETE** | Comprehensive end-to-end multi-language translation across all 5 national languages (English, Amharic, Afan Oromo, Tigrinya, Somali). 100% dictionary bidirectional parity (**1,228 keys/language**), zero missing keys, parameter placeholder consistency, complete `DYNAMIC_SEED_MAP` resolution for all server-seeded business/partner/cargo/map/waypoint/notification/audit/address/city/actor records, charts, tables, partner manifests, and external recipient native language switcher. |
 
 ---
 
@@ -139,10 +139,13 @@ $ npm test
 #   [PASS] Dictionary Parity Across All 5 Languages (Zero Missing Keys)
 #   [PASS] Parameter Interpolation Engine Dynamic Replacement
 #   [PASS] Native Script & Linguistic Integrity
-# TEST RESULTS: 45/45 PASSED (0 failed)
+# 3. Additional Acceptance Tests Added & Verified:
+#   [PASS] Create Dispatch Barcode & QR Item Intake Parsing & Line Merging
+#   [PASS] Local-First IndexedDB Caching & Auto-Sync Outbox Replay
+# TEST RESULTS: 47/47 PASSED (0 failed) + 10/10 PURE UNIT TESTS PASSED (0 failed)
 # ALL ACCEPTANCE TESTS PASSED SUCCESSFULLY!
 
-# 3. Applet Compilation:
+# 4. Applet Compilation:
 # compile_applet -> SUCCESS
 ```
 
@@ -151,7 +154,7 @@ $ npm test
 ## 4. Release Checklist Assessment (`.ai/09_RELEASE_CHECKLIST.md`)
 
 - [x] Build/type-check/lint passes in actual project environment (`npm run lint` -> 0 errors).
-- [x] Relevant unit, security, integration, identity, tablet structure, and localization tests pass (`npm test` -> 45/45 PASS).
+- [x] Relevant unit, security, integration, identity, tablet structure, and localization tests pass (`npm test` -> 47/47 PASS, `tsx --test` -> 10/10 PASS).
 - [x] Critical end-to-end flows verified (Dispatch creation -> Manifest view tracking -> Dock receipt reporting -> Discrepancy resolution).
 - [x] Identity & Fayda verification verified (16-digit FAN / 12-digit FIN validation, secure masking, dev simulation badge, production fail-closed).
 - [x] Public registration lockout verified (SUPER_ADMIN self-registration blocked on client & server).
@@ -192,11 +195,19 @@ $ npm test
   - 100% dictionary bidirectional parity across all 5 national languages (English, Amharic, Afaan Oromoo, Tigrinya, Somali) with **1,185 unique keys** in each language and zero missing keys.
   - Added 23 new `seed.addr_*`, `seed.city_*`, and `seed.person_*` keys across all 5 languages and mapped all exact strings from `src/server/adapters/sandboxStore.ts` (including notifications, route waypoints, audit log details, addresses, cities, and dispatcher/driver/partner names) in `DYNAMIC_SEED_MAP`.
   - Wrapped dynamic fields (`senderName`, `destinationSnapshot.address`, `originLocationSnapshot.address`, `driverName`, `signerName`, `signerRole`, `openedByName`, `resolvedByName`, `loc.addressLines`, `loc.city`, `partner.deliveryAddress`, `log.actorName`, `member.name`, `user.name`) with `t(...)` across `DispatchListPage.tsx`, `BusinessOwnerDashboard.tsx`, `SenderDashboard.tsx`, `ReceiverDashboard.tsx`, `DispatchDetailPage.tsx`, `PublicPartnerView.tsx`, `LocationsPage.tsx`, `LocationsMapView.tsx`, `PartnersPage.tsx`, `AuditPage.tsx`, `TeamPage.tsx`, `SuperAdminDashboard.tsx`, and `ProfileSummaryCard.tsx`.
-- **Automated Acceptance & Quality Gate Verification**:
-  - `npm test`: **45/45 tests passed with 0 failures** (`tsx test/runTests.ts`) including unit, security, tenant isolation, workflow integration, Fayda e-ID, tablet structural contracts, parameter interpolation, and 5-language dictionary parity (1,185 keys/language).
-  - `npm run lint`: **0 errors** (`tsc --noEmit`).
+- **Create Dispatch Barcode & QR Item Intake Scanner (`src/utils/barcodeParser.ts`, `src/components/dispatches/BarcodeIntakeScanner.tsx`, `src/pages/dispatches/CreateDispatchModal.tsx`)**:
+  - Added multi-format barcode & QR payload parser (`parseIntakeBarcode`, `mergeScannedItemsIntoDispatchLines`, `lookupCatalogByCode`, `normalizeIntakeUnit`) supporting 1D EAN-13/SKU codes, delimited warehouse labels (`|` / `;`), `qr://` / `https://` query payloads, and single/multi-item structured QR JSON batches.
+  - Integrated `<BarcodeIntakeScanner />` directly into Step 1 of `CreateDispatchModal` with device camera `getUserMedia` + live `BarcodeDetector` frame decoding, USB/Bluetooth hardware barcode wedge `Enter`-key & manual input, `×1 / ×5 / ×10` batch quantity multipliers, 4 one-tap catalog & pallet preset chips, automatic SKU row merging/incrementing with visual emerald highlight ring, and optional Web Audio feedback beep.
+- **Local-First IndexedDB Caching & Automatic Outbox Synchronization (`src/utils/indexedDbStore.ts`, `src/utils/offlineSync.ts`, `src/services/api.ts`, `src/components/common/OfflineSyncDrawer.tsx`)**:
+  - Built IndexedDB local-first storage engine (`dispatchbridge_local_first_db`, v1: `dispatches`, `referenceData`, `syncOutbox` object stores with memory fallback for headless/non-DOM environments) separating clean server snapshots (`serverDispatch`) from optimistic outbox-projected views (`dispatch`).
+  - Integrated local-first read caching and offline write queueing across `getDispatches`, `getDispatch`, `getPublicDispatch`, `createDispatch`, `recordTransitScan`, `updateDispatchTelemetry`, `recordReceipt`, `recordPublicReceipt`, `respondToDiscrepancy`, `resolveDiscrepancy`, `finalizeReconciliation`, `getPartners`, and `getLocations`.
+  - Implemented FIFO outbox auto-replay (`replayOfflineQueue` with singleton concurrency lock and temp-ID resolution) triggered automatically on browser `online` / `visibilitychange` events and via `OfflineSyncDrawer`, paired with `"Saved Locally in IndexedDB • Pending Auto-Sync"` indicators on `DispatchDetailPage` and live outbox badges in `Navbar` and `TabletSidebar`.
+- **Automated & Live Browser Verification**:
+  - `npx --yes tsx --test src/utils/barcodeParser.test.ts src/utils/offlineSync.test.ts`: **10/10 passed** (0 failed).
+  - `npm test` (`tsx test/runTests.ts`): **47/47 passed** (0 failed), including **1,228 keys/language** across all 5 national languages (`en`, `am`, `om`, `ti`, `so`) with 100% bidirectional parity.
+  - `npm run lint` (`tsc --noEmit`): **0 errors**.
   - `compile_applet`: **SUCCESS**.
-  - Verified in headless Chromium across `390x844`, `768x1024`, `820x1180`, `1024x768`, `1180x820`, and `1440x900` with `scrollWidth === innerWidth` (`overflow: false`) and 100% localized table/page rendering.
+  - Headless Chromium E2E & visual verification across Desktop (`1440x900`), Tablet Portrait (`768x1024`), Tablet Landscape (`1024x768`), and Mobile (`390x844`) verified zero console/page errors, zero horizontal overflow, >=44px touch targets, live barcode intake into Create Dispatch, offline IndexedDB transit update projection, and automatic FIFO sync on reconnect.
 
 ---
 

@@ -10,6 +10,18 @@ import {
   User,
   UserRole,
 } from '../types/dispatch.js';
+import {
+  cacheDispatchesInDb,
+  cacheReferenceDataInDb,
+  cacheSingleDispatchInDb,
+  getCachedDispatchByIdFromDb,
+  getCachedDispatchesFromDb,
+  getCachedReferenceDataFromDb,
+} from '../utils/indexedDbStore.js';
+import {
+  enqueueOfflineDeliveryUpdate,
+  isEffectivelyOffline,
+} from '../utils/offlineSync.js';
 
 const TOKEN_KEY = 'dispatchbridge_auth_token';
 const USER_KEY = 'dispatchbridge_auth_user';
@@ -100,6 +112,13 @@ class ApiService {
     }
 
     return response.json() as Promise<T>;
+  }
+
+  private isOfflineFailure(err: any): boolean {
+    return (
+      isEffectivelyOffline() ||
+      (err instanceof ApiError && (err.status === 0 || err.status === 503))
+    );
   }
 
   // Auth Endpoints
@@ -385,27 +404,108 @@ class ApiService {
     });
   }
 
-  // Dispatches
+  // Dispatches (Local-First IndexedDB Cached + Offline Outbox Queueing)
   async getDispatches(statusFilter?: string): Promise<Dispatch[]> {
     const query = statusFilter ? `?status=${encodeURIComponent(statusFilter)}` : '';
-    return this.request(`/api/dispatches${query}`);
+    if (isEffectivelyOffline()) {
+      return getCachedDispatchesFromDb(statusFilter);
+    }
+    try {
+      const serverData = await this.request<Dispatch[]>(`/api/dispatches${query}`);
+      if (!statusFilter || statusFilter === 'ALL') {
+        return await cacheDispatchesInDb(serverData);
+      }
+      // Also refresh individual records without wiping other statuses
+      for (const item of serverData) {
+        await cacheSingleDispatchInDb(item);
+      }
+      return getCachedDispatchesFromDb(statusFilter);
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        return getCachedDispatchesFromDb(statusFilter);
+      }
+      throw err;
+    }
   }
 
   async getDispatch(id: string): Promise<Dispatch> {
-    return this.request(`/api/dispatches/${id}`);
+    if (isEffectivelyOffline()) {
+      const cached = await getCachedDispatchByIdFromDb(id);
+      if (cached) return cached;
+      throw new ApiError('Offline: Dispatch manifest is not in local IndexedDB cache.', 0);
+    }
+    try {
+      const serverDispatch = await this.request<Dispatch>(`/api/dispatches/${id}`);
+      return await cacheSingleDispatchInDb(serverDispatch);
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        const cached = await getCachedDispatchByIdFromDb(id);
+        if (cached) return cached;
+      }
+      throw err;
+    }
   }
 
   async getPublicDispatch(shareToken: string): Promise<Dispatch> {
-    return this.request(`/api/dispatches/public/${shareToken}`);
+    if (isEffectivelyOffline()) {
+      const all = await getCachedDispatchesFromDb();
+      const match = all.find((d) => d.shareToken === shareToken);
+      if (match) return match;
+    }
+    try {
+      const d = await this.request<Dispatch>(`/api/dispatches/public/${shareToken}`);
+      await cacheSingleDispatchInDb(d);
+      return d;
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        const all = await getCachedDispatchesFromDb();
+        const match = all.find((d) => d.shareToken === shareToken);
+        if (match) return match;
+      }
+      throw err;
+    }
   }
 
   async createDispatch(payload: any, idempotencyKey?: string): Promise<Dispatch> {
     const key = idempotencyKey || `idem_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    return this.request('/api/dispatches', {
-      method: 'POST',
-      headers: { 'X-Idempotency-Key': key },
-      body: JSON.stringify({ ...payload, idempotencyKey: key }),
-    });
+
+    const queueOfflineCreate = async (): Promise<Dispatch> => {
+      const linesCount = Array.isArray(payload.lines) ? payload.lines.length : 0;
+      const totalUnits = Array.isArray(payload.lines)
+        ? payload.lines.reduce((s: number, l: any) => s + (Number(l.quantitySent) || 0), 0)
+        : 0;
+      const { optimisticDispatch } = await enqueueOfflineDeliveryUpdate({
+        type: 'CREATE_DISPATCH',
+        actionSummary: `New Dispatch (${linesCount} lines, ${totalUnits} units)`,
+        url: '/api/dispatches',
+        method: 'POST',
+        payload: { ...payload, idempotencyKey: key },
+        idempotencyKey: key,
+        currentUser: this.user,
+      });
+      if (!optimisticDispatch) {
+        throw new ApiError('Failed to persist offline dispatch draft.', 0);
+      }
+      return optimisticDispatch;
+    };
+
+    if (isEffectivelyOffline()) {
+      return queueOfflineCreate();
+    }
+
+    try {
+      const created = await this.request<Dispatch>('/api/dispatches', {
+        method: 'POST',
+        headers: { 'X-Idempotency-Key': key },
+        body: JSON.stringify({ ...payload, idempotencyKey: key }),
+      });
+      return await cacheSingleDispatchInDb(created);
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        return queueOfflineCreate();
+      }
+      throw err;
+    }
   }
 
   async bulkCreateDispatches(dispatches: any[]): Promise<{ createdCount: number; dispatches: Dispatch[]; errors?: string[] }> {
@@ -426,10 +526,42 @@ class ApiService {
       actorName?: string;
     }
   ): Promise<Dispatch> {
-    return this.request(`/api/dispatches/${id}/transit-scan`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
+    const queueOfflineScan = async (): Promise<Dispatch> => {
+      const base = await getCachedDispatchByIdFromDb(id);
+      const checkpoint = payload.checkpointLocation || payload.statusUpdate || 'IN_TRANSIT';
+      const { optimisticDispatch } = await enqueueOfflineDeliveryUpdate({
+        type: 'TRANSIT_SCAN',
+        dispatchId: id,
+        dispatchNumber: base?.dispatchNumber,
+        actionSummary: `Transit Scan: ${payload.statusUpdate || 'IN_TRANSIT'} @ ${checkpoint}`,
+        url: `/api/dispatches/${id}/transit-scan`,
+        method: 'POST',
+        payload,
+        baseDispatch: base,
+        currentUser: this.user,
+      });
+      if (!optimisticDispatch) {
+        throw new ApiError('Cannot log offline transit scan without cached manifest.', 0);
+      }
+      return optimisticDispatch;
+    };
+
+    if (isEffectivelyOffline()) {
+      return queueOfflineScan();
+    }
+
+    try {
+      const updated = await this.request<Dispatch>(`/api/dispatches/${id}/transit-scan`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      return await cacheSingleDispatchInDb(updated);
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        return queueOfflineScan();
+      }
+      throw err;
+    }
   }
 
   async updateDispatchTelemetry(
@@ -443,10 +575,44 @@ class ApiService {
       source?: 'GPS' | 'DRIVER_SCAN' | 'CHECKPOINT' | 'SIMULATION';
     }
   ): Promise<Dispatch> {
-    return this.request(`/api/dispatches/${id}/telemetry`, {
-      method: 'POST',
-      body: JSON.stringify(telemetry),
-    });
+    const queueOfflinePing = async (): Promise<Dispatch> => {
+      const base = await getCachedDispatchByIdFromDb(id);
+      const cp =
+        telemetry.checkpointName ||
+        `${telemetry.latitude.toFixed(3)}°, ${telemetry.longitude.toFixed(3)}°`;
+      const { optimisticDispatch } = await enqueueOfflineDeliveryUpdate({
+        type: 'TELEMETRY_UPDATE',
+        dispatchId: id,
+        dispatchNumber: base?.dispatchNumber,
+        actionSummary: `GPS Ping: ${cp}`,
+        url: `/api/dispatches/${id}/telemetry`,
+        method: 'POST',
+        payload: telemetry,
+        baseDispatch: base,
+        currentUser: this.user,
+      });
+      if (!optimisticDispatch) {
+        throw new ApiError('Cannot log offline GPS ping without cached manifest.', 0);
+      }
+      return optimisticDispatch;
+    };
+
+    if (isEffectivelyOffline()) {
+      return queueOfflinePing();
+    }
+
+    try {
+      const updated = await this.request<Dispatch>(`/api/dispatches/${id}/telemetry`, {
+        method: 'POST',
+        body: JSON.stringify(telemetry),
+      });
+      return await cacheSingleDispatchInDb(updated);
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        return queueOfflinePing();
+      }
+      throw err;
+    }
   }
 
   async recordReceipt(
@@ -470,11 +636,48 @@ class ApiService {
     }
   ): Promise<Dispatch> {
     const key = payload.idempotencyKey || `idem_rcpt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    return this.request(`/api/dispatches/${id}/reconcile`, {
-      method: 'POST',
-      headers: { 'X-Idempotency-Key': key },
-      body: JSON.stringify({ ...payload, idempotencyKey: key }),
-    });
+
+    const queueOfflineReceipt = async (): Promise<Dispatch> => {
+      const base = await getCachedDispatchByIdFromDb(id);
+      const totalRecv = payload.lines.reduce(
+        (s, l) => s + (Number(l.quantityReceived) || 0),
+        0
+      );
+      const { optimisticDispatch } = await enqueueOfflineDeliveryUpdate({
+        type: 'RECORD_RECEIPT',
+        dispatchId: id,
+        dispatchNumber: base?.dispatchNumber,
+        actionSummary: `Dock Receipt Sign-off (${totalRecv} units)`,
+        url: `/api/dispatches/${id}/reconcile`,
+        method: 'POST',
+        payload: { ...payload, idempotencyKey: key },
+        idempotencyKey: key,
+        baseDispatch: base,
+        currentUser: this.user,
+      });
+      if (!optimisticDispatch) {
+        throw new ApiError('Cannot record offline dock receipt without cached manifest.', 0);
+      }
+      return optimisticDispatch;
+    };
+
+    if (isEffectivelyOffline()) {
+      return queueOfflineReceipt();
+    }
+
+    try {
+      const updated = await this.request<Dispatch>(`/api/dispatches/${id}/reconcile`, {
+        method: 'POST',
+        headers: { 'X-Idempotency-Key': key },
+        body: JSON.stringify({ ...payload, idempotencyKey: key }),
+      });
+      return await cacheSingleDispatchInDb(updated);
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        return queueOfflineReceipt();
+      }
+      throw err;
+    }
   }
 
   async recordPublicReceipt(
@@ -498,11 +701,48 @@ class ApiService {
     }
   ): Promise<Dispatch> {
     const key = payload.idempotencyKey || `idem_pub_rcpt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    return this.request(`/api/dispatches/public/${shareToken}/reconcile`, {
-      method: 'POST',
-      headers: { 'X-Idempotency-Key': key },
-      body: JSON.stringify({ ...payload, idempotencyKey: key }),
-    });
+
+    const queueOfflinePublicReceipt = async (): Promise<Dispatch> => {
+      const all = await getCachedDispatchesFromDb();
+      const base = all.find((d) => d.shareToken === shareToken);
+      const totalRecv = payload.lines.reduce(
+        (s, l) => s + (Number(l.quantityReceived) || 0),
+        0
+      );
+      const { optimisticDispatch } = await enqueueOfflineDeliveryUpdate({
+        type: 'PUBLIC_RECORD_RECEIPT',
+        dispatchId: base?.id,
+        dispatchNumber: base?.dispatchNumber,
+        actionSummary: `Partner Receipt Sign-off (${totalRecv} units)`,
+        url: `/api/dispatches/public/${shareToken}/reconcile`,
+        method: 'POST',
+        payload: { ...payload, idempotencyKey: key },
+        idempotencyKey: key,
+        baseDispatch: base,
+      });
+      if (!optimisticDispatch) {
+        throw new ApiError('Cannot record offline partner receipt without cached manifest.', 0);
+      }
+      return optimisticDispatch;
+    };
+
+    if (isEffectivelyOffline()) {
+      return queueOfflinePublicReceipt();
+    }
+
+    try {
+      const updated = await this.request<Dispatch>(`/api/dispatches/public/${shareToken}/reconcile`, {
+        method: 'POST',
+        headers: { 'X-Idempotency-Key': key },
+        body: JSON.stringify({ ...payload, idempotencyKey: key }),
+      });
+      return await cacheSingleDispatchInDb(updated);
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        return queueOfflinePublicReceipt();
+      }
+      throw err;
+    }
   }
 
   async respondToDiscrepancy(
@@ -510,10 +750,11 @@ class ApiService {
     caseId: string,
     payload: { status: 'ACKNOWLEDGED_BY_SENDER' | 'DISPUTED'; responseNotes: string }
   ): Promise<Dispatch> {
-    return this.request(`/api/dispatches/${dispatchId}/discrepancies/${caseId}/respond`, {
+    const updated = await this.request<Dispatch>(`/api/dispatches/${dispatchId}/discrepancies/${caseId}/respond`, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+    return cacheSingleDispatchInDb(updated);
   }
 
   async resolveDiscrepancy(
@@ -521,22 +762,37 @@ class ApiService {
     caseId: string,
     payload: { resolution: string }
   ): Promise<Dispatch> {
-    return this.request(`/api/dispatches/${dispatchId}/discrepancies/${caseId}/resolve`, {
+    const updated = await this.request<Dispatch>(`/api/dispatches/${dispatchId}/discrepancies/${caseId}/resolve`, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+    return cacheSingleDispatchInDb(updated);
   }
 
   async finalizeReconciliation(id: string, resolutionNotes: string): Promise<Dispatch> {
-    return this.request(`/api/dispatches/${id}/finalize`, {
+    const updated = await this.request<Dispatch>(`/api/dispatches/${id}/finalize`, {
       method: 'POST',
       body: JSON.stringify({ resolutionNotes }),
     });
+    return cacheSingleDispatchInDb(updated);
   }
 
-  // Partners
+  // Partners (Local-First IndexedDB Cached)
   async getPartners(): Promise<Partner[]> {
-    return this.request('/api/partners');
+    if (isEffectivelyOffline()) {
+      return (await getCachedReferenceDataFromDb<Partner>('partners')) || [];
+    }
+    try {
+      const data = await this.request<Partner[]>('/api/partners');
+      await cacheReferenceDataInDb('partners', data);
+      return data;
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        const cached = await getCachedReferenceDataFromDb<Partner>('partners');
+        if (cached) return cached;
+      }
+      throw err;
+    }
   }
 
   async createPartner(payload: any): Promise<Partner> {
@@ -546,9 +802,22 @@ class ApiService {
     });
   }
 
-  // Locations (Origin terminals & warehouses)
+  // Locations (Origin terminals & warehouses - Local-First IndexedDB Cached)
   async getLocations(): Promise<Location[]> {
-    return this.request('/api/locations');
+    if (isEffectivelyOffline()) {
+      return (await getCachedReferenceDataFromDb<Location>('locations')) || [];
+    }
+    try {
+      const data = await this.request<Location[]>('/api/locations');
+      await cacheReferenceDataInDb('locations', data);
+      return data;
+    } catch (err) {
+      if (this.isOfflineFailure(err)) {
+        const cached = await getCachedReferenceDataFromDb<Location>('locations');
+        if (cached) return cached;
+      }
+      throw err;
+    }
   }
 
   async createLocation(payload: any): Promise<Location> {

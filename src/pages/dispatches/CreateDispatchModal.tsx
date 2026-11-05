@@ -13,16 +13,28 @@ import {
   ArrowRight,
   ArrowLeft,
   FileCheck,
+  ScanBarcode,
+  WifiOff,
+  Database,
 } from 'lucide-react';
 import { Location, Partner } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { useTranslation } from '../../context/LanguageContext.js';
+import { BarcodeIntakeScanner } from '../../components/dispatches/BarcodeIntakeScanner.js';
+import { mergeScannedItemsIntoDispatchLines, ParsedIntakeItem } from '../../utils/barcodeParser.js';
+import { useOfflineSync } from '../../utils/offlineSync.js';
 
 interface CreateDispatchModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (dispatchId: string) => void;
   preselectedPartnerId?: string;
+  preselectedItem?: {
+    sku: string;
+    name: string;
+    unit: string;
+    unitPrice: number;
+  } | null;
 }
 
 export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
@@ -30,8 +42,10 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
   onClose,
   onSuccess,
   preselectedPartnerId,
+  preselectedItem,
 }) => {
   const { t } = useTranslation();
+  const { isOnline } = useOfflineSync();
   const [step, setStep] = useState<'input' | 'review'>('input');
   const [partners, setPartners] = useState<Partner[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -67,13 +81,26 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(true);
+  const [highlightedSkus, setHighlightedSkus] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (isOpen) {
+      if (preselectedItem) {
+        setLines([
+          {
+            sku: preselectedItem.sku,
+            itemName: preselectedItem.name,
+            unit: preselectedItem.unit || 'cases',
+            unitPrice: preselectedItem.unitPrice || 0,
+            quantitySent: 10,
+          },
+        ]);
+      }
       loadData();
       setStep('input');
     }
-  }, [isOpen]);
+  }, [isOpen, preselectedPartnerId, preselectedItem]);
 
   const loadData = async () => {
     try {
@@ -86,12 +113,14 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
         setSelectedLocationId(defaultLoc.id);
       }
 
-      if (pData.length > 0 && !selectedPartnerId) {
+      const effectivePartnerId = preselectedPartnerId || selectedPartnerId;
+      if (effectivePartnerId) {
+        setSelectedPartnerId(effectivePartnerId);
+        const match = pData.find((p) => p.id === effectivePartnerId);
+        if (match) setDestinationAddress(match.deliveryAddress);
+      } else if (pData.length > 0) {
         setSelectedPartnerId(pData[0].id);
         setDestinationAddress(pData[0].deliveryAddress);
-      } else if (selectedPartnerId) {
-        const match = pData.find((p) => p.id === selectedPartnerId);
-        if (match) setDestinationAddress(match.deliveryAddress);
       }
     } catch (err) {
       console.error(err);
@@ -129,6 +158,28 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
     const updated = [...lines];
     updated[index] = { ...updated[index], [field]: value };
     setLines(updated);
+  };
+
+  const handleItemsScanned = (
+    scannedItems: ParsedIntakeItem[]
+  ): { addedCount: number; incrementedCount: number; totalUnitsAdded: number } => {
+    const res = mergeScannedItemsIntoDispatchLines(lines, scannedItems);
+    setLines(res.lines);
+    setErrorMessage(null);
+    const matched = new Set<string>(res.affectedSkus);
+    setHighlightedSkus(matched);
+    setTimeout(() => {
+      setHighlightedSkus((prev) => {
+        const next = new Set(prev);
+        matched.forEach((s) => next.delete(s));
+        return next;
+      });
+    }, 1800);
+    return {
+      addedCount: res.addedCount,
+      incrementedCount: res.incrementedCount,
+      totalUnitsAdded: res.totalUnitsAdded,
+    };
   };
 
   const validateInput = (): boolean => {
@@ -239,12 +290,24 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {!isOnline && (
+          <div className="mt-3 p-3 rounded-xl bg-amber-950/60 border border-amber-800/80 text-amber-200 text-xs flex items-center gap-2 shrink-0">
+            <WifiOff className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>
+              {t(
+                'dispatch.offline_queued',
+                'Offline Mode: New dispatch manifest will be stored locally in IndexedDB and synced automatically when online.'
+              )}
+            </span>
+          </div>
+        )}
 
         {errorMessage && (
           <div className="my-3 p-3 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-center gap-2 shrink-0">
@@ -342,21 +405,53 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
               </div>
             </div>
 
-            {/* Itemized Lines */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
+            {/* Itemized Lines + Rapid Barcode / QR Intake Scanner */}
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                   <Package className="w-3.5 h-3.5 text-indigo-400" />
                   {t('dispatch.line_items_title', { count: lines.length })}
                 </label>
-                <span className="text-xs font-mono text-indigo-300">{t('dispatch.total_units', { total: totalUnits })}</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-mono text-indigo-300">{t('dispatch.total_units', { total: totalUnits })}</span>
+                  <button
+                    type="button"
+                    data-testid="toggle-barcode-intake-btn"
+                    onClick={() => setIsScannerOpen(!isScannerOpen)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors min-h-[44px] ${
+                      isScannerOpen
+                        ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50 hover:bg-indigo-600/30'
+                        : 'bg-slate-800 text-sky-300 border-slate-700 hover:bg-slate-700'
+                    }`}
+                  >
+                    <ScanBarcode className="w-4 h-4 shrink-0" />
+                    <span>
+                      {isScannerOpen
+                        ? t('intake_scanner.hide_btn', 'Hide Scanner')
+                        : t('intake_scanner.open_btn', 'Scan Barcode / QR')}
+                    </span>
+                  </button>
+                </div>
               </div>
 
+              {isScannerOpen && (
+                <BarcodeIntakeScanner
+                  onItemsScanned={handleItemsScanned}
+                  onClose={() => setIsScannerOpen(false)}
+                />
+              )}
+
               <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                {lines.map((item, index) => (
+                {lines.map((item, index) => {
+                  const isHighlighted = highlightedSkus.has(item.sku.trim().toUpperCase());
+                  return (
                   <div
                     key={index}
-                    className="grid grid-cols-12 gap-2 bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/60 items-center text-xs"
+                    className={`grid grid-cols-12 gap-2 p-2.5 rounded-xl border items-center text-xs transition-all ${
+                      isHighlighted
+                        ? 'bg-emerald-950/50 border-emerald-500 ring-2 ring-emerald-500/30'
+                        : 'bg-slate-800/60 border-slate-700/60'
+                    }`}
                   >
                     <div className="col-span-4 sm:col-span-2">
                       <input
@@ -409,24 +504,26 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                       />
                     </div>
 
-                    <div className="col-span-2 sm:col-span-1 text-right">
+                    <div className="col-span-2 sm:col-span-1 text-right flex justify-end">
                       <button
                         type="button"
                         disabled={lines.length <= 1}
                         onClick={() => handleRemoveLine(index)}
-                        className="text-slate-500 hover:text-rose-400 disabled:opacity-30 p-1 rounded"
+                        aria-label={`Remove line ${index + 1}`}
+                        className="text-slate-400 hover:text-rose-400 disabled:opacity-30 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                ))}
+                );
+                })}
               </div>
 
               <button
                 type="button"
                 onClick={handleAddLine}
-                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1.5 mt-2 cursor-pointer"
+                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1.5 px-2 py-1.5 rounded-lg min-h-[44px] cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>{t('dispatch.add_line_item')}</span>

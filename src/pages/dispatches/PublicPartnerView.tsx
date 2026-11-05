@@ -23,6 +23,7 @@ import { LoadingSpinner } from '../../components/common/LoadingSpinner.js';
 import { SignaturePad } from '../../components/dispatches/SignaturePad.js';
 import { DamagePhotoUpload } from '../../components/dispatches/DamagePhotoUpload.js';
 import { useTranslation } from '../../context/LanguageContext.js';
+import { useOfflineSync } from '../../utils/offlineSync.js';
 
 interface PublicPartnerViewProps {
   shareToken: string;
@@ -31,6 +32,7 @@ interface PublicPartnerViewProps {
 
 export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken, onExit }) => {
   const { t, language, setLanguage, languages } = useTranslation();
+  const { isOnline } = useOfflineSync();
   const [dispatch, setDispatch] = useState<Dispatch | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -142,7 +144,14 @@ export const PublicPartnerView: React.FC<PublicPartnerViewProps> = ({ shareToken
 
       setDispatch(updated);
       setIsVerifying(false);
-      setSubmitSuccess(t('manifest.submit_success_msg', 'Official delivery receipt verified! Shipper has been notified, signature locked, and audit entry recorded.'));
+      setSubmitSuccess(
+        !isOnline
+          ? t(
+              'offline_sync.saved_offline_msg',
+              'Delivery update saved locally in IndexedDB and will sync automatically when connectivity returns.'
+            )
+          : t('manifest.submit_success_msg', 'Official delivery receipt verified! Shipper has been notified, signature locked, and audit entry recorded.')
+      );
     } catch (err: any) {
       setSubmitError(err.message || t('manifest.submit_error_msg', 'Failed to submit receipt confirmation.'));
     } finally {

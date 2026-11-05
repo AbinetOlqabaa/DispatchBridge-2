@@ -23,6 +23,7 @@ import {
   RefreshCw,
   BarChart3,
   UserPlus,
+  Database,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
 import { useTheme } from '../../context/ThemeContext.js';
@@ -36,6 +37,7 @@ interface TabletSidebarProps {
   onOpenAuth: () => void;
   onOpenNotifications: () => void;
   onOpenProfile?: () => void;
+  onOpenOfflineSync?: () => void;
 }
 
 export const TabletSidebar: React.FC<TabletSidebarProps> = ({
@@ -44,11 +46,12 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
   onOpenAuth,
   onOpenNotifications,
   onOpenProfile,
+  onOpenOfflineSync,
 }) => {
   const { user, logout, quickLoginDemoRole, unreadNotifsCount } = useAuth();
   const { themeMode, setThemeMode, effectiveTheme } = useTheme();
   const { language, setLanguage, t, languages, currentLanguageOption } = useTranslation();
-  const { isOnline, queueCount, replayNow } = useOfflineSync();
+  const { isOnline, queueCount, isSyncing, replayNow } = useOfflineSync();
 
   const [roleSwitchOpen, setRoleSwitchOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -296,6 +299,43 @@ export const TabletSidebar: React.FC<TabletSidebarProps> = ({
             )}
           </button>
         )}
+      </div>
+
+      {/* Local-First IndexedDB & Outbox Sync Button */}
+      <div className="px-3 pb-2 shrink-0">
+        <button
+          type="button"
+          data-testid="sidebar-offline-sync-btn"
+          onClick={() => (onOpenOfflineSync ? onOpenOfflineSync() : replayNow())}
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-colors min-h-[44px] ${
+            !isOnline
+              ? 'bg-amber-950/80 hover:bg-amber-900/80 text-amber-200 border-amber-700'
+              : queueCount > 0
+              ? 'bg-teal-950/80 hover:bg-teal-900/80 text-teal-200 border-teal-700'
+              : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300 border-slate-700/80'
+          }`}
+          title={t('offline_sync.title', 'Local-First Storage & Auto-Sync')}
+        >
+          <span className="flex items-center gap-2 min-w-0">
+            {!isOnline ? (
+              <WifiOff className="w-4 h-4 text-amber-400 shrink-0" />
+            ) : queueCount > 0 ? (
+              <RefreshCw className={`w-4 h-4 text-teal-400 shrink-0 ${isSyncing ? 'animate-spin' : ''}`} />
+            ) : (
+              <Database className="w-4 h-4 text-emerald-400 shrink-0" />
+            )}
+            <span className="truncate">
+              {!isOnline
+                ? t('nav.offline', 'Offline ({count} queued)', { count: queueCount })
+                : queueCount > 0
+                ? t('nav.sync', 'Sync ({count})', { count: queueCount })
+                : t('nav.offline_cache', 'IDB Sync')}
+            </span>
+          </span>
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-950/70 border border-slate-700 text-slate-300 shrink-0">
+            {queueCount}
+          </span>
+        </button>
       </div>
 
       {/* User Card & Sign In / Out */}

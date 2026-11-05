@@ -11,10 +11,12 @@ import {
   ScanLine,
   RefreshCw,
   Package,
+  WifiOff,
 } from 'lucide-react';
 import { Dispatch, DispatchStatus } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { useTranslation } from '../../context/LanguageContext.js';
+import { useOfflineSync } from '../../utils/offlineSync.js';
 
 interface QrScannerModalProps {
   dispatch: Dispatch;
@@ -30,6 +32,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
   onScanSuccess,
 }) => {
   const { t } = useTranslation();
+  const { isOnline } = useOfflineSync();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -131,14 +134,19 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
       });
 
       setScanMessage({
-        text: `Transit milestone recorded: ${selectedStatus.replace(/_/g, ' ')}. Audit logged!`,
+        text: !isOnline
+          ? t(
+              'offline_sync.saved_offline_msg',
+              'Delivery update saved locally in IndexedDB and will sync automatically when connectivity returns.'
+            )
+          : `Transit milestone recorded: ${selectedStatus.replace(/_/g, ' ')}. Audit logged!`,
         type: 'success',
       });
 
       setTimeout(() => {
         onScanSuccess(updated);
         onClose();
-      }, 700);
+      }, 650);
     } catch (err: any) {
       setScanMessage({
         text: err.message || 'Failed to record transit scan.',
@@ -161,17 +169,30 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
             <div>
               <h2 className="text-lg font-bold text-white">{t('scanner.title')}</h2>
               <p className="text-xs text-slate-400">
-                {t('scanner.subtitle')} <span className="font-mono text-sky-400">{dispatch.dispatchNumber}</span>
+                {t('scanner.subtitle', { dispatch: dispatch.dispatchNumber })}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label={t('action.close', 'Close')}
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {!isOnline && scanMessage?.type !== 'success' && (
+          <div className="mt-4 p-3 rounded-xl bg-amber-950/60 border border-amber-800 text-amber-200 text-xs flex items-center gap-2">
+            <WifiOff className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>
+              {t(
+                'offline_sync.saved_offline_msg',
+                'Delivery update saved locally in IndexedDB and will sync automatically when connectivity returns.'
+              )}
+            </span>
+          </div>
+        )}
 
         {/* Scan Message / Alert */}
         {scanMessage && (

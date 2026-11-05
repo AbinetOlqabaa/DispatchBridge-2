@@ -32,13 +32,9 @@ import { useTranslation } from '../../context/LanguageContext.js';
 import {
   saveMapCache,
   getMapCache,
-  isMapCached,
-  clearMapCache,
-  queueOfflineTelemetry,
-  getOfflineTelemetryQueue,
-  clearOfflineTelemetryQueue,
   CachedMapRecord,
 } from '../../utils/mapCache.js';
+import { useOfflineSync } from '../../utils/offlineSync.js';
 
 interface DispatchTrackingMapProps {
   dispatch: Dispatch;
@@ -79,11 +75,8 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
   const [isSimulatingPing, setIsSimulatingPing] = useState(false);
   const [pingSuccessMsg, setPingSuccessMsg] = useState<string | null>(null);
 
-  // Offline Caching & Network State
-  const [isSimulatedOffline, setIsSimulatedOffline] = useState(false);
-  const [isBrowserOnline, setIsBrowserOnline] = useState(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
+  // Offline Caching & Unified Local-First Network State
+  const { isOnline, isSimulatedOffline, setSimulatedOffline } = useOfflineSync();
   const [cachedRecord, setCachedRecord] = useState<CachedMapRecord | null>(null);
   const [cacheNotification, setCacheNotification] = useState<string | null>(null);
 
@@ -92,31 +85,17 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
   const [showActualRoute, setShowActualRoute] = useState(true);
   const [showBreadcrumbs, setShowBreadcrumbs] = useState(true);
 
-  // Listen to native online/offline window events
   useEffect(() => {
-    const handleOnline = () => setIsBrowserOnline(true);
-    const handleOffline = () => setIsBrowserOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    // Initial check of local map cache
     const existing = getMapCache(dispatch.id);
     if (existing) {
       setCachedRecord(existing);
     } else {
-      // Auto-cache on initial mount to ensure offline availability
       const saved = saveMapCache(dispatch);
       setCachedRecord(saved);
     }
+  }, [dispatch.id, dispatch.status, dispatch.updatedAt]);
 
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, [dispatch.id]);
-
-  const isEffectivelyOffline = !isBrowserOnline || isSimulatedOffline;
+  const isEffectivelyOffline = !isOnline || isSimulatedOffline;
 
   // 1. Resolve Origin Coordinates (with offline cache fallback)
   const originCoords = useMemo(() => {
@@ -362,7 +341,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
     setTimeout(() => setCacheNotification(null), 4000);
   };
 
-  // Live GPS Telemetry Simulation Action
+  // Live GPS Telemetry Simulation Action (persists to IndexedDB outbox when offline & auto-syncs on reconnect)
   const handleSimulateGpsPing = async () => {
     setIsSimulatingPing(true);
     setPingSuccessMsg(null);
@@ -373,33 +352,23 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
       const newSpeed = Math.floor(75 + Math.random() * 20);
       const nextWaypointName = `${t('map.waypoints')} ${(coveredDistanceKm + 45).toFixed(0)} km`;
 
-      if (isEffectivelyOffline) {
-        // Queue locally when offline
-        queueOfflineTelemetry(dispatch.id, {
-          latitude: parseFloat(nextLat.toFixed(5)),
-          longitude: parseFloat(nextLng.toFixed(5)),
-          speedKmh: newSpeed,
-          heading: 310,
-          checkpointName: nextWaypointName,
-          source: 'GPS',
-        });
+      const updated = await api.updateDispatchTelemetry(dispatch.id, {
+        latitude: parseFloat(nextLat.toFixed(5)),
+        longitude: parseFloat(nextLng.toFixed(5)),
+        speedKmh: newSpeed,
+        heading: 310,
+        checkpointName: nextWaypointName,
+        source: 'GPS',
+      });
 
-        // Update local cache directly
-        const updatedOffline: Dispatch = {
-          ...dispatch,
-          status: 'IN_TRANSIT',
-          currentCoordinates: {
-            latitude: parseFloat(nextLat.toFixed(5)),
-            longitude: parseFloat(nextLng.toFixed(5)),
-            speedKmh: newSpeed,
-            heading: 310,
-            checkpointName: nextWaypointName,
-            source: 'GPS',
-            updatedAt: new Date().toISOString(),
-          },
-        };
-        const saved = saveMapCache(updatedOffline);
-        setCachedRecord(saved);
+      const saved = saveMapCache(updated);
+      setCachedRecord(saved);
+
+      if (onTelemetryUpdate) {
+        onTelemetryUpdate(updated);
+      }
+
+      if (isEffectivelyOffline) {
         setPingSuccessMsg(
           t('map.ping_offline_queued', {
             lat: nextLat.toFixed(4),
@@ -407,21 +376,6 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           })
         );
       } else {
-        const updated = await api.updateDispatchTelemetry(dispatch.id, {
-          latitude: parseFloat(nextLat.toFixed(5)),
-          longitude: parseFloat(nextLng.toFixed(5)),
-          speedKmh: newSpeed,
-          heading: 310,
-          checkpointName: nextWaypointName,
-          source: 'GPS',
-        });
-
-        saveMapCache(updated);
-        setCachedRecord(getMapCache(updated.id));
-
-        if (onTelemetryUpdate) {
-          onTelemetryUpdate(updated);
-        }
         setPingSuccessMsg(
           t('map.ping_recorded_toast', {
             lat: nextLat.toFixed(4),
@@ -487,8 +441,8 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
 
             {/* Network Status Toggle */}
             <button
-              onClick={() => setIsSimulatedOffline(!isSimulatedOffline)}
-              className={`flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded cursor-pointer transition-colors ${
+              onClick={() => setSimulatedOffline(!isSimulatedOffline)}
+              className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-lg cursor-pointer transition-colors ${
                 isSimulatedOffline
                   ? 'bg-amber-950 text-amber-300 border border-amber-800'
                   : 'bg-slate-800 text-slate-400 hover:text-white border border-slate-700'
@@ -843,21 +797,8 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             {/* Animated Radar Pulse Rings */}
             {!isDelivered && (
               <>
-                <circle r="26" fill="#38bdf8" opacity="0.25">
-                  <animate
-                    attributeName="r"
-                    values="16;42"
-                    dur="2.2s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="opacity"
-                    values="0.5;0"
-                    dur="2.2s"
-                    repeatCount="indefinite"
-                  />
-                </circle>
-                <circle r="18" fill="#0284c7" opacity="0.4" />
+                <circle r="24" fill="#38bdf8" opacity="0.28" className="animate-ping origin-center" />
+                <circle r="21" fill="#0284c7" opacity="0.35" />
               </>
             )}
 
