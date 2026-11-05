@@ -1,20 +1,34 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# DispatchBridge — Delivery & Reconciliation Engine
 
-# Run and deploy your AI Studio app
+Full-stack TypeScript web application & installable Progressive Web App (PWA) for multi-tenant B2B dispatch management, barcode/QR intake scanning, offline-first IndexedDB queuing with automatic FIFO synchronization, live GPS corridor tracking, and dock receipt discrepancy reconciliation.
 
-This contains everything you need to run your app locally.
+## Architecture & Key Capabilities
 
-View your app in AI Studio: https://ai.studio/apps/613aaaaf-00d7-4e42-b187-2e496e68c7fd
+- **Frontend (`src/`)**: React 19, TypeScript, Tailwind CSS v4, Lucide React, Recharts, jsPDF, IndexedDB local-first storage (`dispatchbridge_local_first_db`), Service Worker (`public/sw.js`), and full 5-language localization (`en`, `am`, `om`, `ti`, `so`).
+- **Backend (`server.ts`, `src/server/`)**: Node.js 22 + Express 4 API server with Vite middleware in development, HMAC SHA-256 session tokens, Fayda e-ID adapter, OTP challenge lifecycle, multi-tenant access controls, and immutable audit logging.
+- **Create Dispatch Barcode & QR Intake (`src/components/dispatches/BarcodeIntakeScanner.tsx`, `src/utils/barcodeParser.ts`)**: Device camera `getUserMedia` + `BarcodeDetector` live decoding, USB/Bluetooth hardware barcode wedge input, `×1 / ×5 / ×10` batch multipliers, and smart SKU line merging.
+- **Local-First IndexedDB & Auto-Sync (`src/utils/indexedDbStore.ts`, `src/utils/offlineSync.ts`, `src/components/common/OfflineSyncDrawer.tsx`)**: Event-sourced local caching and offline delivery update outbox that automatically replays queued updates in FIFO order when connectivity returns.
 
-## Run Locally
+## Running Locally
 
-**Prerequisites:**  Node.js
+1. Install dependencies with npm:
+   ```bash
+   npm install
+   ```
+2. Copy `.env.example` to `.env` and configure any optional environment variables (works out of the box in sandbox development mode).
+3. Start the full-stack development server on port `3000`:
+   ```bash
+   npm run dev
+   ```
+4. Run TypeScript checks, unit tests, acceptance suite, and production build:
+   ```bash
+   npm run lint
+   npx tsx --test src/utils/barcodeParser.test.ts src/utils/offlineSync.test.ts
+   npm test
+   npm run build
+   ```
 
+## Exporting & Re-Importing in Google AI Studio
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- Ensure `.gitignore` is preserved (`node_modules/`, `dist/`, `.aistudio/` are excluded so exports stay lightweight and conflict-free).
+- Use `package-lock.json` with `npm` (Node.js 22 runtime on port `3000`).
