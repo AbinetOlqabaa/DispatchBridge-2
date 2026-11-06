@@ -209,16 +209,16 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
       <ProfileSummaryCard onOpenProfile={onOpenProfile} />
 
       {/* Super Admin Control Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-purple-900/40 p-6 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-900/40 p-6 rounded-2xl shadow-sm">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-purple-400 bg-purple-950 px-2.5 py-0.5 rounded-full border border-purple-800">
+            <span className="text-xs font-semibold uppercase tracking-wider text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950 px-2.5 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">
               {t('admin.control_center', 'Super Administrator Control Center')}
             </span>
-            <span className="text-xs text-slate-400">{t('admin.privileged_session', 'Privileged Session')}</span>
+            <span className="text-xs text-slate-600 dark:text-slate-400">{t('admin.privileged_session', 'Privileged Session')}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">{t('admin.infra_governance', 'System Infrastructure & User Governance')}</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{t('admin.infra_governance', 'System Infrastructure & User Governance')}</h1>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
             {t('admin.infra_subtitle', 'Cross-tenant inspection, Fayda identity oversight, user activation controls, and cryptographic audit ledger.')}
           </p>
         </div>
@@ -229,14 +229,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
               loadData();
               loadUsers();
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
+            className="min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-medium cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>{t('action.refresh', 'Refresh')}</span>
           </button>
           <button
             onClick={onNavigateStatus}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-lg shadow-purple-600/30 cursor-pointer"
+            className="min-h-[44px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-lg shadow-purple-600/30 cursor-pointer"
           >
             <Activity className="w-3.5 h-3.5" />
             <span>{t('nav.status', 'Diagnostic Health')}</span>
@@ -245,13 +245,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
       </div>
 
       {/* Tab Switcher: Overview vs User Administration */}
-      <div className="flex gap-2 border-b border-slate-800 pb-2">
+      <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
         <button
           onClick={() => setActiveTab('OVERVIEW')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+          className={`min-h-[44px] flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
             activeTab === 'OVERVIEW'
               ? 'bg-purple-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >
           <Activity className="w-4 h-4" />
@@ -262,10 +262,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
             setActiveTab('USERS');
             loadUsers();
           }}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+          className={`min-h-[44px] flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
             activeTab === 'USERS'
               ? 'bg-purple-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -274,22 +274,34 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
       </div>
 
       {userActionError && (
-        <div className="p-3.5 rounded-xl bg-rose-950/70 border border-rose-800/80 text-rose-300 text-xs flex items-center justify-between gap-3">
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800/80 text-rose-800 dark:text-rose-300 text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
             <span>{userActionError}</span>
           </div>
-          <button onClick={() => setUserActionError(null)} className="text-slate-400 hover:text-white">✕</button>
+          <button
+            onClick={() => setUserActionError(null)}
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-rose-600 hover:text-rose-900 dark:text-slate-400 dark:hover:text-white cursor-pointer"
+            aria-label={t('action.close', 'Close')}
+          >
+            ✕
+          </button>
         </div>
       )}
 
       {userActionSuccess && (
-        <div className="p-3.5 rounded-xl bg-emerald-950/70 border border-emerald-800/80 text-emerald-300 text-xs flex items-center justify-between gap-3">
+        <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 text-xs flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{userActionSuccess}</span>
           </div>
-          <button onClick={() => setUserActionSuccess(null)} className="text-slate-400 hover:text-white">✕</button>
+          <button
+            onClick={() => setUserActionSuccess(null)}
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-emerald-700 hover:text-emerald-950 dark:text-slate-400 dark:hover:text-white cursor-pointer"
+            aria-label={t('action.close', 'Close')}
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -298,58 +310,58 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
         <>
           {/* System Highlights */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-              <div className="text-xs text-slate-400 mb-1">{t('admin.total_audit_events', 'Total Audit Events')}</div>
-              <div className="text-xl font-bold text-purple-400">{logs.length}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">{t('admin.immutable_ledger', 'Immutable append-only ledger')}</div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl shadow-sm">
+              <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">{t('admin.total_audit_events', 'Total Audit Events')}</div>
+              <div className="text-xl font-bold tabular-nums text-purple-600 dark:text-purple-400">{logs.length}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{t('admin.immutable_ledger', 'Immutable append-only ledger')}</div>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-              <div className="text-xs text-slate-400 mb-1">{t('admin.enrolled_users', 'Enrolled Users')}</div>
-              <div className="text-xl font-bold text-emerald-400">{usersList.length}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">{t('admin.fayda_accounts', 'Fayda verified accounts')}</div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl shadow-sm">
+              <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">{t('admin.enrolled_users', 'Enrolled Users')}</div>
+              <div className="text-xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">{usersList.length}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{t('admin.fayda_accounts', 'Fayda verified accounts')}</div>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-              <div className="text-xs text-slate-400 mb-1">{t('admin.registered_tenants', 'Registered Tenants')}</div>
-              <div className="text-xl font-bold text-sky-400">{businesses.length}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">{t('admin.active_entities', 'Active business entities')}</div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl shadow-sm">
+              <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">{t('admin.registered_tenants', 'Registered Tenants')}</div>
+              <div className="text-xl font-bold tabular-nums text-sky-600 dark:text-sky-400">{businesses.length}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{t('admin.active_entities', 'Active business entities')}</div>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-              <div className="text-xs text-slate-400 mb-1">{t('system.db_adapter', 'Database Adapter')}</div>
-              <div className="text-xs font-bold text-amber-400 truncate mt-1">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl shadow-sm">
+              <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">{t('system.db_adapter', 'Database Adapter')}</div>
+              <div className="text-xs font-bold text-amber-700 dark:text-amber-400 truncate mt-1">
                 {statusInfo?.databaseProvider || 'Sandbox In-Memory'}
               </div>
-              <div className="text-[11px] text-slate-500 mt-0.5">{t('system.staging_ready', 'Isolated dev provider')}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{t('system.staging_ready', 'Isolated dev provider')}</div>
             </div>
           </div>
 
           {/* Super Admin Bootstrap Validator Box */}
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <KeyRound className="w-4 h-4 text-purple-400" />
-                <h2 className="text-sm font-bold text-white">{t('admin.bootstrap_title')}</h2>
+                <KeyRound className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">{t('admin.bootstrap_title')}</h2>
               </div>
               {statusInfo?.superAdminBootstrapAvailable ? (
-                <span className="text-[11px] font-semibold text-amber-400 bg-amber-950 px-2 py-0.5 rounded-full border border-amber-800">
+                <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
                   {t('admin.token_active_badge')}
                 </span>
               ) : (
-                <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800 flex items-center gap-1">
+                <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3" />
                   {t('admin.token_consumed_badge')}
                 </span>
               )}
             </div>
 
-            <p className="text-xs text-slate-400 mb-3 leading-relaxed">
-              {t('admin.bootstrap_desc')} <code className="text-slate-300">POST /api/auth/bootstrap-superadmin</code>.
+            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3 leading-relaxed">
+              {t('admin.bootstrap_desc')} <code className="text-slate-800 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">POST /api/auth/bootstrap-superadmin</code>.
             </p>
 
             {statusInfo?.superAdminBootstrapAvailable && (
-              <form onSubmit={handleRedeemBootstrap} className="space-y-3 pt-2 border-t border-slate-800">
+              <form onSubmit={handleRedeemBootstrap} className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
                   <input
                     type="text"
@@ -357,7 +369,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     value={bootstrapTokenInput}
                     onChange={(e) => setBootstrapTokenInput(e.target.value)}
                     placeholder={t('admin.token_placeholder')}
-                    className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    className="min-h-[44px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   />
                   <input
                     type="text"
@@ -365,7 +377,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     value={bootstrapName}
                     onChange={(e) => setBootstrapName(e.target.value)}
                     placeholder={t('admin.admin_name_placeholder')}
-                    className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    className="min-h-[44px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   />
                   <input
                     type="email"
@@ -373,7 +385,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     value={bootstrapEmail}
                     onChange={(e) => setBootstrapEmail(e.target.value)}
                     placeholder={t('admin.placeholder_email', 'admin@domain.com')}
-                    className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    className="min-h-[44px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   />
                   <input
                     type="password"
@@ -382,18 +394,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     value={bootstrapPassword}
                     onChange={(e) => setBootstrapPassword(e.target.value)}
                     placeholder={t('admin.admin_pass_placeholder')}
-                    className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    className="min-h-[44px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   />
                 </div>
 
                 {bootstrapError && (
-                  <p className="text-xs text-rose-400 flex items-center gap-1.5">
+                  <p className="text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {bootstrapError}
                   </p>
                 )}
                 {bootstrapMessage && (
-                  <p className="text-xs text-emerald-400 flex items-center gap-1.5">
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     {bootstrapMessage}
                   </p>
@@ -402,7 +414,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                 <button
                   type="submit"
                   disabled={isBootstrapping}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 text-white text-xs font-semibold rounded-lg cursor-pointer"
+                  className="min-h-[44px] px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white text-xs font-semibold rounded-lg cursor-pointer"
                 >
                   {isBootstrapping ? t('admin.redeeming') : t('admin.redeem_btn')}
                 </button>
@@ -411,28 +423,29 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
           </div>
 
           {/* Full Audit Trail */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-indigo-400" />
-                <h2 className="text-sm font-bold text-white">{t('system.audit_title')} ({filteredLogs.length})</h2>
+                <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">{t('system.audit_title')} ({filteredLogs.length})</h2>
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-1 sm:w-64">
-                  <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+                  <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 absolute left-3 top-3.5" />
                   <input
                     type="text"
                     value={auditFilter}
                     onChange={(e) => setAuditFilter(e.target.value)}
                     placeholder={t('audit.search_placeholder')}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-8 pr-3 py-1 text-xs text-white"
+                    className="w-full min-h-[44px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   />
                 </div>
                 <select
                   value={actionFilter}
                   onChange={(e) => setActionFilter(e.target.value)}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
+                  aria-label={t('audit.all_event_types')}
+                  className="min-h-[44px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
                 >
                   <option value="ALL">{t('audit.all_event_types')}</option>
                   <option value="DISPATCH_CREATED">{t('audit.action_dispatch_created', 'DISPATCH_CREATED')}</option>
@@ -449,9 +462,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/80 scrollbar-thin">
               <table className="w-full text-left text-xs min-w-[680px] sm:min-w-[720px] lg:min-w-full">
-                <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/40 border-b border-slate-800">
+                <thead className="text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/40 border-b border-slate-200 dark:border-slate-800">
                   <tr>
                     <th className="px-3.5 py-3 font-semibold whitespace-nowrap">{t('system.timestamp')}</th>
                     <th className="px-3.5 py-3 font-semibold whitespace-nowrap">{t('system.actor')}</th>
@@ -460,25 +473,25 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     <th className="px-3.5 py-3 font-semibold">{t('system.details')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 font-mono text-[11px]">
                   {filteredLogs.map((log) => (
-                    <tr key={log.id} className="hover:bg-slate-800/40">
-                      <td className="px-3.5 py-2.5 text-slate-400 whitespace-nowrap">
+                    <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                      <td className="px-3.5 py-2.5 text-slate-600 dark:text-slate-400 tabular-nums whitespace-nowrap">
                         {new Date(log.timestamp).toLocaleString()}
                       </td>
                       <td className="px-3.5 py-2.5 whitespace-nowrap">
-                        <span className="font-semibold text-slate-200">{t(log.actorName)}</span>
-                        <span className="text-[10px] text-slate-500 block">{t('table.role')}: {t('role.' + log.actorRole.toLowerCase(), log.actorRole)}</span>
+                        <span className="font-semibold text-slate-900 dark:text-slate-200">{t(log.actorName)}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block">{t('table.role')}: {t('role.' + log.actorRole.toLowerCase(), log.actorRole)}</span>
                       </td>
                       <td className="px-3.5 py-2.5">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                           {t('audit.action_' + log.action.toLowerCase(), log.action)}
                         </span>
                       </td>
-                      <td className="px-3.5 py-2.5 text-indigo-300 whitespace-nowrap">
+                      <td className="px-3.5 py-2.5 text-indigo-700 dark:text-indigo-300 whitespace-nowrap">
                         {t('audit.entity_' + log.entityType.toLowerCase(), log.entityType)}: {log.entityId}
                       </td>
-                      <td className="px-3.5 py-2.5 text-slate-300 font-sans text-xs">
+                      <td className="px-3.5 py-2.5 text-slate-700 dark:text-slate-300 font-sans text-xs">
                         {t(log.details)}
                       </td>
                     </tr>
@@ -492,29 +505,29 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
 
       {/* TAB 2: USER ADMINISTRATION */}
       {activeTab === 'USERS' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-5 shadow-sm">
           {/* Controls Bar */}
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
             <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Users className="w-5 h-5 text-purple-400" />
+              <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 <span>{t('admin.user_oversight_title', 'Platform User Accounts & Identity Oversight')}</span>
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                 {t('admin.user_oversight_subtitle', 'Manage roles, view Fayda identity verification status, and enforce account suspension with audit logs.')}
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
               <div className="relative flex-1 sm:w-60 min-w-[180px]">
-                <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 absolute left-3 top-3.5" />
                 <input
                   type="text"
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && loadUsers()}
                   placeholder={t('admin.search_placeholder', 'Search name, phone, FAN...')}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                  className="w-full min-h-[44px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-purple-500"
                 />
               </div>
 
@@ -525,7 +538,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   onChange={(e) => {
                     setUserRoleFilter(e.target.value as UserRole | '');
                   }}
-                  className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500 cursor-pointer"
+                  className="min-h-[44px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-purple-500 cursor-pointer"
                 >
                   <option value="">{t('admin.all_roles', 'All Roles')}</option>
                   <option value="SUPER_ADMIN">{t('role.super_admin', 'Super Admin')}</option>
@@ -540,7 +553,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   onChange={(e) => {
                     setUserStatusFilter(e.target.value as 'ACTIVE' | 'SUSPENDED' | '');
                   }}
-                  className="bg-slate-800 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500 cursor-pointer"
+                  className="min-h-[44px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-purple-500 cursor-pointer"
                 >
                   <option value="">{t('admin.all_statuses', 'All Statuses')}</option>
                   <option value="ACTIVE">{t('admin.status_active', 'Active')}</option>
@@ -549,8 +562,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
 
                 <button
                   onClick={loadUsers}
-                  className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer transition shrink-0"
+                  className="min-w-[44px] min-h-[44px] p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 cursor-pointer transition shrink-0 flex items-center justify-center"
                   title={t('admin.apply_filter', 'Apply Filter')}
+                  aria-label={t('admin.apply_filter', 'Apply Filter')}
                 >
                   <RefreshCw className={`w-4 h-4 ${usersLoading ? 'animate-spin' : ''}`} />
                 </button>
@@ -559,9 +573,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
           </div>
 
           {/* User Accounts Table */}
-          <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
+          <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/80 scrollbar-thin">
             <table className="w-full text-left text-xs min-w-[700px] sm:min-w-[740px] lg:min-w-full">
-              <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/60 border-b border-slate-800">
+              <thead className="text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="px-2.5 sm:px-4 py-3 font-semibold">{t('admin.col_user', 'User')}</th>
                   <th className="px-2.5 sm:px-4 py-3 font-semibold">{t('admin.col_phone', 'Verified Phone')}</th>
@@ -572,7 +586,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   <th className="px-2.5 sm:px-4 py-3 font-semibold text-right">{t('table.actions', 'Actions')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
                 {usersList.map((u) => {
                   const initials = u.name
                     .split(' ')
@@ -582,7 +596,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                     .slice(0, 2);
 
                   return (
-                    <tr key={u.id} className="hover:bg-slate-800/40 transition">
+                    <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
                       {/* User Info with Avatar */}
                       <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-2.5">
@@ -590,53 +604,54 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                             <img
                               src={u.avatarUrl}
                               alt={u.name}
-                              className="w-8 h-8 rounded-full object-cover border border-slate-700 shrink-0"
+                              className="w-8 h-8 rounded-full object-cover border border-slate-300 dark:border-slate-700 shrink-0"
                             />
                           ) : (
-                            <div className="w-8 h-8 rounded-full bg-indigo-700 text-white font-bold flex items-center justify-center text-xs shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
                               {initials}
                             </div>
                           )}
                           <div>
-                            <div className="font-semibold text-white">{t(u.name)}</div>
-                            <div className="text-[10px] text-slate-500 font-mono">{u.id}</div>
+                            <div className="font-semibold text-slate-900 dark:text-white">{t(u.name)}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{u.id}</div>
                           </div>
                         </div>
                       </td>
 
                       {/* Phone */}
                       <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
-                        <span className="font-mono text-slate-300">
+                        <span className="font-mono text-slate-700 dark:text-slate-300">
                           {u.maskedPhone || u.phoneNumber}
                         </span>
                         {u.phoneVerified && (
-                          <span className="block text-[10px] text-emerald-400">{t('auth.verified_badge')}</span>
+                          <span className="block text-[10px] text-emerald-700 dark:text-emerald-400">{t('auth.verified_badge')}</span>
                         )}
                       </td>
 
                       {/* Fayda National ID */}
                       <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                         <div className="space-y-0.5">
-                          <div className="font-mono text-[11px] text-sky-400">
+                          <div className="font-mono text-[11px] text-sky-700 dark:text-sky-400">
                             FAN: {u.maskedFan || '•••• •••• •••• 4444'}
                           </div>
-                          <div className="font-mono text-[11px] text-emerald-400">
+                          <div className="font-mono text-[11px] text-emerald-700 dark:text-emerald-400">
                             FIN: {u.maskedFin || '•••• •••• 3333'}
                           </div>
                         </div>
                       </td>
 
                       {/* Business Entity */}
-                      <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-slate-300">
+                      <td className="px-3 sm:px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300">
                         {t(u.businessName)}
                       </td>
 
                       {/* Role Selector */}
                       <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                         <select
+                          aria-label={t('admin.col_role', 'Assigned Role')}
                           value={u.role}
                           onChange={(e) => handleRoleChange(u, e.target.value as UserRole)}
-                          className="bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-purple-500 cursor-pointer"
+                          className="min-h-[40px] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 cursor-pointer"
                         >
                           <option value="BUSINESS_OWNER">{t('role.business_owner')}</option>
                           <option value="SENDER">{t('role.sender')}</option>
@@ -648,12 +663,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                       {/* Status */}
                       <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                         {u.status === 'ACTIVE' ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
                             {t('admin.status_active')}
                           </span>
                         ) : (
                           <span
-                            className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                            className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20"
                             title={u.suspendedReason ? `${u.suspendedReason}` : undefined}
                           >
                             {t('admin.status_suspended')}
@@ -670,14 +685,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                               setSuspendReason('');
                               setUserActionError(null);
                             }}
-                            className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 font-semibold text-[11px] transition cursor-pointer"
+                            className="min-h-[40px] px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 font-semibold text-[11px] transition cursor-pointer inline-flex items-center justify-center"
                           >
                             {t('admin.suspend_btn', 'Suspend...')}
                           </button>
                         ) : (
                           <button
                             onClick={() => handleReactivateUser(u)}
-                            className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-semibold text-[11px] transition cursor-pointer"
+                            className="min-h-[40px] px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 font-semibold text-[11px] transition cursor-pointer inline-flex items-center justify-center"
                           >
                             {t('admin.reactivate_btn', 'Reactivate')}
                           </button>
@@ -694,24 +709,25 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
 
       {/* Account Suspension Reason Modal */}
       {suspendTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-md bg-slate-900 border border-rose-900/60 rounded-2xl shadow-2xl p-6 text-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 rounded-2xl shadow-2xl p-6 text-slate-900 dark:text-slate-100">
             <button
               onClick={() => setSuspendTarget(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white cursor-pointer"
+              aria-label={t('action.close', 'Close')}
             >
               ✕
             </button>
 
-            <div className="flex items-center gap-2.5 mb-4 text-rose-400">
+            <div className="flex items-center gap-2.5 mb-4 text-rose-600 dark:text-rose-400">
               <UserX className="w-5 h-5" />
-              <h3 className="text-base font-bold text-white">{t('admin.suspend_modal_title', 'Suspend User Account')}</h3>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('admin.suspend_modal_title', 'Suspend User Account')}</h3>
             </div>
 
-            <p className="text-xs text-slate-300 mb-2 leading-relaxed">
-              <span className="font-semibold text-white">{t(suspendTarget.name)}</span> (<code className="text-slate-400">{suspendTarget.id}</code>)
+            <p className="text-xs text-slate-700 dark:text-slate-300 mb-2 leading-relaxed">
+              <span className="font-semibold text-slate-900 dark:text-white">{t(suspendTarget.name)}</span> (<code className="text-slate-600 dark:text-slate-400">{suspendTarget.id}</code>)
             </p>
-            <p className="text-[11px] text-amber-400/90 mb-4 bg-amber-950/40 p-2.5 rounded-xl border border-amber-900/40">
+            <p className="text-[11px] text-amber-800 dark:text-amber-400/90 mb-4 bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200 dark:border-amber-900/40">
               {t('admin.suspend_modal_desc', {
                 name: suspendTarget.name,
                 phone: suspendTarget.phoneNumber || suspendTarget.email,
@@ -720,8 +736,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
 
             <form onSubmit={handleConfirmSuspend} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  {t('admin.suspension_reason_label', 'Suspension Justification Reason')} <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  {t('admin.suspension_reason_label', 'Suspension Justification Reason')} <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
                 <textarea
                   required
@@ -729,7 +745,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                   value={suspendReason}
                   onChange={(e) => setSuspendReason(e.target.value)}
                   placeholder={t('admin.suspend_reason_placeholder')}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-rose-500"
                 />
               </div>
 
@@ -737,14 +753,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ onNavi
                 <button
                   type="button"
                   onClick={() => setSuspendTarget(null)}
-                  className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+                  className="flex-1 min-h-[44px] py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-300 text-xs font-semibold cursor-pointer"
                 >
                   {t('action.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingSuspend || !suspendReason.trim()}
-                  className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 transition cursor-pointer disabled:opacity-50"
+                  className="flex-1 min-h-[44px] py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-lg shadow-rose-600/30 transition cursor-pointer disabled:opacity-50"
                 >
                   {isSubmittingSuspend ? t('msg.loading') : t('admin.confirm_suspend_btn', 'Confirm Suspension')}
                 </button>

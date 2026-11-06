@@ -256,41 +256,42 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
   const totalErrorsCount = parsedDispatches.reduce((s, d) => s + d.errors.length, 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-white my-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+      <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-900 dark:text-white my-8 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400 flex items-center justify-center">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">{t('bulk.title')}</h2>
-              <p className="text-xs text-slate-400">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('bulk.title')}</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 {t('bulk.subtitle')}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label={t('action.close', 'Close')}
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Action / Helper Bar */}
-        <div className="mt-4 p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div>
-            <span className="font-semibold text-slate-200">{t('bulk.schema_label', 'Standard CSV Column Schema:')}</span>
-            <p className="text-slate-400 text-[11px] mt-0.5 font-mono">
+            <span className="font-semibold text-slate-800 dark:text-slate-200">{t('bulk.schema_label', 'Standard CSV Column Schema:')}</span>
+            <p className="text-slate-600 dark:text-slate-400 text-[11px] mt-0.5 font-mono">
               dispatch_reference, partner_name, destination_address, driver_name, sku, item_name, unit, quantity
             </p>
           </div>
           <button
             type="button"
             onClick={downloadSampleTemplate}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded-lg text-xs font-semibold cursor-pointer shrink-0 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 min-h-[40px] bg-white hover:bg-slate-100 text-indigo-700 border border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-indigo-300 dark:border-slate-700 rounded-lg text-xs font-semibold cursor-pointer shrink-0 transition-colors shadow-2xs"
           >
             <Download className="w-3.5 h-3.5" />
             <span>{t('bulk.download_template')}</span>
@@ -299,12 +300,12 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
 
         {/* Upload Dropzone */}
         <div className="mt-4">
-          <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-indigo-500 bg-slate-950/40 hover:bg-indigo-950/10 rounded-xl p-6 cursor-pointer transition-colors text-center">
-            <Upload className="w-8 h-8 text-indigo-400 mb-2" />
-            <span className="text-sm font-semibold text-white">
+          <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-indigo-500 bg-slate-50/70 hover:bg-indigo-50/40 dark:border-slate-700 dark:hover:border-indigo-500 dark:bg-slate-950/40 dark:hover:bg-indigo-950/10 rounded-xl p-6 cursor-pointer transition-colors text-center">
+            <Upload className="w-8 h-8 text-indigo-600 dark:text-indigo-400 mb-2" />
+            <span className="text-sm font-semibold text-slate-900 dark:text-white">
               {file ? file.name : t('bulk.choose_file')}
             </span>
-            <span className="text-xs text-slate-500 mt-1">
+            <span className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               {t('bulk.drop_note')}
             </span>
             <input type="file" accept=".csv" onChange={handleFileUpload} className="hidden" />
@@ -313,14 +314,14 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
 
         {/* Error / Success Banners */}
         {uploadError && (
-          <div className="mt-4 p-3 bg-rose-950/60 border border-rose-800 text-rose-300 rounded-xl text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+          <div className="mt-4 p-3 bg-rose-50 border border-rose-200 text-rose-800 dark:bg-rose-950/60 dark:border-rose-800 dark:text-rose-300 rounded-xl text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
             <span>{uploadError}</span>
           </div>
         )}
         {uploadSuccess && (
-          <div className="mt-4 p-3 bg-emerald-950/60 border border-emerald-800 text-emerald-300 rounded-xl text-xs flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+          <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 dark:bg-emerald-950/60 dark:border-emerald-800 dark:text-emerald-300 rounded-xl text-xs flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
             <span>{uploadSuccess}</span>
           </div>
         )}
@@ -329,24 +330,24 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
         {parsedDispatches.length > 0 && (
           <div className="mt-5 space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-300 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-sky-400" />
+              <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                 {t('bulk.parsed_summary', { dispatches: parsedDispatches.length, lines: totalLinesCount, units: totalQuantitySum })}
               </span>
               {totalErrorsCount > 0 ? (
-                <span className="text-rose-400 font-semibold bg-rose-950 px-2 py-0.5 rounded border border-rose-800">
+                <span className="text-rose-800 dark:text-rose-400 font-semibold bg-rose-50 dark:bg-rose-950 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800">
                   {t('bulk.validation_errors', { count: totalErrorsCount })}
                 </span>
               ) : (
-                <span className="text-emerald-400 font-semibold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+                <span className="text-emerald-800 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                   {t('bulk.validated_ready')}
                 </span>
               )}
             </div>
 
-            <div className="border border-slate-800 rounded-xl overflow-x-auto max-h-56 overflow-y-auto scrollbar-thin">
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto max-h-56 overflow-y-auto scrollbar-thin">
               <table className="w-full text-left text-xs min-w-[550px] sm:min-w-full">
-                <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+                <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 dark:bg-slate-950 dark:text-slate-400 dark:border-slate-800">
                   <tr>
                     <th className="py-2 px-3">{t('table.dispatch_number', 'Reference')}</th>
                     <th className="py-2 px-3">{t('table.destination_partner', 'Receiving Partner')}</th>
@@ -355,28 +356,28 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
                     <th className="py-2 px-3 text-right">{t('table.quantity_loss', 'Total Units')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/80 bg-slate-900/60">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800/80 bg-white dark:bg-slate-900/60">
                   {parsedDispatches.map((d, idx) => (
-                    <tr key={idx} className="hover:bg-slate-800/40">
-                      <td className="py-2 px-3 font-mono font-bold text-sky-400">{d.reference}</td>
+                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <td className="py-2 px-3 font-mono font-bold text-indigo-700 dark:text-sky-400">{d.reference}</td>
                       <td className="py-2 px-3">
-                        <div className="font-semibold text-white">{d.partnerName || t('dispatch.unknown_partner', 'Unknown Partner')}</div>
+                        <div className="font-semibold text-slate-900 dark:text-white">{d.partnerName || t('dispatch.unknown_partner', 'Unknown Partner')}</div>
                         {d.destinationAddress && (
                           <div className="text-[10px] text-slate-500 truncate max-w-[180px]">
                             {d.destinationAddress}
                           </div>
                         )}
                       </td>
-                      <td className="py-2 px-3 text-slate-300 text-[11px]">
+                      <td className="py-2 px-3 text-slate-700 dark:text-slate-300 text-[11px]">
                         {d.driverName || t('dispatch.standard_freight', 'Standard Freight')} {d.vehicleReg ? `(${d.vehicleReg})` : ''}
                       </td>
                       <td className="py-2 px-3">
-                        <span className="text-slate-300 font-mono">{d.lines.length} {t('table.items', 'items')}</span>
+                        <span className="text-slate-700 dark:text-slate-300 font-mono tabular-nums">{d.lines.length} {t('table.items', 'items')}</span>
                         <div className="text-[10px] text-slate-500 truncate max-w-[150px]">
                           {d.lines.map((l) => `${l.quantitySent}x ${l.sku}`).join(', ')}
                         </div>
                       </td>
-                      <td className="py-2 px-3 text-right font-mono font-bold text-white">
+                      <td className="py-2 px-3 text-right font-mono tabular-nums font-bold text-slate-900 dark:text-white">
                         {d.lines.reduce((s, l) => s + l.quantitySent, 0)}
                       </td>
                     </tr>
@@ -388,11 +389,11 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
         )}
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-5 mt-6 border-t border-slate-800">
+        <div className="flex items-center justify-between pt-5 mt-6 border-t border-slate-200 dark:border-slate-800">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 rounded-xl cursor-pointer"
+            className="px-4 py-2 min-h-[44px] text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 dark:text-slate-400 dark:hover:text-white dark:bg-slate-800/60 dark:hover:bg-slate-800 rounded-xl cursor-pointer"
           >
             {t('action.cancel', 'Cancel')}
           </button>
@@ -401,7 +402,7 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
             type="button"
             onClick={handleProcessImport}
             disabled={parsedDispatches.length === 0 || isProcessing || totalErrorsCount > 0}
-            className="flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isProcessing ? (
               <RefreshCw className="w-4 h-4 animate-spin" />

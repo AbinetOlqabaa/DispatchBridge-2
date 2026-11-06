@@ -23,7 +23,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-2 py-1.5 flex items-center justify-around shadow-2xl safe-area-bottom">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 flex items-center justify-around shadow-2xl safe-area-bottom">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = currentTab === item.id;
@@ -32,10 +32,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
             key={item.id}
             onClick={() => onSelectTab(item.id)}
             className={`flex flex-col items-center justify-center py-1 px-2 rounded-lg transition-colors cursor-pointer min-w-[44px] min-h-[44px] ${
-              isActive ? 'text-sky-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              isActive ? 'text-indigo-600 dark:text-sky-400 font-semibold' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
-            <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'scale-110 text-sky-400' : ''}`} />
+            <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'scale-110 text-indigo-600 dark:text-sky-400' : ''}`} />
             <span className="text-[10px] mt-0.5 truncate max-w-[68px]">{item.label}</span>
           </button>
         );

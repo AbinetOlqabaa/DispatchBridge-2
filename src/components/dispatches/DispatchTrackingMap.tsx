@@ -29,6 +29,7 @@ import {
 import { Dispatch, RouteWaypoint } from '../../types/dispatch.js';
 import { api } from '../../services/api.js';
 import { useTranslation } from '../../context/LanguageContext.js';
+import { useTheme } from '../../context/ThemeContext.js';
 import {
   saveMapCache,
   getMapCache,
@@ -69,6 +70,8 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
   onTelemetryUpdate,
 }) => {
   const { t } = useTranslation();
+  const { effectiveTheme } = useTheme();
+  const isDarkMap = effectiveTheme === 'dark';
   const [copiedCoords, setCopiedCoords] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [activeWaypointTooltip, setActiveWaypointTooltip] = useState<RouteWaypoint | null>(null);
@@ -394,17 +397,17 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
   const isDelivered = ['RECEIVED', 'PARTIALLY_RECEIVED', 'RECONCILED'].includes(dispatch.status);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg space-y-0">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-lg space-y-0">
       {/* Offline Mode Active Banner */}
       {isEffectivelyOffline && (
-        <div className="bg-amber-950/80 border-b border-amber-800/80 px-4 py-2.5 text-xs text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <div className="bg-amber-50 dark:bg-amber-950/80 border-b border-amber-200 dark:border-amber-800/80 px-4 py-2.5 text-xs text-amber-900 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <WifiOff className="w-4 h-4 text-amber-400 shrink-0" />
+            <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <span className="font-semibold">
               {t('map.offline_transit_mode', 'Operating in Offline Transit Mode • Using Cached Coordinate Data & Offline Map Canvas')}
             </span>
           </div>
-          <span className="text-[11px] bg-amber-900/60 px-2 py-0.5 rounded border border-amber-700/60 font-mono">
+          <span className="text-[11px] bg-amber-100 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 px-2 py-0.5 rounded border border-amber-300 dark:border-amber-700/60 font-mono">
             {t('map.cache_hit', 'Cache Hit: {size}', {
               size: cachedRecord ? `${(cachedRecord.sizeBytes / 1024).toFixed(1)} KB` : t('map.local_grid', 'Local Grid'),
             })}
@@ -414,24 +417,24 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
 
       {/* Cache Notification Toast */}
       {cacheNotification && (
-        <div className="bg-emerald-950/90 border-b border-emerald-800/80 px-4 py-2 text-xs text-emerald-200 flex items-center gap-2 animate-fade-in">
-          <Database className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="bg-emerald-50 dark:bg-emerald-950/90 border-b border-emerald-200 dark:border-emerald-800/80 px-4 py-2 text-xs text-emerald-900 dark:text-emerald-200 flex items-center gap-2 animate-fade-in">
+          <Database className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span>{cacheNotification}</span>
         </div>
       )}
 
       {/* 1. Telemetry Top Header */}
-      <div className="p-4 sm:p-5 border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-950/40">
+      <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-950/40">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-sky-950 text-sky-400 border border-sky-800/80">
-              <Radio className="w-3 h-3 text-sky-400 animate-pulse" />
+            <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800/80">
+              <Radio className="w-3 h-3 text-sky-600 dark:text-sky-400 animate-pulse" />
               {t('map.live_telemetry_badge', 'Live Telemetry & Geo-Coordinates')}
             </span>
 
             {/* Offline Cache Status Badge */}
-            <span className="flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-              <Database className="w-3 h-3 text-emerald-400" />
+            <span className="flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-xs">
+              <Database className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
               {cachedRecord
                 ? t('map.cached_offline_badge', 'Cached Offline ({size})', {
                     size: `${(cachedRecord.sizeBytes / 1024).toFixed(1)} KB`,
@@ -444,22 +447,22 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               onClick={() => setSimulatedOffline(!isSimulatedOffline)}
               className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-lg cursor-pointer transition-colors ${
                 isSimulatedOffline
-                  ? 'bg-amber-950 text-amber-300 border border-amber-800'
-                  : 'bg-slate-800 text-slate-400 hover:text-white border border-slate-700'
+                  ? 'bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800'
+                  : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:text-white dark:border-slate-700 shadow-xs'
               }`}
               title={t('map.toggle_offline_title', 'Toggle simulated low-signal/offline transit mode')}
             >
-              {isSimulatedOffline ? <WifiOff className="w-3 h-3 text-amber-400" /> : <Wifi className="w-3 h-3 text-emerald-400" />}
+              {isSimulatedOffline ? <WifiOff className="w-3 h-3 text-amber-600 dark:text-amber-400" /> : <Wifi className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
               <span>{isSimulatedOffline ? t('map.simulating_offline_btn', 'Simulating Offline') : t('map.online_conn_btn', 'Online Connection')}</span>
             </button>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-0.5">
-            <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
-              <Navigation className="w-4 h-4 text-sky-400" />
+            <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              <Navigation className="w-4 h-4 text-sky-600 dark:text-sky-400" />
               {currentCoords.checkpointName}
             </h3>
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-slate-600 dark:text-slate-400 font-mono">
               ({currentCoords.lat.toFixed(5)}° N, {Math.abs(currentCoords.lng).toFixed(5)}° W)
             </span>
           </div>
@@ -470,10 +473,10 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           {/* Pre-cache Button */}
           <button
             onClick={handlePrecacheRoute}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700 text-xs font-semibold cursor-pointer transition-colors shadow-xs"
             title={t('map.precache_title', 'Pre-cache map tiles, waypoints and vector paths for offline transit')}
           >
-            <Database className="w-3.5 h-3.5 text-emerald-400" />
+            <Database className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>{t('map.precache')}</span>
           </button>
 
@@ -482,7 +485,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             <button
               onClick={handleSimulateGpsPing}
               disabled={isSimulatingPing}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-950/70 hover:bg-sky-900 text-sky-300 border border-sky-800/60 text-xs font-semibold cursor-pointer transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 dark:bg-sky-950/70 dark:hover:bg-sky-900 dark:text-sky-300 dark:border-sky-800/60 text-xs font-semibold cursor-pointer transition-colors shadow-xs"
               title={t('map.record_telemetry_title', 'Record next live GPS telemetry waypoint')}
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSimulatingPing ? 'animate-spin' : ''}`} />
@@ -493,17 +496,17 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           {/* Copy Coordinates */}
           <button
             onClick={handleCopyCoordinates}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700 text-xs font-semibold cursor-pointer transition-colors shadow-xs"
             title={t('map.copy_coords_title', 'Copy latitude and longitude coordinates')}
           >
             {copiedCoords ? (
               <>
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400">{t('action.copied')}</span>
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-emerald-700 dark:text-emerald-400">{t('action.copied')}</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5 text-slate-400" />
+                <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>{t('map.copy_coords')}</span>
               </>
             )}
@@ -514,10 +517,10 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             href={`https://www.google.com/maps?q=${currentCoords.lat},${currentCoords.lng}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-slate-700 text-xs font-semibold cursor-pointer transition-colors shadow-xs"
             title={t('map.view_gmaps_title', 'View exact geo-coordinates on Google Maps')}
           >
-            <ExternalLink className="w-3.5 h-3.5 text-indigo-400" />
+            <ExternalLink className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             <span>{t('map.open_in_maps')}</span>
           </a>
         </div>
@@ -525,18 +528,18 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
 
       {/* Ping Success Banner */}
       {pingSuccessMsg && (
-        <div className="bg-sky-950/80 border-b border-sky-800/80 px-5 py-2 text-xs text-sky-200 flex items-center gap-2 animate-fade-in">
-          <Radio className="w-3.5 h-3.5 text-sky-400 animate-pulse shrink-0" />
+        <div className="bg-sky-50 dark:bg-sky-950/80 border-b border-sky-200 dark:border-sky-800/80 px-5 py-2 text-xs text-sky-800 dark:text-sky-200 flex items-center gap-2 animate-fade-in">
+          <Radio className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 animate-pulse shrink-0" />
           <span>{pingSuccessMsg}</span>
         </div>
       )}
 
       {/* Route Layer Legend & Corridor Adherence HUD Bar */}
-      <div className="bg-slate-950/90 border-b border-slate-800 px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="bg-slate-100/90 dark:bg-slate-950/90 border-b border-slate-200 dark:border-slate-800 px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs">
         {/* Layer Toggles */}
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-slate-500 font-semibold text-[11px] uppercase tracking-wider flex items-center gap-1">
-            <Layers className="w-3 h-3 text-slate-400" /> {t('map.polyline_layers')}
+          <span className="text-slate-600 dark:text-slate-500 font-semibold text-[11px] uppercase tracking-wider flex items-center gap-1">
+            <Layers className="w-3 h-3 text-slate-500 dark:text-slate-400" /> {t('map.polyline_layers')}
           </span>
 
           {/* Toggle Planned Polyline */}
@@ -544,11 +547,11 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             onClick={() => setShowPlannedRoute(!showPlannedRoute)}
             className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium cursor-pointer transition-colors ${
               showPlannedRoute
-                ? 'bg-indigo-950 text-indigo-300 border border-indigo-800'
-                : 'bg-slate-800/50 text-slate-500 line-through'
+                ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-800 shadow-xs'
+                : 'bg-slate-200/70 text-slate-500 dark:bg-slate-800/50 dark:text-slate-500 line-through'
             }`}
           >
-            <span className="w-3 h-0.5 bg-indigo-400 inline-block border-b border-dashed border-indigo-300" />
+            <span className="w-3 h-0.5 bg-indigo-500 inline-block border-b border-dashed border-indigo-400" />
             <span>{t('map.planned_corridor', { count: plannedWaypoints.length })}</span>
           </button>
 
@@ -557,11 +560,11 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             onClick={() => setShowActualRoute(!showActualRoute)}
             className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium cursor-pointer transition-colors ${
               showActualRoute
-                ? 'bg-cyan-950 text-cyan-300 border border-cyan-800'
-                : 'bg-slate-800/50 text-slate-500 line-through'
+                ? 'bg-cyan-50 text-cyan-800 border border-cyan-200 dark:bg-cyan-950 dark:text-cyan-300 dark:border-cyan-800 shadow-xs'
+                : 'bg-slate-200/70 text-slate-500 dark:bg-slate-800/50 dark:text-slate-500 line-through'
             }`}
           >
-            <span className="w-3 h-1 bg-cyan-400 inline-block rounded-full shadow" />
+            <span className="w-3 h-1 bg-cyan-500 inline-block rounded-full shadow-xs" />
             <span>{t('map.actual_route', { count: actualWaypoints.length })}</span>
           </button>
 
@@ -570,31 +573,31 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             onClick={() => setShowBreadcrumbs(!showBreadcrumbs)}
             className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium cursor-pointer transition-colors ${
               showBreadcrumbs
-                ? 'bg-slate-800 text-sky-300 border border-slate-700'
-                : 'bg-slate-800/50 text-slate-500 line-through'
+                ? 'bg-white text-sky-800 border border-slate-200 dark:bg-slate-800 dark:text-sky-300 dark:border-slate-700 shadow-xs'
+                : 'bg-slate-200/70 text-slate-500 dark:bg-slate-800/50 dark:text-slate-500 line-through'
             }`}
           >
-            <History className="w-3 h-3 text-sky-400" />
+            <History className="w-3 h-3 text-sky-600 dark:text-sky-400" />
             <span>{t('map.waypoints')}</span>
           </button>
         </div>
 
         {/* Corridor Variance Indicator */}
-        <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
+        <div className="flex items-center gap-2 text-[11px] font-mono text-slate-600 dark:text-slate-400">
           <span className="text-slate-500">{t('map.corridor_variance')}</span>
-          <span className="text-emerald-400 font-semibold">{corridorVarianceKm.toFixed(1)} km</span>
-          <span className="text-slate-500">•</span>
-          <span className="text-slate-300">{t('map.adherence')}</span>
+          <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{corridorVarianceKm.toFixed(1)} km</span>
+          <span className="text-slate-400 dark:text-slate-500">•</span>
+          <span className="text-slate-700 dark:text-slate-300">{t('map.adherence')}</span>
         </div>
       </div>
 
       {/* 2. Interactive SVG Map Canvas */}
-      <div className="relative w-full h-84 sm:h-96 bg-slate-950 overflow-hidden select-none">
+      <div className="relative w-full h-84 sm:h-96 bg-slate-100 dark:bg-slate-950 overflow-hidden select-none">
         {/* Map Grid Background Pattern (Offline Vector Tiles) */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-35 dark:opacity-20">
           <defs>
             <pattern id="offline-grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#6366f1" strokeWidth="0.5" />
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke={isDarkMap ? '#6366f1' : '#94a3b8'} strokeWidth="0.6" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#offline-grid-pattern)" />
@@ -744,12 +747,12 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               })
             }
           >
-            <circle r="18" fill="#1e293b" stroke="#3b82f6" strokeWidth="2.5" />
-            <Warehouse x="-9" y="-9" width="18" height="18" className="text-blue-400" />
+            <circle r="18" fill={isDarkMap ? '#1e293b' : '#ffffff'} stroke={isDarkMap ? '#3b82f6' : '#2563eb'} strokeWidth="2.5" />
+            <Warehouse x="-9" y="-9" width="18" height="18" className="text-blue-600 dark:text-blue-400" />
             <text
               y="32"
               textAnchor="middle"
-              className="fill-slate-300 font-sans font-semibold text-[11px] drop-shadow"
+              className="fill-slate-800 dark:fill-slate-300 font-sans font-semibold text-[11px]"
             >
               {t(dispatch.originLocationSnapshot?.label || '') || t('map.origin_dock_pin', 'Origin Dock')}
             </text>
@@ -768,12 +771,12 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
               })
             }
           >
-            <circle r="18" fill="#064e3b" stroke="#10b981" strokeWidth="2.5" />
-            <Store x="-9" y="-9" width="18" height="18" className="text-emerald-400" />
+            <circle r="18" fill={isDarkMap ? '#064e3b' : '#ecfdf5'} stroke={isDarkMap ? '#10b981' : '#059669'} strokeWidth="2.5" />
+            <Store x="-9" y="-9" width="18" height="18" className="text-emerald-700 dark:text-emerald-400" />
             <text
               y="32"
               textAnchor="middle"
-              className="fill-emerald-300 font-sans font-semibold text-[11px] drop-shadow"
+              className="fill-emerald-800 dark:fill-emerald-300 font-sans font-semibold text-[11px]"
             >
               {t(dispatch.partnerName)}
             </text>
@@ -822,7 +825,7 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
             <text
               y="-24"
               textAnchor="middle"
-              className="fill-sky-300 font-mono font-bold text-[10px] bg-slate-900 px-1 py-0.5 rounded shadow"
+              className="fill-sky-800 dark:fill-sky-300 font-mono font-bold text-[10px]"
             >
               {dispatch.vehicleReg || 'TRK-LIVE'}
             </text>
@@ -831,26 +834,26 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
 
         {/* Waypoint Click Inspection Card */}
         {activeWaypointTooltip && (
-          <div className="absolute top-4 left-4 bg-slate-900/95 border border-slate-700 p-3 rounded-xl shadow-xl z-20 text-xs space-y-1.5 max-w-xs animate-fade-in backdrop-blur-md">
-            <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-1">
-              <span className="font-semibold text-sky-300 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-sky-400" />
+          <div className="absolute top-4 left-4 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 p-3 rounded-xl shadow-xl z-20 text-xs space-y-1.5 max-w-xs animate-fade-in backdrop-blur-md">
+            <div className="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-1">
+              <span className="font-semibold text-sky-700 dark:text-sky-300 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 {t('map.waypoint_inspection')}
               </span>
               <button
                 onClick={() => setActiveWaypointTooltip(null)}
-                className="text-slate-400 hover:text-white cursor-pointer px-1"
+                className="text-slate-400 hover:text-slate-800 dark:hover:text-white cursor-pointer px-1"
               >
                 ×
               </button>
             </div>
-            <div className="font-medium text-white">{t(activeWaypointTooltip.label || '')}</div>
-            <div className="text-[11px] font-mono text-slate-300">
+            <div className="font-medium text-slate-900 dark:text-white">{t(activeWaypointTooltip.label || '')}</div>
+            <div className="text-[11px] font-mono text-slate-600 dark:text-slate-300">
               {activeWaypointTooltip.latitude.toFixed(5)}° N, {Math.abs(activeWaypointTooltip.longitude).toFixed(5)}° W
             </div>
             {activeWaypointTooltip.speedKmh !== undefined && (
-              <div className="text-[11px] text-slate-400">
-                {t('map.speed')}: <span className="text-amber-400 font-mono">{activeWaypointTooltip.speedKmh} km/h</span>
+              <div className="text-[11px] text-slate-600 dark:text-slate-400">
+                {t('map.speed')}: <span className="text-amber-700 dark:text-amber-400 font-mono font-semibold">{activeWaypointTooltip.speedKmh} km/h</span>
               </div>
             )}
             {activeWaypointTooltip.timestamp && (
@@ -865,21 +868,21 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
         <div className="absolute top-4 right-4 flex flex-col gap-1.5 z-10">
           <button
             onClick={() => setZoomLevel((z) => Math.min(2.5, z + 0.35))}
-            className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 shadow-md cursor-pointer transition-colors"
+            className="p-2 rounded-xl bg-white/95 dark:bg-slate-900/90 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md cursor-pointer transition-colors"
             title={t('map.zoom_in')}
           >
             <ZoomIn className="w-4 h-4" />
           </button>
           <button
             onClick={() => setZoomLevel((z) => Math.max(0.75, z - 0.35))}
-            className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 shadow-md cursor-pointer transition-colors"
+            className="p-2 rounded-xl bg-white/95 dark:bg-slate-900/90 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md cursor-pointer transition-colors"
             title={t('map.zoom_out')}
           >
             <ZoomOut className="w-4 h-4" />
           </button>
           <button
             onClick={() => setZoomLevel(1)}
-            className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 shadow-md cursor-pointer transition-colors"
+            className="p-2 rounded-xl bg-white/95 dark:bg-slate-900/90 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md cursor-pointer transition-colors"
             title={t('map.fit_bounds')}
           >
             <Maximize2 className="w-4 h-4" />
@@ -887,15 +890,15 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
         </div>
 
         {/* Live Vehicle Floating HUD */}
-        <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-md bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-xl p-3.5 shadow-2xl z-10 space-y-2">
-          <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-2">
+        <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700/80 rounded-xl p-3.5 shadow-xl dark:shadow-2xl z-10 space-y-2">
+          <div className="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
             <div className="flex items-center gap-2">
-              <span className={`w-2.5 h-2.5 rounded-full ${isDelivered ? 'bg-emerald-400' : 'bg-sky-400 animate-pulse'}`} />
-              <span className="text-xs font-bold text-white font-mono">
+              <span className={`w-2.5 h-2.5 rounded-full ${isDelivered ? 'bg-emerald-500' : 'bg-sky-500 animate-pulse'}`} />
+              <span className="text-xs font-bold text-slate-900 dark:text-white font-mono">
                 {dispatch.dispatchNumber} • {dispatch.vehicleReg || 'TRK-CORRIDOR'}
               </span>
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-sky-400 bg-sky-950 px-2 py-0.5 rounded-full border border-sky-800">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-sky-700 bg-sky-50 border border-sky-200 dark:text-sky-400 dark:bg-sky-950 dark:border-sky-800 px-2 py-0.5 rounded-full">
               {t('map.completed_progress', { progress: progressPercentage })}
             </span>
           </div>
@@ -903,37 +906,37 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
           {/* Telemetry Stats Grid: Coordinates, Speed, Heading, Last Ping */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             <div>
-              <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-sky-400" /> {t('map.latitude')}
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-sky-600 dark:text-sky-400" /> {t('map.latitude')}
               </div>
-              <div className="font-mono font-semibold text-slate-200">
+              <div className="font-mono font-semibold text-slate-800 dark:text-slate-200">
                 {currentCoords.lat.toFixed(5)}° N
               </div>
             </div>
 
             <div>
-              <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-sky-400" /> {t('map.longitude')}
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-sky-600 dark:text-sky-400" /> {t('map.longitude')}
               </div>
-              <div className="font-mono font-semibold text-slate-200">
+              <div className="font-mono font-semibold text-slate-800 dark:text-slate-200">
                 {Math.abs(currentCoords.lng).toFixed(5)}° W
               </div>
             </div>
 
             <div>
-              <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <Gauge className="w-3 h-3 text-amber-400" /> {t('map.speed')}
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <Gauge className="w-3 h-3 text-amber-600 dark:text-amber-400" /> {t('map.speed')}
               </div>
-              <div className="font-mono font-semibold text-slate-200">
+              <div className="font-mono font-semibold text-slate-800 dark:text-slate-200">
                 {currentCoords.speedKmh} km/h
               </div>
             </div>
 
             <div>
-              <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                <Compass className="w-3 h-3 text-indigo-400" /> {t('map.heading')}
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <Compass className="w-3 h-3 text-indigo-600 dark:text-indigo-400" /> {t('map.heading')}
               </div>
-              <div className="font-mono font-semibold text-slate-200">
+              <div className="font-mono font-semibold text-slate-800 dark:text-slate-200">
                 {headingToCardinal(currentCoords.heading)}
               </div>
             </div>
@@ -942,41 +945,41 @@ export const DispatchTrackingMap: React.FC<DispatchTrackingMapProps> = ({
       </div>
 
       {/* 3. Progress Metric Footbar */}
-      <div className="p-4 bg-slate-900 border-t border-slate-800">
+      <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
         <div className="space-y-2">
           {/* Progress Bar */}
-          <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
             <span className="flex items-center gap-1">
-              <Warehouse className="w-3.5 h-3.5 text-blue-400" />
+              <Warehouse className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>{originCoords.lat.toFixed(4)}°, {originCoords.lng.toFixed(4)}°</span>
             </span>
-            <span className="font-medium text-slate-300">
+            <span className="font-medium text-slate-800 dark:text-slate-300">
               {t('map.distance_covered_rem', '{covered} km covered • {remaining} km remaining', {
                 covered: coveredDistanceKm.toFixed(0),
                 remaining: remainingDistanceKm.toFixed(0),
               })}
             </span>
             <span className="flex items-center gap-1">
-              <Store className="w-3.5 h-3.5 text-emerald-400" />
+              <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>{destCoords.lat.toFixed(4)}°, {destCoords.lng.toFixed(4)}°</span>
             </span>
           </div>
 
-          <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden p-0.5">
+          <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden p-0.5">
             <div
               className="bg-gradient-to-r from-blue-500 via-sky-400 to-emerald-500 h-full rounded-full transition-all duration-500 shadow-sm"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-400 pt-1">
+          <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 pt-1">
             <div className="flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-slate-500" />
               <span>{t('map.last_gps_ping', 'Last GPS Ping: {time}', { time: new Date(currentCoords.updatedAt).toLocaleString() })}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-slate-500">{t('map.carrier_label', 'Carrier:')}</span>
-              <span className="text-slate-300 font-medium">
+              <span className="text-slate-800 dark:text-slate-300 font-medium">
                 {dispatch.driverName || t('map.designated_driver', 'Designated Driver')} ({dispatch.driverPhone || t('map.radio_dispatched', 'Radio dispatched')})
               </span>
             </div>

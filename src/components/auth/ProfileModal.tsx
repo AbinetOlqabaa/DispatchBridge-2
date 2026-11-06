@@ -195,29 +195,29 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-labelledby="profile-modal-title"
     >
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl text-slate-100 max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl text-slate-900 dark:text-slate-100 max-h-[90vh] flex flex-col overflow-hidden">
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90">
+        <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/90 dark:bg-slate-900/90">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+            <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 id="profile-modal-title" className="text-lg font-bold tracking-tight text-white leading-tight">
+              <h2 id="profile-modal-title" className="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
                 {t('profile.title')}
               </h2>
-              <p className="text-xs text-slate-400">{t('profile.subtitle')}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">{t('profile.subtitle')}</p>
             </div>
           </div>
           <button
             onClick={onClose}
             aria-label="Close profile modal"
-            className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-2 rounded-xl hover:bg-slate-200/70 dark:hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -226,319 +226,321 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
         {/* Scrollable Content Body */}
         <div className="p-5 sm:p-6 overflow-y-auto flex-1 scrollbar-thin">
           {photoError && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
               <span>{photoError}</span>
             </div>
           )}
 
-        {/* Profile Avatar & Quick Stats */}
-        <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 mb-6 flex flex-col sm:flex-row items-center gap-4">
-          <div className="relative group shrink-0">
-            {user.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt={user.name}
-                className="w-20 h-20 rounded-full object-cover border-2 border-indigo-500/40 shadow-md"
+          {/* Profile Avatar & Quick Stats */}
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 mb-6 flex flex-col sm:flex-row items-center gap-4">
+            <div className="relative group shrink-0">
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="w-20 h-20 rounded-full object-cover border-2 border-indigo-400/50 dark:border-indigo-500/40 shadow-md"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-700 to-sky-600 flex items-center justify-center text-white text-xl font-bold border-2 border-indigo-400/40 dark:border-indigo-500/30 shadow-md">
+                  {initials}
+                </div>
+              )}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handlePhotoUpload}
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
               />
-            ) : (
-              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-700 to-sky-600 flex items-center justify-center text-white text-xl font-bold border-2 border-indigo-500/30 shadow-md">
-                {initials}
-              </div>
-            )}
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handlePhotoUpload}
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-            />
-          </div>
-
-          <div className="flex-1 text-center sm:text-left">
-            <h3 className="text-base font-semibold text-white">{user.name}</h3>
-            <p className="text-xs text-slate-400 flex items-center justify-center sm:justify-start gap-1 mt-0.5">
-              <Building className="w-3 h-3 text-slate-500" />
-              <span>{t(user.businessName)}</span>
-            </p>
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase tracking-wider">
-                {t('role.' + user.role.toLowerCase(), user.role)}
-              </span>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                <CheckCircle2 className="w-2.5 h-2.5" />
-                <span>{t('auth.verified_badge', 'Verified Account')}</span>
-              </span>
             </div>
 
-            {/* Photo Action Buttons */}
-            <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={photoLoading}
-                className="text-xs px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium flex items-center gap-1 transition cursor-pointer disabled:opacity-50"
-              >
-                <Camera className="w-3 h-3" />
-                <span>{t('profile.change_photo')}</span>
-              </button>
-              {user.avatarUrl && (
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">{user.name}</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 flex items-center justify-center sm:justify-start gap-1 mt-0.5">
+                <Building className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                <span>{t(user.businessName)}</span>
+              </p>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 uppercase tracking-wider">
+                  {t('role.' + user.role.toLowerCase(), user.role)}
+                </span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 flex items-center gap-1">
+                  <CheckCircle2 className="w-2.5 h-2.5" />
+                  <span>{t('auth.verified_badge', 'Verified Account')}</span>
+                </span>
+              </div>
+
+              {/* Photo Action Buttons */}
+              <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
                 <button
                   type="button"
-                  onClick={handleRemovePhoto}
+                  onClick={() => fileInputRef.current?.click()}
                   disabled={photoLoading}
-                  className="text-xs px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-medium flex items-center gap-1 transition cursor-pointer disabled:opacity-50"
+                  className="min-h-[40px] text-xs px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
                 >
-                  <Trash2 className="w-3 h-3" />
-                  <span>{t('profile.remove_photo')}</span>
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>{t('profile.change_photo')}</span>
                 </button>
-              )}
+                {user.avatarUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    disabled={photoLoading}
+                    className="min-h-[40px] text-xs px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 font-medium flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>{t('profile.remove_photo')}</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Identity & Fayda Verification Badges */}
-        <div className="space-y-3 mb-6">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            {t('profile.identity_info')}
+          {/* Identity & Fayda Verification Badges */}
+          <div className="space-y-3 mb-6">
+            <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+              {t('profile.identity_info')}
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-2.5">
+              {/* Phone */}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                  <Smartphone className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                  <span>{t('auth.mobile_phone')}:</span>
+                </span>
+                <span className="font-mono font-medium text-slate-900 dark:text-slate-200 tabular-nums">
+                  {user.maskedPhone || user.phoneNumber}
+                </span>
+              </div>
+
+              {/* Fayda FAN */}
+              <div className="flex items-center justify-between text-xs border-t border-slate-200 dark:border-slate-800/80 pt-2">
+                <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                  <span>{t('auth.fayda_id')}:</span>
+                </span>
+                <span className="font-mono font-medium text-sky-700 dark:text-sky-300 tabular-nums">
+                  {user.maskedFan || '•••• •••• •••• 4444'}
+                </span>
+              </div>
+
+              {/* Fayda FIN */}
+              <div className="flex items-center justify-between text-xs border-t border-slate-200 dark:border-slate-800/80 pt-2">
+                <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>{t('auth.fin_number')}:</span>
+                </span>
+                <span className="font-mono font-medium text-emerald-700 dark:text-emerald-300 tabular-nums">
+                  {user.maskedFin || '•••• •••• 3333'}
+                </span>
+              </div>
+
+              {/* Fayda Verification Status Chip */}
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-[11px] text-slate-600 dark:text-slate-400">{t('auth.fayda_verification_title')}:</span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
+                  <ShieldCheck className="w-3 h-3" />
+                  <span>{t('auth.verified_badge')}</span>
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2.5">
-            {/* Phone */}
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400 flex items-center gap-1.5">
-                <Smartphone className="w-3.5 h-3.5 text-slate-500" />
-                <span>{t('auth.mobile_phone')}:</span>
-              </span>
-              <span className="font-mono font-medium text-slate-200">
-                {user.maskedPhone || user.phoneNumber}
-              </span>
+          {/* Edit Full Name Form */}
+          <form onSubmit={handleSaveName} className="mb-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800">
+            <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              {t('auth.full_name')}
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="flex-1 min-h-[44px] bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              />
+              <button
+                type="submit"
+                disabled={isUpdatingName || name === user.name}
+                className="min-h-[44px] px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition cursor-pointer disabled:opacity-40"
+              >
+                {isUpdatingName ? t('auth.submitting') : t('profile.update_name')}
+              </button>
+            </div>
+            {nameSuccess && (
+              <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1.5 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                <span>{t('profile.name_updated')}</span>
+              </p>
+            )}
+          </form>
+
+          {/* Change Password Section (with Step-Up OTP) */}
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className="text-xs font-semibold text-slate-900 dark:text-slate-200">{t('profile.security_password')}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPasswordSection(!showPasswordSection);
+                  setPasswordError(null);
+                  setPasswordSuccess(null);
+                }}
+                className="min-h-[36px] px-2 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium cursor-pointer"
+              >
+                {showPasswordSection ? t('action.close') : t('profile.change_password_action')}
+              </button>
             </div>
 
-            {/* Fayda FAN */}
-            <div className="flex items-center justify-between text-xs border-t border-slate-800/80 pt-2">
-              <span className="text-slate-400 flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-sky-400" />
-                <span>{t('auth.fayda_id')}:</span>
-              </span>
-              <span className="font-mono font-medium text-sky-300">
-                {user.maskedFan || '•••• •••• •••• 4444'}
-              </span>
-            </div>
-
-            {/* Fayda FIN */}
-            <div className="flex items-center justify-between text-xs border-t border-slate-800/80 pt-2">
-              <span className="text-slate-400 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{t('auth.fin_number')}:</span>
-              </span>
-              <span className="font-mono font-medium text-emerald-300">
-                {user.maskedFin || '•••• •••• 3333'}
-              </span>
-            </div>
-
-            {/* Fayda Verification Status Chip */}
-            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
-              <span className="text-[11px] text-slate-400">{t('auth.fayda_verification_title')}:</span>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                <ShieldCheck className="w-3 h-3" />
-                <span>{t('auth.verified_badge')}</span>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Edit Full Name Form */}
-        <form onSubmit={handleSaveName} className="mb-6 p-4 rounded-xl bg-slate-950/40 border border-slate-800">
-          <label className="block text-xs font-medium text-slate-300 mb-1.5">
-            {t('auth.full_name')}
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
-            <button
-              type="submit"
-              disabled={isUpdatingName || name === user.name}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition cursor-pointer disabled:opacity-40"
-            >
-              {isUpdatingName ? t('auth.submitting') : t('profile.update_name')}
-            </button>
-          </div>
-          {nameSuccess && (
-            <p className="text-xs text-emerald-400 mt-1.5 flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" />
-              <span>{t('profile.name_updated')}</span>
-            </p>
-          )}
-        </form>
-
-        {/* Change Password Section (with Step-Up OTP) */}
-        <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-indigo-400" />
-              <span className="text-xs font-semibold text-slate-200">{t('profile.security_password')}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setShowPasswordSection(!showPasswordSection);
-                setPasswordError(null);
-                setPasswordSuccess(null);
-              }}
-              className="text-xs text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer"
-            >
-              {showPasswordSection ? t('action.close') : t('profile.change_password_action')}
-            </button>
-          </div>
-
-          {showPasswordSection && (
-            <div className="mt-4 pt-4 border-t border-slate-800 space-y-3">
-              {passwordError && (
-                <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
-                  <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
-                  <span>{passwordError}</span>
-                </div>
-              )}
-
-              {passwordSuccess && (
-                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>{passwordSuccess}</span>
-                </div>
-              )}
-
-              {!otpChallengeId ? (
-                <>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      {t('auth.current_password')}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showCurrentPassword ? 'text' : 'password'}
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 pr-9 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1"
-                      >
-                        {showCurrentPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
+            {showPasswordSection && (
+              <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                {passwordError && (
+                  <div className="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                    <span>{passwordError}</span>
                   </div>
+                )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {passwordSuccess && (
+                  <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs flex items-start gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                    <span>{passwordSuccess}</span>
+                  </div>
+                )}
+
+                {!otpChallengeId ? (
+                  <>
                     <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">
-                        {t('auth.new_password')}
+                      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        {t('auth.current_password')}
                       </label>
                       <div className="relative">
                         <input
-                          type={showNewPassword ? 'text' : 'password'}
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
+                          type={showCurrentPassword ? 'text' : 'password'}
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 pr-9 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                          className="w-full min-h-[44px] bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 pr-11 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                         />
                         <button
                           type="button"
-                          onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
+                          className="absolute right-1.5 top-1/2 -translate-y-1/2 min-w-[40px] min-h-[40px] flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 p-1 cursor-pointer"
                         >
-                          {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">
-                        {t('auth.confirm_password')}
-                      </label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleRequestOtp}
-                    disabled={isRequestingOtp || !currentPassword || newPassword.length < 8}
-                    className="w-full mt-2 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition cursor-pointer disabled:opacity-40 flex items-center justify-center gap-1.5"
-                  >
-                    <KeyRound className="w-3.5 h-3.5" />
-                    <span>{isRequestingOtp ? t('auth.submitting') : t('profile.request_otp')}</span>
-                  </button>
-                </>
-              ) : (
-                <form onSubmit={handleSubmitPasswordChange} className="space-y-3">
-                  <div className="p-3 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs">
-                    <p className="font-semibold text-sky-200">{t('auth.otp_verification')}</p>
-                    <p className="text-slate-300 mt-1">
-                      {t('profile.password_change_desc')} <span className="font-mono text-white">{user.maskedPhone || user.phoneNumber}</span>.
-                    </p>
-                    {simulatedCode && (
-                      <div className="mt-2 p-1.5 rounded bg-sky-950/80 border border-sky-700/50 flex items-center justify-between">
-                        <span className="text-[10px] text-sky-300 font-mono">{t('auth.simulated_sms_code', { code: '' })}</span>
-                        <span className="text-xs font-bold font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700">
-                          {simulatedCode}
-                        </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          {t('auth.new_password')}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showNewPassword ? 'text' : 'password'}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="••••••••"
+                            className="w-full min-h-[44px] bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 pr-11 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                            className="absolute right-1.5 top-1/2 -translate-y-1/2 min-w-[40px] min-h-[40px] flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 p-1 cursor-pointer"
+                          >
+                            {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
-                    )}
-                  </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      {t('auth.enter_otp')}
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                      placeholder="123456"
-                      required
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-center text-lg font-mono tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          {t('auth.confirm_password')}
+                        </label>
+                        <input
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className="w-full min-h-[44px] bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                        />
+                      </div>
+                    </div>
 
-                  <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => setOtpChallengeId(null)}
-                      className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition cursor-pointer"
+                      onClick={handleRequestOtp}
+                      disabled={isRequestingOtp || !currentPassword || newPassword.length < 8}
+                      className="w-full min-h-[44px] mt-2 py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition cursor-pointer disabled:opacity-40 flex items-center justify-center gap-1.5"
                     >
-                      {t('auth.back_to_form')}
+                      <KeyRound className="w-3.5 h-3.5" />
+                      <span>{isRequestingOtp ? t('auth.submitting') : t('profile.request_otp')}</span>
                     </button>
-                    <button
-                      type="submit"
-                      disabled={isChangingPassword || otpCode.length < 6}
-                      className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition cursor-pointer disabled:opacity-50"
-                    >
-                      {isChangingPassword ? t('auth.submitting') : t('profile.change_password_action')}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
-          )}
+                  </>
+                ) : (
+                  <form onSubmit={handleSubmitPasswordChange} className="space-y-3">
+                    <div className="p-3 rounded-lg bg-sky-50 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/20 text-sky-900 dark:text-sky-300 text-xs">
+                      <p className="font-semibold text-sky-950 dark:text-sky-200">{t('auth.otp_verification')}</p>
+                      <p className="text-slate-700 dark:text-slate-300 mt-1">
+                        {t('profile.password_change_desc')} <span className="font-mono font-semibold text-slate-900 dark:text-white">{user.maskedPhone || user.phoneNumber}</span>.
+                      </p>
+                      {simulatedCode && (
+                        <div className="mt-2 p-1.5 rounded bg-white dark:bg-sky-950/80 border border-sky-200 dark:border-sky-700/50 flex items-center justify-between">
+                          <span className="text-[10px] text-sky-800 dark:text-sky-300 font-mono">{t('auth.simulated_sms_code', { code: '' })}</span>
+                          <span className="text-xs font-bold font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-700">
+                            {simulatedCode}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        {t('auth.enter_otp')}
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={6}
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                        placeholder="123456"
+                        required
+                        className="w-full min-h-[44px] bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-center text-lg font-mono tracking-widest text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setOtpChallengeId(null)}
+                        className="flex-1 min-h-[44px] py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-300 font-medium text-xs transition cursor-pointer"
+                      >
+                        {t('auth.back_to_form')}
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isChangingPassword || otpCode.length < 6}
+                        className="flex-1 min-h-[44px] py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition cursor-pointer disabled:opacity-50"
+                      >
+                        {isChangingPassword ? t('auth.submitting') : t('profile.change_password_action')}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };

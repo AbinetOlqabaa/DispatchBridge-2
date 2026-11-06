@@ -75,7 +75,7 @@ function MainApp() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <LoadingSpinner text={t('msg.loading')} />
       </div>
     );
@@ -84,7 +84,7 @@ function MainApp() {
   // If public token is active, show the partner delivery manifest
   if (publicShareToken) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 antialiased pb-12">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased pb-12">
         <PublicPartnerView
           shareToken={publicShareToken}
           onExit={() => {
@@ -100,9 +100,9 @@ function MainApp() {
   const renderDashboard = () => {
     if (!user) {
       return (
-        <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl max-w-lg mx-auto my-12 space-y-3">
-          <h2 className="text-lg font-bold text-white">{t('auth.signin_required', 'Sign In Required')}</h2>
-          <p className="text-xs text-slate-400">
+        <div className="p-8 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg mx-auto my-12 space-y-3 shadow-sm">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('auth.signin_required', 'Sign In Required')}</h2>
+          <p className="text-xs text-slate-600 dark:text-slate-400">
             {t('auth.signin_prompt_desc', 'Please sign in to access your role-specific dashboard, or explore the public Dispatches and System Status pages.')}
           </p>
           <button
@@ -163,7 +163,7 @@ function MainApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:landscape:flex-row font-sans selection:bg-indigo-500 selection:text-white pb-20 md:pb-8 md:landscape:pb-0 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:landscape:flex-row font-sans selection:bg-indigo-500 selection:text-white pb-20 md:pb-8 md:landscape:pb-0 w-full max-w-full overflow-x-hidden">
       {/* Landscape Navigation Sidebar (Tablet Landscape & Desktop) */}
       <TabletSidebar
         currentTab={currentTab}

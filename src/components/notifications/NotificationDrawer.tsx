@@ -1,14 +1,12 @@
 import React from 'react';
 import {
   Bell,
-  Check,
   CheckCheck,
   Eye,
   AlertTriangle,
   Truck,
   FileCheck,
   X,
-  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
 import { useTranslation } from '../../context/LanguageContext.js';
@@ -34,26 +32,26 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
   const getEventIcon = (eventType: NotificationItem['eventType']) => {
     switch (eventType) {
       case 'DISPATCH_VIEWED':
-        return <Eye className="w-4 h-4 text-sky-400" />;
+        return <Eye className="w-4 h-4 text-sky-600 dark:text-sky-400" />;
       case 'DISCREPANCY_OPENED':
-        return <AlertTriangle className="w-4 h-4 text-rose-400" />;
+        return <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400" />;
       case 'RECEIPT_SUBMITTED':
-        return <FileCheck className="w-4 h-4 text-emerald-400" />;
+        return <FileCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />;
       case 'DISPATCH_SUBMITTED':
-        return <Truck className="w-4 h-4 text-indigo-400" />;
+        return <Truck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />;
       default:
-        return <Bell className="w-4 h-4 text-slate-400" />;
+        return <Bell className="w-4 h-4 text-slate-600 dark:text-slate-400" />;
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-100">
-      <div className="w-full max-w-sm sm:max-w-md bg-slate-900 border-l border-slate-800 h-full flex flex-col shadow-2xl text-slate-100">
+    <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/50 dark:bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-100">
+      <div className="w-full max-w-sm sm:max-w-md bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 h-full flex flex-col shadow-2xl text-slate-900 dark:text-slate-100">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-base font-bold text-white">{t('nav.notifications', 'Notifications')}</h2>
+            <Bell className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">{t('nav.notifications', 'Notifications')}</h2>
             {unreadNotifsCount > 0 && (
               <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-600 text-white">
                 {t('notif.unread_count', { count: unreadNotifsCount })}
@@ -64,7 +62,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
             {unreadNotifsCount > 0 && (
               <button
                 onClick={markAllNotificationsAsRead}
-                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 cursor-pointer"
+                className="text-xs text-indigo-700 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold flex items-center gap-1 cursor-pointer min-h-[44px] px-2"
                 title={t('notif.mark_all_read', 'Mark all as read')}
               >
                 <CheckCheck className="w-3.5 h-3.5" />
@@ -73,7 +71,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
+              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Close notifications"
             >
               <X className="w-5 h-5" />
@@ -82,18 +80,21 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
         </div>
 
         {/* Notifications List */}
-        <div className="flex-1 overflow-y-auto divide-y divide-slate-800/80 p-2">
+        <div className="flex-1 overflow-y-auto divide-y divide-slate-200 dark:divide-slate-800/80 p-2">
           {notifications.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 text-xs">
+            <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-xs">
               <Bell className="w-8 h-8 mx-auto mb-2 opacity-40" />
               {t('notif.empty_desc', 'No notifications yet. Activity alerts will appear here.')}
             </div>
           ) : (
             notifications.map((notif) => (
-              <div
+              <button
                 key={notif.id}
-                className={`p-3.5 rounded-xl transition-colors cursor-pointer flex items-start gap-3 ${
-                  notif.isRead ? 'hover:bg-slate-800/40 opacity-80' : 'bg-slate-800/60 hover:bg-slate-800'
+                type="button"
+                className={`w-full text-left p-3.5 rounded-xl transition-colors cursor-pointer flex items-start gap-3 ${
+                  notif.isRead
+                    ? 'hover:bg-slate-50 dark:hover:bg-slate-800/40 opacity-85'
+                    : 'bg-indigo-50/70 hover:bg-indigo-50 dark:bg-slate-800/60 dark:hover:bg-slate-800'
                 }`}
                 onClick={() => {
                   if (!notif.isRead) markNotificationAsRead(notif.id);
@@ -103,32 +104,32 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
                   }
                 }}
               >
-                <div className="p-2 rounded-xl bg-slate-900 border border-slate-700 shrink-0 mt-0.5">
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shrink-0 mt-0.5 shadow-2xs">
                   {getEventIcon(notif.eventType)}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-xs font-semibold text-white truncate">{t(notif.title)}</span>
-                    <span className="text-[10px] text-slate-500 shrink-0">
+                    <span className="text-xs font-semibold text-slate-900 dark:text-white truncate">{t(notif.title)}</span>
+                    <span className="text-[10px] font-mono tabular-nums text-slate-500 dark:text-slate-400 shrink-0">
                       {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-0.5 line-clamp-2">{t(notif.message)}</p>
+                  <p className="text-xs text-slate-700 dark:text-slate-300 mt-0.5 line-clamp-2">{t(notif.message)}</p>
 
                   <div className="flex items-center gap-2 mt-2">
                     {notif.dispatchNumber && (
-                      <span className="font-mono text-[10px] text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-800/60">
+                      <span className="font-mono text-[10px] text-indigo-700 bg-indigo-50 border border-indigo-200 dark:text-indigo-300 dark:bg-indigo-950/80 dark:border-indigo-800/60 px-2 py-0.5 rounded">
                         {notif.dispatchNumber}
                       </span>
                     )}
-                    <span className="text-[10px] text-slate-400">{t('notif.channel_label', { channel: notif.channel })}</span>
-                    <span className="text-[10px] text-emerald-400 font-medium ml-auto">
-                      {notif.status}
+                    <span className="text-[10px] text-slate-600 dark:text-slate-400">{t('notif.channel_label', { channel: notif.channel })}</span>
+                    <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold ml-auto">
+                      {t('status.' + notif.status.toLowerCase(), notif.status)}
                     </span>
                   </div>
                 </div>
-              </div>
+              </button>
             ))
           )}
         </div>

@@ -12,8 +12,27 @@
     <meta name="theme-color" content="#0f172a" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+    <script>
+      (function () {
+        try {
+          var mode = localStorage.getItem('dispatchbridge_theme') || 'dark';
+          var prefersDark =
+            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var resolved = mode === 'system' ? (prefersDark ? 'dark' : 'light') : mode;
+          var root = document.documentElement;
+          root.classList.remove('dark', 'light');
+          root.classList.add(resolved === 'light' ? 'light' : 'dark');
+          root.setAttribute('data-theme', resolved === 'light' ? 'light' : 'dark');
+          root.style.colorScheme = resolved === 'light' ? 'light' : 'dark';
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) {
+            meta.setAttribute('content', resolved === 'light' ? '#f8fafc' : '#020617');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-slate-950 text-slate-100 antialiased min-h-screen selection:bg-indigo-500 selection:text-white">
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased min-h-screen selection:bg-indigo-500 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -20,30 +20,30 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
     <div className="space-y-2 px-4 pt-3 max-w-7xl mx-auto">
       {/* Sandbox Isolation Notice */}
       {!dismissed && (
-        <div className="bg-amber-950/70 border border-amber-800/80 rounded-xl px-4 py-2.5 text-xs text-amber-200 flex items-center justify-between gap-3 shadow-sm">
+        <div className="bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-800/80 rounded-xl px-4 py-2.5 text-xs text-amber-900 dark:text-amber-200 flex items-center justify-between gap-3 shadow-sm">
           <div className="flex items-center gap-2.5">
-            <span className="p-1 rounded bg-amber-900/80 text-amber-300">
+            <span className="p-1 rounded bg-amber-100 dark:bg-amber-900/80 text-amber-800 dark:text-amber-300 shrink-0">
               <AlertTriangle className="w-3.5 h-3.5" />
             </span>
-            <div>
+            <div className="font-medium">
               {t('banner.sandbox_mode', 'Sandbox Kernel Mode: Running isolated development provider with mock persistence.')}
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1 shrink-0">
             {onNavigateStatus && (
               <button
                 onClick={onNavigateStatus}
-                className="underline hover:text-white font-medium cursor-pointer"
+                className="underline hover:text-amber-950 dark:hover:text-white font-semibold cursor-pointer min-h-[44px] px-2 flex items-center"
               >
                 {t('banner.inspect_status', 'Inspect Setup & Status')}
               </button>
             )}
             <button
               onClick={() => setDismissed(true)}
-              className="text-amber-400 hover:text-white p-0.5 rounded cursor-pointer"
+              className="text-amber-700 hover:text-amber-950 dark:text-amber-400 dark:hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg cursor-pointer"
               aria-label="Dismiss banner"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -51,18 +51,18 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
 
       {/* Phone verification alert */}
       {user && !user.phoneVerified && onOpenPhoneVerify && (
-        <div className="bg-indigo-950/80 border border-indigo-700/80 rounded-xl px-4 py-2.5 text-xs text-indigo-200 flex items-center justify-between gap-3 shadow-sm">
+        <div className="bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-700/80 rounded-xl px-4 py-2.5 text-xs text-indigo-900 dark:text-indigo-200 flex items-center justify-between gap-3 shadow-sm">
           <div className="flex items-center gap-2.5">
-            <span className="p-1 rounded bg-indigo-900 text-indigo-300">
+            <span className="p-1 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 shrink-0">
               <Smartphone className="w-3.5 h-3.5" />
             </span>
-            <div>
+            <div className="font-medium">
               {t('banner.phone_verify_req', { phone: user.phoneNumber })}
             </div>
           </div>
           <button
             onClick={onOpenPhoneVerify}
-            className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer transition-colors shrink-0"
+            className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold cursor-pointer transition-colors shrink-0"
           >
             {t('banner.verify_code_btn')}
           </button>

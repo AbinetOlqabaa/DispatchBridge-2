@@ -23,6 +23,7 @@ import { useTranslation } from '../../context/LanguageContext.js';
 import { BarcodeIntakeScanner } from '../../components/dispatches/BarcodeIntakeScanner.js';
 import { mergeScannedItemsIntoDispatchLines, ParsedIntakeItem } from '../../utils/barcodeParser.js';
 import { useOfflineSync } from '../../utils/offlineSync.js';
+import { hapticFeedback } from '../../utils/haptics.js';
 
 interface CreateDispatchModalProps {
   isOpen: boolean;
@@ -244,9 +245,11 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
       };
 
       const created = await api.createDispatch(payload);
+      hapticFeedback.dispatchCreated();
       onSuccess(created.id);
       onClose();
     } catch (err: any) {
+      hapticFeedback.errorAlert();
       setErrorMessage(err.message || 'Failed to dispatch manifest.');
       setStep('input');
     } finally {
@@ -261,27 +264,27 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
   const selectedLocation = locations.find((l) => l.id === selectedLocationId);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-hidden">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-5 sm:p-6 text-slate-100 max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-5 sm:p-6 text-slate-900 dark:text-slate-100 max-h-[92vh] flex flex-col">
         {/* Pinned Modal Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
           {/* Stepper indicator */}
           <div className="flex items-center gap-2">
             <div
               className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
                 step === 'input'
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-800 text-slate-400'
+                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
               }`}
             >
               <span>{t('dispatch.step_manifest_details')}</span>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-600" />
+            <ArrowRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600" />
             <div
               className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
                 step === 'review'
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-800 text-slate-400'
+                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
               }`}
             >
               <span>{t('dispatch.step_review')}</span>
@@ -290,16 +293,16 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
-            aria-label="Close"
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label={t('action.close', 'Close')}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {!isOnline && (
-          <div className="mt-3 p-3 rounded-xl bg-amber-950/60 border border-amber-800/80 text-amber-200 text-xs flex items-center gap-2 shrink-0">
-            <WifiOff className="w-4 h-4 text-amber-400 shrink-0" />
+          <div className="mt-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2 shrink-0">
+            <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <span>
               {t(
                 'dispatch.offline_queued',
@@ -310,8 +313,8 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
         )}
 
         {errorMessage && (
-          <div className="my-3 p-3 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-center gap-2 shrink-0">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="my-3 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2 shrink-0">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
@@ -322,33 +325,33 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
             <div className="flex-1 overflow-y-auto pr-1 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
-                  <Warehouse className="w-3.5 h-3.5 text-indigo-400" />
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                  <Warehouse className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   {t('dispatch.origin_terminal_label')}
                 </label>
                 <select
                   value={selectedLocationId}
                   onChange={(e) => setSelectedLocationId(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
                 >
                   {locations.map((loc) => (
                     <option key={loc.id} value={loc.id}>
-                      {t(loc.label)} ({loc.city})
+                      {t(loc.label)} ({t(loc.city)})
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-sky-400" />
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                   {t('dispatch.dest_partner_label')}
                 </label>
                 <select
                   value={selectedPartnerId}
                   onChange={(e) => handlePartnerChange(e.target.value)}
                   required
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
                 >
                   {partners.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -360,47 +363,47 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.dest_address_label')}</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('dispatch.dest_address_label')}</label>
               <input
                 type="text"
                 required
                 value={destinationAddress}
                 onChange={(e) => setDestinationAddress(e.target.value)}
                 placeholder={t('dispatch.placeholder_dest_address', 'Street address, Dock number, City')}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
               />
             </div>
 
             {/* Carrier info */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-800/40 p-3 rounded-xl border border-slate-800">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.driver_name')}</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('dispatch.driver_name')}</label>
                 <input
                   type="text"
                   value={driverName}
                   onChange={(e) => setDriverName(e.target.value)}
                   placeholder={t('dispatch.placeholder_driver_name', 'e.g. Robert Lang')}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.driver_phone')}</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('dispatch.driver_phone')}</label>
                 <input
                   type="tel"
                   value={driverPhone}
                   onChange={(e) => setDriverPhone(e.target.value)}
                   placeholder="+1 555-019-9021"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.truck_plate')}</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('dispatch.truck_plate')}</label>
                 <input
                   type="text"
                   value={vehicleReg}
                   onChange={(e) => setVehicleReg(e.target.value)}
                   placeholder={t('dispatch.placeholder_vehicle_plate', 'TRK-4921')}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                 />
               </div>
             </div>
@@ -408,20 +411,20 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
             {/* Itemized Lines + Rapid Barcode / QR Intake Scanner */}
             <div className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                  <Package className="w-3.5 h-3.5 text-indigo-400" />
+                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <Package className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   {t('dispatch.line_items_title', { count: lines.length })}
                 </label>
                 <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-mono text-indigo-300">{t('dispatch.total_units', { total: totalUnits })}</span>
+                  <span className="text-xs font-mono font-semibold text-indigo-700 dark:text-indigo-300 tabular-nums">{t('dispatch.total_units', { total: totalUnits })}</span>
                   <button
                     type="button"
                     data-testid="toggle-barcode-intake-btn"
                     onClick={() => setIsScannerOpen(!isScannerOpen)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors min-h-[44px] ${
                       isScannerOpen
-                        ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50 hover:bg-indigo-600/30'
-                        : 'bg-slate-800 text-sky-300 border-slate-700 hover:bg-slate-700'
+                        ? 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 dark:bg-indigo-600/20 dark:text-indigo-300 dark:border-indigo-500/50 dark:hover:bg-indigo-600/30'
+                        : 'bg-slate-100 text-sky-700 border-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-sky-300 dark:border-slate-700 dark:hover:bg-slate-700'
                     }`}
                   >
                     <ScanBarcode className="w-4 h-4 shrink-0" />
@@ -449,8 +452,8 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                     key={index}
                     className={`grid grid-cols-12 gap-2 p-2.5 rounded-xl border items-center text-xs transition-all ${
                       isHighlighted
-                        ? 'bg-emerald-950/50 border-emerald-500 ring-2 ring-emerald-500/30'
-                        : 'bg-slate-800/60 border-slate-700/60'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500 ring-2 ring-emerald-500/30'
+                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/60'
                     }`}
                   >
                     <div className="col-span-4 sm:col-span-2">
@@ -459,7 +462,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                         value={item.sku}
                         onChange={(e) => handleLineChange(index, 'sku', e.target.value)}
                         placeholder={t('dispatch.placeholder_sku', 'SKU')}
-                        className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-200 font-mono text-[11px]"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1 text-slate-900 dark:text-slate-200 font-mono text-[11px]"
                       />
                     </div>
 
@@ -470,7 +473,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                         value={item.itemName}
                         onChange={(e) => handleLineChange(index, 'itemName', e.target.value)}
                         placeholder={t('dispatch.placeholder_item_name', 'Item name / description')}
-                        className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-200"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1 text-slate-900 dark:text-slate-200"
                       />
                     </div>
 
@@ -478,7 +481,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                       <select
                         value={item.unit}
                         onChange={(e) => handleLineChange(index, 'unit', e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-slate-200"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-1.5 py-1 text-slate-900 dark:text-slate-200"
                       >
                         <option value="cases">{t('unit.cases')}</option>
                         <option value="boxes">{t('unit.boxes')}</option>
@@ -500,7 +503,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                         value={item.quantitySent}
                         onChange={(e) => handleLineChange(index, 'quantitySent', parseFloat(e.target.value) || 0)}
                         placeholder={t('dispatch.placeholder_qty', 'Qty')}
-                        className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-mono text-right"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded px-2 py-1 text-slate-900 dark:text-white font-mono text-right"
                       />
                     </div>
 
@@ -510,9 +513,9 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                         disabled={lines.length <= 1}
                         onClick={() => handleRemoveLine(index)}
                         aria-label={`Remove line ${index + 1}`}
-                        className="text-slate-400 hover:text-rose-400 disabled:opacity-30 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg cursor-pointer"
+                        className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 disabled:opacity-30 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg cursor-pointer"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -523,7 +526,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
               <button
                 type="button"
                 onClick={handleAddLine}
-                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1.5 px-2 py-1.5 rounded-lg min-h-[44px] cursor-pointer"
+                className="text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-semibold flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg min-h-[44px] cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>{t('dispatch.add_line_item')}</span>
@@ -531,28 +534,28 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">{t('dispatch.delivery_notes')}</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('dispatch.delivery_notes')}</label>
               <textarea
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={t('dispatch.placeholder_dispatch_instructions', 'Handling notes, temperature limits, delivery dock instructions...')}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800 shrink-0 mt-3">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800 shrink-0 mt-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white rounded-xl cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-xl cursor-pointer min-h-[44px]"
               >
                 {t('action.cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-2 cursor-pointer min-h-[40px]"
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-2 cursor-pointer min-h-[44px]"
               >
                 <span>{t('dispatch.continue_review')}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -565,30 +568,30 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
         {step === 'review' && (
           <div className="flex-1 flex flex-col min-h-0 pt-3">
             <div className="flex-1 overflow-y-auto pr-1 space-y-4">
-              <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-800 space-y-3 text-xs">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <FileCheck className="w-4 h-4 text-emerald-400" />
+              <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3 text-xs">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <FileCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   {t('dispatch.review_summary')}
                 </h3>
 
-                <div className="grid grid-cols-2 gap-3 text-slate-300">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700 dark:text-slate-300">
                   <div>
                     <span className="text-slate-500 font-semibold block">{t('dispatch.origin_terminal', 'Origin Terminal')}:</span>
-                    <div className="font-semibold text-white">{t(selectedLocation?.label || 'Main Dock')}</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">{t(selectedLocation?.label || 'Main Dock')}</div>
                   </div>
                   <div>
                     <span className="text-slate-500 font-semibold block">{t('table.destination_partner', 'Destination Partner')}:</span>
-                    <div className="font-semibold text-white">{t(selectedPartner?.name || '')}</div>
-                    <div className="text-[11px] text-slate-400">{destinationAddress}</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">{t(selectedPartner?.name || '')}</div>
+                    <div className="text-[11px] text-slate-600 dark:text-slate-400">{destinationAddress}</div>
                   </div>
                   <div>
                     <span className="text-slate-500 font-semibold block">{t('dispatch.carrier_driver', 'Carrier / Driver')}:</span>
-                    <div>{driverName || t('dispatch.carrier_unassigned', 'Unassigned')} ({vehicleReg || 'TRK'})</div>
-                    {driverPhone && <div className="text-[11px] text-slate-400">{driverPhone}</div>}
+                    <div className="text-slate-800 dark:text-slate-200">{driverName || t('dispatch.carrier_unassigned', 'Unassigned')} ({vehicleReg || 'TRK'})</div>
+                    {driverPhone && <div className="text-[11px] text-slate-600 dark:text-slate-400">{driverPhone}</div>}
                   </div>
                   <div>
                     <span className="text-slate-500 font-semibold block">{t('dispatch.total_manifest_qty')}</span>
-                    <div className="font-mono font-bold text-indigo-300 text-sm">
+                    <div className="font-mono font-bold text-indigo-700 dark:text-indigo-300 text-sm tabular-nums">
                       {t('dispatch.units_across_lines', { units: totalUnits, lines: lines.length })}
                     </div>
                   </div>
@@ -596,16 +599,16 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
               </div>
 
               {/* Line items preview table */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-3">
-                <div className="text-xs font-bold text-white mb-2">{t('dispatch.item_breakdown')}</div>
-                <div className="divide-y divide-slate-800 text-xs">
+              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3">
+                <div className="text-xs font-bold text-slate-900 dark:text-white mb-2">{t('dispatch.item_breakdown')}</div>
+                <div className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
                   {lines.map((l, i) => (
                     <div key={i} className="py-2 flex items-center justify-between">
                       <div>
-                        <span className="font-mono text-indigo-300 mr-2 text-[11px]">{l.sku}</span>
-                        <span className="text-slate-200">{l.itemName}</span>
+                        <span className="font-mono text-indigo-600 dark:text-indigo-300 mr-2 text-[11px]">{l.sku}</span>
+                        <span className="text-slate-800 dark:text-slate-200">{l.itemName}</span>
                       </div>
-                      <div className="font-mono font-bold text-slate-200">
+                      <div className="font-mono font-bold text-slate-900 dark:text-slate-200 tabular-nums">
                         {l.quantitySent} {t(`unit.${l.unit}`, l.unit)}
                       </div>
                     </div>
@@ -614,19 +617,19 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
               </div>
 
               {notes && (
-                <div className="bg-slate-800/30 p-2.5 rounded-lg border border-slate-800 text-xs text-slate-300">
+                <div className="bg-slate-50 dark:bg-slate-800/30 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300">
                   <span className="text-slate-500 font-semibold block">{t('dispatch.delivery_notes')}:</span>
                   {notes}
                 </div>
               )}
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-slate-800 shrink-0 mt-3">
+            <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800 shrink-0 mt-3">
               <button
                 type="button"
                 onClick={() => setStep('input')}
                 disabled={isLoading}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white cursor-pointer min-h-[40px]"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white cursor-pointer min-h-[44px]"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>{t('dispatch.back_to_edit')}</span>
@@ -636,7 +639,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
                 type="button"
                 onClick={handleCommitSubmit}
                 disabled={isLoading}
-                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white text-xs font-semibold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2 cursor-pointer min-h-[40px]"
+                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white text-xs font-semibold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2 cursor-pointer min-h-[44px]"
               >
                 {isLoading ? (
                   <span>{t('dispatch.generating_manifest')}</span>

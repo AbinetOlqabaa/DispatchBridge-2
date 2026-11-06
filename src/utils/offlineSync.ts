@@ -28,6 +28,7 @@ import {
   saveCachedDispatchRecordInDb,
 } from './indexedDbStore.js';
 import { saveMapCache, clearOfflineTelemetryQueue, queueOfflineTelemetry } from './mapCache.js';
+import { hapticFeedback } from './haptics.js';
 
 export type { OfflineQueueItem, OfflineMutationType, LocalFirstStats };
 
@@ -193,6 +194,7 @@ export async function enqueueOfflineDeliveryUpdate(
     } catch {
       // ignore
     }
+    hapticFeedback.dispatchCreated();
   } else if (dispatchId) {
     if (params.type === 'TELEMETRY_UPDATE') {
       try {
@@ -410,6 +412,7 @@ async function executeReplay(
 
   if (synced > 0) {
     await recordLastSyncTimestampInDb(backend);
+    hapticFeedback.syncSuccess();
   }
 
   emitOfflineSyncEvent();

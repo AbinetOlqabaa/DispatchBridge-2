@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, Image as ImageIcon, Trash2, ShieldCheck, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { Camera, Trash2, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useTranslation } from '../../context/LanguageContext.js';
 import { CargoEvidence } from '../../types/dispatch.js';
 
@@ -18,7 +18,6 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
   const [computingHash, setComputingHash] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Compute SHA-256 hash using Web Crypto API
   const calculateSha256 = async (arrayBuffer: ArrayBuffer): Promise<string> => {
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -39,23 +38,20 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
         if (newItems.length >= maxFiles) break;
         const file = files[i];
 
-        // Validate MIME type
         const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
         if (!validTypes.includes(file.type)) {
-          setError(`File "${file.name}" has invalid format. Only JPEG, PNG, and WebP are supported.`);
+          setError(t('recon.err_file_format', 'File "{name}" has invalid format. Only JPEG, PNG, and WebP are supported.', { name: file.name }));
           continue;
         }
 
-        // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
-          setError(`File "${file.name}" exceeds 5MB size limit.`);
+          setError(t('recon.err_file_size', 'File "{name}" exceeds 5MB size limit.', { name: file.name }));
           continue;
         }
 
         const buffer = await file.arrayBuffer();
         const hash = await calculateSha256(buffer);
 
-        // Convert to Base64 data URL for persistence
         const dataUrl = await new Promise<string>((resolve) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result as string);
@@ -76,34 +72,30 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
 
       onChange(newItems);
     } catch (err: any) {
-      setError(`Failed to process photo: ${err.message}`);
+      setError(t('recon.err_photo_process', 'Failed to process photo: {msg}', { msg: err.message }));
     } finally {
       setComputingHash(false);
       e.target.value = '';
     }
   };
 
-  // Helper to generate a realistic SVG canvas image for rapid testing
   const addSimulatedEvidencePhoto = async (label: string, color: string) => {
     if (evidence.length >= maxFiles) return;
     setComputingHash(true);
     setError(null);
 
     try {
-      // Draw simulated inspection photo canvas
       const canvas = document.createElement('canvas');
       canvas.width = 400;
       canvas.height = 300;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        // Gradient background
         const grad = ctx.createLinearGradient(0, 0, 400, 300);
         grad.addColorStop(0, '#0f172a');
         grad.addColorStop(1, '#1e293b');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 400, 300);
 
-        // Warning banner
         ctx.fillStyle = color;
         ctx.fillRect(20, 20, 360, 40);
 
@@ -111,12 +103,10 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
         ctx.fillStyle = '#ffffff';
         ctx.fillText(`DOCK EVIDENCE: ${label.toUpperCase()}`, 35, 46);
 
-        // Cargo illustration box
         ctx.strokeStyle = '#64748b';
         ctx.lineWidth = 3;
         ctx.strokeRect(50, 90, 300, 160);
 
-        // Damage indicators
         ctx.strokeStyle = color;
         ctx.lineWidth = 4;
         ctx.beginPath();
@@ -158,33 +148,32 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
   };
 
   return (
-    <div className="space-y-3 p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl">
+    <div className="space-y-3 p-3.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-          <Camera className="w-3.5 h-3.5 text-amber-400" />
+        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+          <Camera className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
           <span>{t('recon.damage_photos_title', 'Cargo Damage Photos & Tamper-Evident Evidence')}</span>
         </label>
-        <span className="text-[11px] text-slate-400">
+        <span className="text-[11px] font-mono tabular-nums text-slate-600 dark:text-slate-400">
           {t('recon.attachments_count', '{count} / {max} attachments', { count: evidence.length, max: maxFiles })}
         </span>
       </div>
 
       {error && (
-        <div className="flex items-center gap-1.5 p-2 rounded-lg bg-rose-950/50 border border-rose-800 text-rose-300 text-xs">
+        <div className="flex items-center gap-1.5 p-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 dark:bg-rose-950/50 dark:border-rose-800 dark:text-rose-300 text-xs">
           <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Thumbnails list */}
       {evidence.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           {evidence.map((item) => (
             <div
               key={item.id}
-              className="group relative bg-slate-950 rounded-lg border border-slate-700 overflow-hidden flex flex-col"
+              className="group relative bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col shadow-2xs"
             >
-              <div className="h-24 w-full bg-slate-900 overflow-hidden flex items-center justify-center relative">
+              <div className="h-24 w-full bg-slate-100 dark:bg-slate-900 overflow-hidden flex items-center justify-center relative">
                 <img
                   src={item.dataUrl}
                   alt={item.fileName}
@@ -193,7 +182,7 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
                 <button
                   type="button"
                   onClick={() => removeEvidence(item.id)}
-                  className="absolute top-1 right-1 p-1 rounded-md bg-black/70 hover:bg-rose-600 text-white cursor-pointer opacity-90 transition-colors"
+                  className="absolute top-1 right-1 p-1.5 rounded-md bg-black/75 hover:bg-rose-600 text-white cursor-pointer opacity-90 transition-colors"
                   title={t('action.remove_photo_title', 'Remove attachment')}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -201,11 +190,11 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
               </div>
 
               <div className="p-1.5 text-[10px] space-y-0.5">
-                <div className="font-semibold text-slate-200 truncate">{item.fileName}</div>
-                <div className="text-slate-400 font-mono text-[9px] truncate" title={item.sha256Hash}>
+                <div className="font-semibold text-slate-800 dark:text-slate-200 truncate">{item.fileName}</div>
+                <div className="text-slate-500 dark:text-slate-400 font-mono text-[9px] truncate" title={item.sha256Hash}>
                   SHA: {item.sha256Hash.substring(0, 12)}...
                 </div>
-                <div className="flex items-center gap-1 text-emerald-400 text-[9px]">
+                <div className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 text-[9px]">
                   <ShieldCheck className="w-3 h-3" />
                   <span>{t('recon.hash_verified', 'Hash verified')}</span>
                 </div>
@@ -215,10 +204,9 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
         </div>
       )}
 
-      {/* Upload button & Quick simulation presets */}
       <div className="flex flex-wrap items-center gap-2 pt-1">
-        <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold cursor-pointer border border-slate-700 shrink-0">
-          <Camera className="w-3.5 h-3.5 text-sky-400" />
+        <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700 text-xs font-semibold cursor-pointer shrink-0 shadow-2xs">
+          <Camera className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
           <span>{computingHash ? t('recon.verifying_sha', 'Verifying SHA-256...') : t('recon.upload_photo', 'Capture / Upload Photo')}</span>
           <input
             type="file"
@@ -231,13 +219,13 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
           />
         </label>
 
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+        <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-600 dark:text-slate-400">
           <span>{t('recon.staging_presets', 'Staging Presets:')}</span>
           <button
             type="button"
             onClick={() => addSimulatedEvidencePhoto('Crushed Pallet Carton', '#f43f5e')}
             disabled={evidence.length >= maxFiles}
-            className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-rose-300 font-medium cursor-pointer border border-slate-700"
+            className="px-2.5 py-1 rounded bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-rose-300 dark:border-slate-700 font-medium cursor-pointer"
           >
             {t('recon.crushed_box', '+ Crushed Box')}
           </button>
@@ -245,7 +233,7 @@ export const DamagePhotoUpload: React.FC<DamagePhotoUploadProps> = ({
             type="button"
             onClick={() => addSimulatedEvidencePhoto('Broken Crate Seal', '#eab308')}
             disabled={evidence.length >= maxFiles}
-            className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-medium cursor-pointer border border-slate-700"
+            className="px-2.5 py-1 rounded bg-white hover:bg-amber-50 text-amber-800 border border-amber-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-amber-300 dark:border-slate-700 font-medium cursor-pointer"
           >
             {t('recon.broken_seal', '+ Broken Seal')}
           </button>

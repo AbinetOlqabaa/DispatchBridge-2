@@ -53,6 +53,7 @@ import {
 import { otpChallengeStore } from '../src/server/adapters/otpAdapter.js';
 import { normalizeToE164, isValidE164 } from '../src/utils/phoneUtils.js';
 import { translations, SUPPORTED_LANGUAGES, SupportedLanguage } from '../src/i18n/translations.js';
+import { hapticFeedback } from '../src/utils/haptics.js';
 
 interface TestResult {
   group: string;
@@ -1844,6 +1845,66 @@ async function runTestSuite() {
     } finally {
       setSimulatedOffline(false, { autoSync: false });
       resetStorageBackend();
+    }
+  });
+
+  await test('Haptic Feedback & Web Vibration API', 'Vibration patterns for barcode scan, dispatch creation, offline sync, and user preferences', () => {
+    // 1. Safe execution in non-browser runtime
+    hapticFeedback.setEnabled(true);
+    const nonBrowserScan = hapticFeedback.barcodeScanned();
+    assert(typeof nonBrowserScan === 'boolean', 'Safe execution without crashing in node');
+
+    // 2. Mock navigator.vibrate to verify exact tactile vibration rhythms
+    const recordedPatterns: any[] = [];
+    const origVibrate = (globalThis.navigator as any)?.vibrate;
+
+    try {
+      Object.defineProperty(globalThis.navigator, 'vibrate', {
+        value: (pattern: any) => {
+          recordedPatterns.push(pattern);
+          return true;
+        },
+        configurable: true,
+        writable: true,
+      });
+
+      assert(hapticFeedback.isSupported(), 'Vibration API marked supported when navigator.vibrate is defined');
+
+      // Crisp 35ms pulse for item/barcode scanning
+      const scanned = hapticFeedback.barcodeScanned();
+      assert(scanned, 'Barcode scan pulse dispatched');
+      assertEqual(JSON.stringify(recordedPatterns[recordedPatterns.length - 1]), JSON.stringify([35]), 'Barcode pulse matches [35]ms');
+
+      // [50, 40, 80] confirmation cadence for dispatch creation
+      const created = hapticFeedback.dispatchCreated();
+      assert(created, 'Dispatch creation vibration dispatched');
+      assertEqual(JSON.stringify(recordedPatterns[recordedPatterns.length - 1]), JSON.stringify([50, 40, 80]), 'Dispatch rhythm matches [50, 40, 80]ms');
+
+      // [40, 60, 40] dual-pulse for offline auto-sync success
+      const synced = hapticFeedback.syncSuccess();
+      assert(synced, 'Offline sync vibration dispatched');
+      assertEqual(JSON.stringify(recordedPatterns[recordedPatterns.length - 1]), JSON.stringify([40, 60, 40]), 'Sync rhythm matches [40, 60, 40]ms');
+
+      // [70, 50, 70] alert for scan or dispatch error
+      const errAlert = hapticFeedback.errorAlert();
+      assert(errAlert, 'Error alert vibration dispatched');
+      assertEqual(JSON.stringify(recordedPatterns[recordedPatterns.length - 1]), JSON.stringify([70, 50, 70]), 'Error rhythm matches [70, 50, 70]ms');
+
+      // User preference disablement stops vibration
+      hapticFeedback.setEnabled(false);
+      assertEqual(hapticFeedback.isEnabled(), false, 'Haptics disabled via toggle');
+      const suppressed = hapticFeedback.barcodeScanned();
+      assertEqual(suppressed, false, 'Vibration suppressed when disabled');
+
+      // Re-enable haptics
+      hapticFeedback.setEnabled(true);
+      assertEqual(hapticFeedback.isEnabled(), true, 'Haptics re-enabled');
+    } finally {
+      if (origVibrate !== undefined) {
+        Object.defineProperty(globalThis.navigator, 'vibrate', { value: origVibrate, configurable: true, writable: true });
+      } else {
+        delete (globalThis.navigator as any).vibrate;
+      }
     }
   });
   console.log('\n========================================================================');

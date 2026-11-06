@@ -102,47 +102,47 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
   const strokeDashoffset = circumference - (circumference * successNumber) / 100;
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
       {/* Header & Sub-nav */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400 bg-indigo-950 px-2.5 py-0.5 rounded-full border border-indigo-800">
+            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 px-2.5 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
               {t('analytics.badge')}
             </span>
-            <span className="text-xs text-slate-400">{t('analytics.subtitle')}</span>
+            <span className="text-xs text-slate-600 dark:text-slate-400">{t('analytics.subtitle')}</span>
           </div>
-          <h2 className="text-lg font-bold text-white tracking-tight">{t('analytics.title')}</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{t('analytics.title')}</h2>
         </div>
 
         {/* Tab Pills */}
-        <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-xs">
+        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950/80 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
           <button
             onClick={() => setActiveMetricTab('success')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+            className={`px-3 py-2 min-h-[38px] rounded-lg font-semibold transition-all cursor-pointer ${
               activeMetricTab === 'success'
                 ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             {t('analytics.tab_fulfillment')}
           </button>
           <button
             onClick={() => setActiveMetricTab('leadtimes')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+            className={`px-3 py-2 min-h-[38px] rounded-lg font-semibold transition-all cursor-pointer ${
               activeMetricTab === 'leadtimes'
                 ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             {t('analytics.tab_lead_times')}
           </button>
           <button
             onClick={() => setActiveMetricTab('discrepancies')}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+            className={`px-3 py-2 min-h-[38px] rounded-lg font-semibold transition-all cursor-pointer ${
               activeMetricTab === 'discrepancies'
                 ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             {t('analytics.tab_root_cause')}
@@ -154,7 +154,7 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
       {activeMetricTab === 'success' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
           {/* Donut Chart */}
-          <div className="flex flex-col items-center justify-center p-4 bg-slate-950/50 rounded-xl border border-slate-800">
+          <div className="flex flex-col items-center justify-center p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800">
             <div className="relative w-36 h-36 flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                 <circle
@@ -164,7 +164,7 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                   fill="transparent"
                   stroke="currentColor"
                   strokeWidth="8"
-                  className="text-slate-800"
+                  className="text-slate-200 dark:text-slate-800"
                 />
                 <circle
                   cx="50"
@@ -176,40 +176,40 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                   strokeDasharray={circumference}
                   strokeDashoffset={strokeDashoffset}
                   strokeLinecap="round"
-                  className="text-emerald-500 transition-all duration-1000 ease-out"
+                  className="text-emerald-600 dark:text-emerald-500 transition-all duration-1000 ease-out"
                 />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-2xl font-bold font-mono text-white">{successPercentage}%</span>
-                <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                <span className="text-2xl font-bold font-mono tabular-nums text-slate-900 dark:text-white">{successPercentage}%</span>
+                <span className="text-[10px] text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">
                   {t('analytics.delivery_success')}
                 </span>
               </div>
             </div>
-            <span className="text-xs text-slate-400 mt-2">
+            <span className="text-xs text-slate-600 dark:text-slate-400 mt-2 tabular-nums">
               {t('analytics.units_intact_summary', { received: totalReceived.toLocaleString(), sent: totalSent.toLocaleString() })}
             </span>
           </div>
 
           {/* Status Breakdown Legend & Bars */}
-          <div className="md:col-span-2 space-y-3 p-4 bg-slate-950/50 rounded-xl border border-slate-800">
-            <div className="text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+          <div className="md:col-span-2 space-y-3 p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div className="text-xs font-semibold text-slate-800 dark:text-slate-300 mb-1 flex items-center justify-between">
               <span>{t('analytics.manifest_distribution')}</span>
-              <span className="text-slate-500 font-mono">{t('analytics.total_shipments', { total: totalDispatches })}</span>
+              <span className="text-slate-600 dark:text-slate-400 font-mono tabular-nums">{t('analytics.total_shipments', { total: totalDispatches })}</span>
             </div>
 
             {/* Reconciled / Received */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-300 flex items-center gap-1.5">
+                <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                   {t('analytics.fully_reconciled')}
                 </span>
-                <span className="text-slate-400 font-mono font-semibold">
+                <span className="text-slate-700 dark:text-slate-400 font-mono tabular-nums font-semibold">
                   {reconciledCount} ({totalDispatches > 0 ? Math.round((reconciledCount / totalDispatches) * 100) : 0}%)
                 </span>
               </div>
-              <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-emerald-500 h-2 rounded-full transition-all duration-700"
                   style={{ width: `${totalDispatches > 0 ? (reconciledCount / totalDispatches) * 100 : 0}%` }}
@@ -220,15 +220,15 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
             {/* Active / In Transit */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-300 flex items-center gap-1.5">
+                <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
                   {t('analytics.active_transit')}
                 </span>
-                <span className="text-slate-400 font-mono font-semibold">
+                <span className="text-slate-700 dark:text-slate-400 font-mono tabular-nums font-semibold">
                   {inTransitCount} ({totalDispatches > 0 ? Math.round((inTransitCount / totalDispatches) * 100) : 0}%)
                 </span>
               </div>
-              <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-sky-500 h-2 rounded-full transition-all duration-700"
                   style={{ width: `${totalDispatches > 0 ? (inTransitCount / totalDispatches) * 100 : 0}%` }}
@@ -239,15 +239,15 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
             {/* Viewed / Pending Receipt */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-300 flex items-center gap-1.5">
+                <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
                   {t('analytics.viewed_partner')}
                 </span>
-                <span className="text-slate-400 font-mono font-semibold">
+                <span className="text-slate-700 dark:text-slate-400 font-mono tabular-nums font-semibold">
                   {viewedCount} ({totalDispatches > 0 ? Math.round((viewedCount / totalDispatches) * 100) : 0}%)
                 </span>
               </div>
-              <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-indigo-500 h-2 rounded-full transition-all duration-700"
                   style={{ width: `${totalDispatches > 0 ? (viewedCount / totalDispatches) * 100 : 0}%` }}
@@ -258,15 +258,15 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
             {/* Discrepancy / Shortfall */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-300 flex items-center gap-1.5">
+                <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                   {t('analytics.discrepancy_review')}
                 </span>
-                <span className="text-slate-400 font-mono font-semibold">
+                <span className="text-slate-700 dark:text-slate-400 font-mono tabular-nums font-semibold">
                   {shortfallCount} ({totalDispatches > 0 ? Math.round((shortfallCount / totalDispatches) * 100) : 0}%)
                 </span>
               </div>
-              <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-rose-500 h-2 rounded-full transition-all duration-700"
                   style={{ width: `${totalDispatches > 0 ? (shortfallCount / totalDispatches) * 100 : 0}%` }}
@@ -281,53 +281,53 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
       {activeMetricTab === 'leadtimes' && (
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-center">
-              <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 mb-1">
-                <Clock className="w-3.5 h-3.5 text-sky-400" />
+            <div className="bg-slate-50 dark:bg-slate-950/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+              <div className="flex items-center justify-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 mb-1">
+                <Clock className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 <span>{t('analytics.dispatch_to_view')}</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-white">{avgViewHours} {t('unit.hours')}</div>
-              <div className="text-[11px] text-emerald-400 mt-0.5">{t('analytics.avg_view_sub')}</div>
+              <div className="text-2xl font-bold font-mono tabular-nums text-slate-900 dark:text-white">{avgViewHours} {t('unit.hours')}</div>
+              <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">{t('analytics.avg_view_sub')}</div>
             </div>
 
-            <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-center">
-              <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 mb-1">
-                <Truck className="w-3.5 h-3.5 text-indigo-400" />
+            <div className="bg-slate-50 dark:bg-slate-950/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+              <div className="flex items-center justify-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 mb-1">
+                <Truck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>{t('analytics.dispatch_to_receipt')}</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-white">{avgReceiptHours} {t('unit.hours')}</div>
-              <div className="text-[11px] text-sky-400 mt-0.5">{t('analytics.transit_turnaround_sub')}</div>
+              <div className="text-2xl font-bold font-mono tabular-nums text-slate-900 dark:text-white">{avgReceiptHours} {t('unit.hours')}</div>
+              <div className="text-[11px] text-sky-700 dark:text-sky-400 mt-0.5">{t('analytics.transit_turnaround_sub')}</div>
             </div>
 
-            <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-center">
-              <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 mb-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="bg-slate-50 dark:bg-slate-950/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+              <div className="flex items-center justify-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 mb-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>{t('analytics.full_recon_cycle')}</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-white">{avgReconciledHours} {t('unit.hours')}</div>
-              <div className="text-[11px] text-indigo-400 mt-0.5">{t('analytics.end_to_end_sub')}</div>
+              <div className="text-2xl font-bold font-mono tabular-nums text-slate-900 dark:text-white">{avgReconciledHours} {t('unit.hours')}</div>
+              <div className="text-[11px] text-indigo-700 dark:text-indigo-400 mt-0.5">{t('analytics.end_to_end_sub')}</div>
             </div>
           </div>
 
           {/* Visual Lead Time Milestone Progress Bars */}
-          <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800 space-y-3">
-            <div className="text-xs font-semibold text-slate-300">{t('analytics.milestones_title')}</div>
+          <div className="bg-slate-50 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
+            <div className="text-xs font-semibold text-slate-800 dark:text-slate-300">{t('analytics.milestones_title')}</div>
             <div className="space-y-2">
               {leadTimes.slice(0, 3).map((item, idx) => (
-                <div key={idx} className="p-3 bg-slate-900 rounded-lg border border-slate-800/80 text-xs space-y-1.5">
+                <div key={idx} className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800/80 text-xs space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <span className="font-mono font-bold text-sky-400">{item.dispatchNumber}</span>
-                    <span className="text-slate-400">{t(item.partnerName)}</span>
+                    <span className="font-mono font-bold text-sky-700 dark:text-sky-400">{item.dispatchNumber}</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t(item.partnerName)}</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-300">
-                    <div className="bg-slate-800/60 px-2 py-1 rounded">
-                      {t('analytics.viewed_in')} <span className="font-mono font-semibold text-white">{item.viewHours || '-'}{t('unit.h_short')}</span>
+                  <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-700 dark:text-slate-300">
+                    <div className="bg-slate-100 dark:bg-slate-800/60 px-2 py-1 rounded">
+                      {t('analytics.viewed_in')} <span className="font-mono tabular-nums font-semibold text-slate-900 dark:text-white">{item.viewHours || '-'}{t('unit.h_short')}</span>
                     </div>
-                    <div className="bg-slate-800/60 px-2 py-1 rounded">
-                      {t('analytics.received_in')} <span className="font-mono font-semibold text-white">{item.receiptHours || '-'}{t('unit.h_short')}</span>
+                    <div className="bg-slate-100 dark:bg-slate-800/60 px-2 py-1 rounded">
+                      {t('analytics.received_in')} <span className="font-mono tabular-nums font-semibold text-slate-900 dark:text-white">{item.receiptHours || '-'}{t('unit.h_short')}</span>
                     </div>
-                    <div className="bg-slate-800/60 px-2 py-1 rounded">
-                      {t('analytics.reconciled_in')} <span className="font-mono font-semibold text-white">{item.reconciledHours || '-'}{t('unit.h_short')}</span>
+                    <div className="bg-slate-100 dark:bg-slate-800/60 px-2 py-1 rounded">
+                      {t('analytics.reconciled_in')} <span className="font-mono tabular-nums font-semibold text-slate-900 dark:text-white">{item.reconciledHours || '-'}{t('unit.h_short')}</span>
                     </div>
                   </div>
                 </div>
@@ -341,11 +341,11 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
       {activeMetricTab === 'discrepancies' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-              <AlertTriangle className="w-4 h-4 text-rose-400" />
+            <span className="font-semibold text-slate-800 dark:text-slate-300 flex items-center gap-1.5">
+              <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
               {t('analytics.discrepancy_breakdown_title', { lost: totalLost })}
             </span>
-            <span className="text-slate-500 font-mono">
+            <span className="text-slate-600 dark:text-slate-400 font-mono tabular-nums">
               {totalDiscrepancies > 0 ? t('analytics.incident_units', { count: totalDiscrepancies }) : t('analytics.zero_incidents')}
             </span>
           </div>
@@ -354,9 +354,9 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
             {Object.entries(discrepancyBreakdown).map(([category, count]) => {
               const pct = totalLost > 0 ? Math.round((count / totalLost) * 100) : 0;
               return (
-                <div key={category} className="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
+                <div key={category} className="p-4 bg-slate-50 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
                   <div className="flex justify-between text-xs">
-                    <span className="font-semibold text-white">
+                    <span className="font-semibold text-slate-900 dark:text-white">
                       {category === 'DAMAGED'
                         ? t('condition.damaged')
                         : category === 'SHORTAGE'
@@ -373,15 +373,15 @@ export const ExecutiveAnalyticsCharts: React.FC<ExecutiveAnalyticsChartsProps> =
                         ? t('discrepancy.other')
                         : t('discrepancy.' + category.toLowerCase(), category.replace(/_/g, ' '))}
                     </span>
-                    <span className="font-mono text-rose-400 font-bold">{count} {t('unit.units')} ({pct}%)</span>
+                    <span className="font-mono tabular-nums text-rose-600 dark:text-rose-400 font-bold">{count} {t('unit.units')} ({pct}%)</span>
                   </div>
-                  <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                     <div
                       className="bg-rose-500 h-2 rounded-full transition-all duration-700"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-[11px] text-slate-600 dark:text-slate-400">
                     {category === 'DAMAGED'
                       ? t('analytics.desc_damaged')
                       : category === 'SHORTAGE'

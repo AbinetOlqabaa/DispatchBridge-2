@@ -17,9 +17,9 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ label, text, siz
   return (
     <div className="flex flex-col items-center justify-center p-8 gap-3" role="status" aria-live="polite">
       <div
-        className={`${sizeMap[size]} border-slate-700 border-t-indigo-500 rounded-full animate-spin`}
+        className={`${sizeMap[size]} border-slate-300 dark:border-slate-700 border-t-indigo-600 dark:border-t-indigo-500 rounded-full animate-spin`}
       />
-      {displayLabel && <p className="text-sm text-slate-400 font-medium">{displayLabel}</p>}
+      {displayLabel && <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">{displayLabel}</p>}
       <span className="sr-only">{displayLabel}</span>
     </div>
   );

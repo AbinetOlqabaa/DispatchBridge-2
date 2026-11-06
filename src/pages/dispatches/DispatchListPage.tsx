@@ -123,16 +123,16 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-sky-400 bg-sky-950 px-2.5 py-0.5 rounded-full border border-sky-800">
+            <span className="text-xs font-semibold uppercase tracking-wider text-sky-700 bg-sky-50 dark:text-sky-400 dark:bg-sky-950 px-2.5 py-0.5 rounded-full border border-sky-200 dark:border-sky-800">
               {t('app.subtitle')}
             </span>
-            <span className="text-xs text-slate-400">{filteredDispatches.length} {t('metric.manifests_active')}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">{filteredDispatches.length} {t('metric.manifests_active')}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">{t('nav.dispatches')}</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{t('nav.dispatches')}</h1>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
             {t('app.enterprise')}
           </p>
         </div>
@@ -151,10 +151,10 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
               {/* Bulk Upload CSV Button */}
               <button
                 onClick={() => setIsBulkUploadOpen(true)}
-                className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl shadow-sm transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700 text-xs font-semibold px-4 py-2.5 min-h-[44px] rounded-xl shadow-sm transition-all cursor-pointer"
                 title={t('dispatch.bulk_upload_tooltip', 'Bulk upload dispatches via CSV format')}
               >
-                <Upload className="w-4 h-4 text-sky-400" />
+                <Upload className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                 <span>{t('action.bulk_upload_csv', 'Bulk Upload CSV')}</span>
               </button>
 
@@ -176,34 +176,34 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
 
       {/* Guest Explorer Banner if not authenticated */}
       {!user && (
-        <div className="bg-gradient-to-r from-indigo-950/90 via-slate-900 to-indigo-950/90 border border-indigo-800/40 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="bg-indigo-50/90 dark:bg-gradient-to-r dark:from-indigo-950/90 dark:via-slate-900 dark:to-indigo-950/90 border border-indigo-200 dark:border-indigo-800/40 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30 px-2 py-0.5 rounded-full">
                 {t('banner.public_exploration')}
               </span>
-              <span className="text-xs text-slate-300 font-medium">{t('banner.viewing_sandbox')}</span>
+              <span className="text-xs text-slate-800 dark:text-slate-300 font-medium">{t('banner.viewing_sandbox')}</span>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               {t('banner.sandbox_mode')}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => quickLoginDemoRole('BUSINESS_OWNER')}
-              className="px-3.5 py-2.5 min-h-[44px] flex items-center rounded-xl bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 border border-emerald-700/50 text-xs font-semibold cursor-pointer transition-colors"
+              className="px-3.5 py-2.5 min-h-[44px] flex items-center rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-850 border border-emerald-300 dark:bg-emerald-900/60 dark:hover:bg-emerald-800 dark:text-emerald-300 dark:border-emerald-700/50 text-xs font-semibold cursor-pointer transition-colors shadow-xs"
             >
               {t('banner.demo_owner')}
             </button>
             <button
               onClick={() => quickLoginDemoRole('SENDER')}
-              className="px-3.5 py-2.5 min-h-[44px] flex items-center rounded-xl bg-blue-900/60 hover:bg-blue-800 text-blue-300 border border-blue-700/50 text-xs font-semibold cursor-pointer transition-colors"
+              className="px-3.5 py-2.5 min-h-[44px] flex items-center rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-850 border border-blue-300 dark:bg-blue-900/60 dark:hover:bg-blue-800 dark:text-blue-300 dark:border-blue-700/50 text-xs font-semibold cursor-pointer transition-colors shadow-xs"
             >
               {t('banner.demo_sender')}
             </button>
             <button
               onClick={() => quickLoginDemoRole('RECEIVER')}
-              className="px-3.5 py-2.5 min-h-[44px] flex items-center rounded-xl bg-amber-900/60 hover:bg-amber-800 text-amber-300 border border-amber-700/50 text-xs font-semibold cursor-pointer transition-colors"
+              className="px-3.5 py-2.5 min-h-[44px] flex items-center rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 dark:bg-amber-900/60 dark:hover:bg-amber-800 dark:text-amber-300 dark:border-amber-700/50 text-xs font-semibold cursor-pointer transition-colors shadow-xs"
             >
               {t('banner.demo_receiver')}
             </button>
@@ -228,7 +228,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
       )}
 
       {/* Filter and Search Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           {/* Status Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 scrollbar-thin">
@@ -246,7 +246,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                 className={`px-3.5 py-2.5 rounded-xl text-xs font-medium whitespace-nowrap transition-colors cursor-pointer min-h-[44px] flex items-center ${
                   statusFilter === tab.id
                     ? 'bg-indigo-600 text-white font-semibold shadow-sm'
-                    : 'bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700'
+                    : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700'
                 }`}
               >
                 {tab.label}
@@ -257,13 +257,13 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
           {/* Search Box & Export */}
           <div className="flex items-center gap-2 w-full lg:w-auto">
             <div className="relative flex-1 lg:w-64">
-              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3.5" />
+              <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-3.5" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={`${t('action.search')}...`}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 min-h-[44px]"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 min-h-[44px]"
               />
             </div>
 
@@ -271,34 +271,34 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
             <div className="relative shrink-0">
               <button
                 onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
-                className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors shadow-sm min-h-[44px]"
+                className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700 text-xs font-medium px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors shadow-sm min-h-[44px]"
                 title={t('dispatch.export_tooltip', 'Export filtered dispatches')}
               >
-                <Download className="w-4 h-4 text-indigo-400" />
+                <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <span>{t('action.export', 'Export')}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
               </button>
 
               {exportDropdownOpen && (
-                <div className="absolute right-0 mt-1.5 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-30 py-1 text-xs">
+                <div className="absolute right-0 mt-1.5 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-30 py-1 text-xs">
                   <button
                     onClick={handleExportCsv}
-                    className="w-full flex items-center gap-2 px-3.5 py-2.5 text-slate-200 hover:bg-slate-700 text-left cursor-pointer min-h-[44px]"
+                    className="w-full flex items-center gap-2 px-3.5 py-2.5 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700 text-left cursor-pointer min-h-[44px]"
                   >
-                    <FileSpreadsheet className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <div>
                       <div className="font-medium">{t('action.export_csv', 'Export CSV')}</div>
-                      <div className="text-[10px] text-slate-400">{t('export.csv_sub')}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">{t('export.csv_sub')}</div>
                     </div>
                   </button>
                   <button
                     onClick={handleExportPdf}
-                    className="w-full flex items-center gap-2 px-3.5 py-2.5 text-slate-200 hover:bg-slate-700 text-left cursor-pointer border-t border-slate-700/60 min-h-[44px]"
+                    className="w-full flex items-center gap-2 px-3.5 py-2.5 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700 text-left cursor-pointer border-t border-slate-200 dark:border-slate-700/60 min-h-[44px]"
                   >
-                    <FileText className="w-4 h-4 text-rose-400 shrink-0" />
+                    <FileText className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                     <div>
                       <div className="font-medium">{t('action.export_pdf', 'Export PDF')}</div>
-                      <div className="text-[10px] text-slate-400">{t('export.pdf_sub')}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400">{t('export.pdf_sub')}</div>
                     </div>
                   </button>
                 </div>
@@ -309,8 +309,8 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
 
         {/* Export Success Banner */}
         {exportSuccessMsg && (
-          <div className="bg-emerald-950/70 border border-emerald-800/80 rounded-xl p-2.5 text-xs text-emerald-300 flex items-center gap-2 animate-fade-in">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800/80 rounded-xl p-2.5 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2 animate-fade-in">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{exportSuccessMsg}</span>
           </div>
         )}
@@ -319,17 +319,17 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
         {loading ? (
           <LoadingSpinner label={t('dispatch.loading_registry')} />
         ) : filteredDispatches.length === 0 ? (
-          <div className="py-12 text-center text-slate-400 space-y-2">
-            <Truck className="w-10 h-10 text-slate-600 mx-auto" />
-            <div className="text-sm font-semibold text-slate-300">{t('empty.no_dispatches_match', 'No dispatches match this filter')}</div>
+          <div className="py-12 text-center text-slate-600 dark:text-slate-400 space-y-2">
+            <Truck className="w-10 h-10 text-slate-400 dark:text-slate-600 mx-auto" />
+            <div className="text-sm font-semibold text-slate-800 dark:text-slate-300">{t('empty.no_dispatches_match', 'No dispatches match this filter')}</div>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               {t('empty.no_dispatches_desc')}
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
+          <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/80 scrollbar-thin">
             <table className="w-full text-left text-xs min-w-[720px] sm:min-w-[760px] lg:min-w-full">
-              <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/40 border-b border-slate-800">
+              <thead className="text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/40 border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.dispatch_number')}</th>
                   <th className="px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.sender_supplier')}</th>
@@ -341,10 +341,10 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                   <th className="px-3.5 py-3 font-semibold text-right whitespace-nowrap">{t('table.action')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
                 {filteredDispatches.map((d) => (
-                  <tr key={d.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="px-3.5 py-3.5 font-mono font-semibold text-indigo-300 whitespace-nowrap">
+                  <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="px-3.5 py-3.5 font-mono font-semibold text-indigo-600 dark:text-indigo-300 whitespace-nowrap">
                       <button
                         onClick={() => onSelectDispatch(d.id)}
                         className="hover:underline text-left cursor-pointer"
@@ -355,24 +355,24 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                         {new Date(d.createdAt).toLocaleDateString()}
                       </div>
                     </td>
-                    <td className="px-3.5 py-3.5 text-slate-300">
-                      <div className="font-medium text-slate-200">{t(d.senderBusinessName)}</div>
+                    <td className="px-3.5 py-3.5 text-slate-700 dark:text-slate-300">
+                      <div className="font-medium text-slate-900 dark:text-slate-200">{t(d.senderBusinessName)}</div>
                       <div className="text-[10px] text-slate-500">{t('table.by_sender', 'By {name}', { name: t(d.senderName) })}</div>
                     </td>
-                    <td className="px-3.5 py-3.5 text-slate-200">
+                    <td className="px-3.5 py-3.5 text-slate-900 dark:text-slate-200">
                       <div className="font-semibold">{t(d.partnerName)}</div>
-                      <div className="text-[10px] text-slate-400 truncate max-w-xs">{t(d.destinationSnapshot?.address || t('table.destination_partner'))}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-xs">{t(d.destinationSnapshot?.address || t('table.destination_partner'))}</div>
                     </td>
                     <td className="px-3.5 py-3.5 whitespace-nowrap">
                       <StatusBadge status={d.status} size="sm" />
                     </td>
                     <td className="px-3.5 py-3.5 whitespace-nowrap">
                       {d.firstViewedAt ? (
-                        <div className="flex items-center gap-1.5 text-indigo-300">
-                          <Eye className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                        <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-300">
+                          <Eye className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                           <div>
                             <div className="text-[11px] font-medium">{t('status.viewed', 'Viewed')}</div>
-                            <div className="text-[10px] text-slate-400">
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400">
                               {new Date(d.firstViewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
                           </div>
@@ -382,16 +382,16 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                       )}
                     </td>
                     <td className="px-3.5 py-3.5 whitespace-nowrap">
-                      <div className="font-mono text-slate-200">
+                      <div className="font-mono text-slate-900 dark:text-slate-200">
                         {d.totalQuantityDispatched} {t('unit.units', 'units')}
                       </div>
                       {d.totalQuantityLost !== undefined && d.totalQuantityLost > 0 ? (
-                        <span className="text-[10px] text-rose-400 font-bold flex items-center gap-1">
+                        <span className="text-[10px] text-rose-700 dark:text-rose-400 font-bold flex items-center gap-1">
                           <AlertTriangle className="w-3 h-3" />
                           {t('table.loss', 'Loss: {count} units', { count: d.totalQuantityLost })}
                         </span>
                       ) : d.totalQuantityReceived !== undefined ? (
-                        <span className="text-[10px] text-emerald-400 font-medium">{t('table.intact', '100% Intact')}</span>
+                        <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">{t('table.intact', '100% Intact')}</span>
                       ) : (
                         <span className="text-[10px] text-slate-500">{t('status.pending', 'Pending')}</span>
                       )}
@@ -400,18 +400,18 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => handleCopyLink(d.shareToken, d.id)}
-                          className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center justify-center border border-transparent hover:border-slate-700"
+                          className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white transition-colors cursor-pointer flex items-center justify-center border border-slate-200 dark:border-transparent dark:hover:border-slate-700"
                           title={t('dispatch.copy_tracking_tooltip', 'Copy delivery tracking link')}
                         >
                           {copiedId === d.id ? (
-                            <CheckCircle className="w-4 h-4 text-emerald-400" />
+                            <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                           ) : (
                             <Copy className="w-4 h-4" />
                           )}
                         </button>
                         <button
                           onClick={() => onOpenPublicLink(d.shareToken)}
-                          className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 cursor-pointer flex items-center justify-center"
+                          className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/80 dark:hover:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-800/60 cursor-pointer flex items-center justify-center"
                           title={t('dispatch.simulate_partner_tooltip', 'Simulate partner viewing delivery list')}
                         >
                           <ExternalLink className="w-4 h-4" />
@@ -421,7 +421,7 @@ export const DispatchListPage: React.FC<DispatchListPageProps> = ({
                     <td className="px-3.5 py-3.5 text-right whitespace-nowrap">
                       <button
                         onClick={() => onSelectDispatch(d.id)}
-                        className="px-3.5 py-2 min-h-[44px] min-w-[70px] rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold cursor-pointer flex items-center justify-center border border-slate-700/60 hover:border-slate-600 transition-colors"
+                        className="px-3.5 py-2 min-h-[44px] min-w-[70px] rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold cursor-pointer flex items-center justify-center dark:border-slate-700/60 transition-colors"
                       >
                         {t('action.inspect')}
                       </button>

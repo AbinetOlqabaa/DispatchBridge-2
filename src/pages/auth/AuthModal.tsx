@@ -352,12 +352,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 my-auto text-slate-100 max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+      <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 my-auto text-slate-900 dark:text-slate-100 max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+          className="absolute top-3.5 right-3.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           aria-label={t('action.close')}
         >
           <X className="w-5 h-5" />
@@ -365,17 +365,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Tab Headers */}
         {mode !== 'verifyPhone' && mode !== 'forgot' && (
-          <div className="flex border-b border-slate-800 mb-6">
+          <div className="flex border-b border-slate-200 dark:border-slate-800 mb-6 pr-8">
             <button
               onClick={() => {
                 setMode('signin');
                 setErrorMessage(null);
                 setSuccessMessage(null);
               }}
-              className={`flex-1 pb-3 text-sm font-semibold border-b-2 text-center transition-colors cursor-pointer ${
+              className={`flex-1 min-h-[44px] pb-2 text-sm font-semibold border-b-2 text-center transition-colors cursor-pointer ${
                 mode === 'signin'
-                  ? 'border-indigo-500 text-indigo-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-indigo-600 dark:border-indigo-500 text-indigo-700 dark:text-indigo-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               {t('auth.signin_tab')}
@@ -387,10 +387,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 setErrorMessage(null);
                 setSuccessMessage(null);
               }}
-              className={`flex-1 pb-3 text-sm font-semibold border-b-2 text-center transition-colors cursor-pointer ${
+              className={`flex-1 min-h-[44px] pb-2 text-sm font-semibold border-b-2 text-center transition-colors cursor-pointer ${
                 mode === 'register'
-                  ? 'border-indigo-500 text-indigo-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-indigo-600 dark:border-indigo-500 text-indigo-700 dark:text-indigo-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               {t('auth.enroll_fayda')}
@@ -400,14 +400,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Feedback Alerts */}
         {errorMessage && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+          <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
             <div>{errorMessage}</div>
           </div>
         )}
         {successMessage && (
-          <div className="mb-4 p-3 rounded-xl bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 text-xs flex items-start gap-2.5">
-            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+          <div className="mb-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 text-xs flex items-start gap-2.5">
+            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 dark:text-emerald-400" />
             <div>{successMessage}</div>
           </div>
         )}
@@ -416,17 +416,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {mode === 'signin' && (
           <form onSubmit={handleSignIn} className="space-y-4">
             {/* Toggle between Mobile Number & Work Email */}
-            <div className="flex rounded-xl bg-slate-950 p-1 mb-2 border border-slate-800">
+            <div className="flex rounded-xl bg-slate-100 dark:bg-slate-950 p-1 mb-2 border border-slate-200 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => {
                   setSignInMode('MOBILE');
                   setErrorMessage(null);
                 }}
-                className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                className={`flex-1 min-h-[40px] py-1.5 px-2.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition cursor-pointer ${
                   signInMode === 'MOBILE'
                     ? 'bg-indigo-600 text-white font-semibold shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />
@@ -438,10 +438,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   setSignInMode('EMAIL');
                   setErrorMessage(null);
                 }}
-                className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                className={`flex-1 min-h-[40px] py-1.5 px-2.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition cursor-pointer ${
                   signInMode === 'EMAIL'
                     ? 'bg-indigo-600 text-white font-semibold shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 <Mail className="w-3.5 h-3.5" />
@@ -451,8 +451,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             {signInMode === 'MOBILE' ? (
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  {t('auth.mobile_phone')} <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  {t('auth.mobile_phone')} <span className="text-rose-500 dark:text-rose-400">*</span>
                 </label>
                 <div className="flex gap-2">
                   <select
@@ -462,43 +462,43 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       const found = SUPPORTED_COUNTRIES.find((c) => c.code === e.target.value);
                       if (found) setSignInCountry(found);
                     }}
-                    className="bg-slate-950/80 border border-slate-700 rounded-xl px-2.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shrink-0"
+                    className="min-h-[44px] bg-slate-50 dark:bg-slate-950/80 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 py-2.5 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shrink-0"
                   >
                     {SUPPORTED_COUNTRIES.map((c) => (
-                      <option key={c.code} value={c.code} className="bg-slate-900 text-white">
+                      <option key={c.code} value={c.code} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                         {c.flag} {c.dialCode}
                       </option>
                     ))}
                   </select>
 
                   <div className="relative flex-1">
-                    <Smartphone className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+                    <Smartphone className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-3.5" />
                     <input
                       type="tel"
                       required
                       value={signInPhone}
                       onChange={(e) => setSignInPhone(e.target.value)}
                       placeholder={signInCountry.samplePlaceholder}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="w-full min-h-[44px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1 font-mono">
+                <p className="text-[11px] text-slate-500 mt-1 font-mono tabular-nums">
                   E.164: {normalizeToE164(signInPhone, signInCountry.dialCode) || '—'}
                 </p>
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('auth.email_address')}</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">{t('auth.email_address')}</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+                  <Mail className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-3.5" />
                   <input
                     type="email"
                     required
                     value={signInEmail}
                     onChange={(e) => setSignInEmail(e.target.value)}
                     placeholder={t('auth.placeholder_email', 'name@company.com')}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    className="w-full min-h-[44px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
@@ -506,7 +506,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-slate-300">{t('auth.password')}</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">{t('auth.password')}</label>
                 <button
                   type="button"
                   onClick={() => {
@@ -515,25 +515,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     setErrorMessage(null);
                     setSuccessMessage(null);
                   }}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 cursor-pointer"
+                  className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium cursor-pointer"
                 >
                   {t('auth.forgot_password')}
                 </button>
               </div>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+                <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-3.5" />
                 <input
                   type={showSignInPassword ? 'text' : 'password'}
                   required
                   value={signInPassword}
                   onChange={(e) => setSignInPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  className="w-full min-h-[44px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-11 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                 />
                 <button
                   type="button"
                   onClick={() => setShowSignInPassword(!showSignInPassword)}
-                  className="absolute right-3 top-3 text-slate-400 hover:text-white cursor-pointer"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 min-w-[40px] min-h-[40px] flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg cursor-pointer"
                   aria-label={showSignInPassword ? 'Hide password' : 'Show password'}
                 >
                   {showSignInPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -544,7 +544,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+              className="w-full min-h-[44px] py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-400 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/25 dark:shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
             >
               {isLoading ? (
                 <span>{t('auth.submitting')}</span>
@@ -557,34 +557,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </button>
 
             {/* Quick pre-fill for sandbox test accounts */}
-            <div className="pt-4 border-t border-slate-800">
-              <span className="text-[11px] font-medium text-slate-400 block mb-2">{t('auth.quick_roles_label')}</span>
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+              <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 block mb-2">{t('auth.quick_roles_label')}</span>
               <div className="grid grid-cols-2 gap-1.5 text-xs">
                 <button
                   type="button"
                   onClick={() => handleQuickDemoRole('BUSINESS_OWNER')}
-                  className="text-left px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-emerald-300 border border-slate-700 cursor-pointer"
+                  className="min-h-[44px] text-left px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 hover:bg-emerald-50 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 border border-slate-200 dark:border-slate-700 font-medium cursor-pointer transition-colors"
                 >
                   {t('role.business_owner')}
                 </button>
                 <button
                   type="button"
                   onClick={() => handleQuickDemoRole('SENDER')}
-                  className="text-left px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-blue-300 border border-slate-700 cursor-pointer"
+                  className="min-h-[44px] text-left px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-slate-700 text-blue-700 dark:text-blue-300 border border-slate-200 dark:border-slate-700 font-medium cursor-pointer transition-colors"
                 >
                   {t('role.sender')}
                 </button>
                 <button
                   type="button"
                   onClick={() => handleQuickDemoRole('RECEIVER')}
-                  className="text-left px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-amber-300 border border-slate-700 cursor-pointer"
+                  className="min-h-[44px] text-left px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 hover:bg-amber-50 dark:hover:bg-slate-700 text-amber-800 dark:text-amber-300 border border-slate-200 dark:border-slate-700 font-medium cursor-pointer transition-colors"
                 >
                   {t('role.receiver')}
                 </button>
                 <button
                   type="button"
                   onClick={() => handleQuickDemoRole('SUPER_ADMIN')}
-                  className="text-left px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-purple-300 border border-slate-700 cursor-pointer"
+                  className="min-h-[44px] text-left px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 hover:bg-purple-50 dark:hover:bg-slate-700 text-purple-700 dark:text-purple-300 border border-slate-200 dark:border-slate-700 font-medium cursor-pointer transition-colors"
                 >
                   {t('role.super_admin')}
                 </button>
@@ -597,8 +597,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {mode === 'register' && (
           <>
             {/* Simulation label badge */}
-            <div className="mb-4 p-2.5 rounded-xl bg-sky-950/70 border border-sky-800/70 text-sky-300 text-xs flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
+            <div className="mb-4 p-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-800/70 text-sky-800 dark:text-sky-300 text-xs flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
               <span>{t('auth.fayda_sim_banner', 'Fayda e-ID Gateway Simulator Active (Dev Mode)')}</span>
             </div>
 
@@ -606,26 +606,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <form onSubmit={handleInitiateRegister} className="space-y-3">
                 {/* Full Legal Name */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    {t('auth.full_name')} <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('auth.full_name')} <span className="text-rose-500 dark:text-rose-400">*</span>
                   </label>
                   <div className="relative">
-                    <UserIcon className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                    <UserIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-3" />
                     <input
                       type="text"
                       required
                       value={regName}
                       onChange={(e) => setRegName(e.target.value)}
                       placeholder={t('auth.placeholder_full_name', 'e.g. Abebe Bikila')}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
 
                 {/* Mobile Phone */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    {t('auth.mobile_phone')} <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('auth.mobile_phone')} <span className="text-rose-500 dark:text-rose-400">*</span>
                   </label>
                   <div className="flex gap-2">
                     <select
@@ -635,23 +635,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         const found = SUPPORTED_COUNTRIES.find((c) => c.code === e.target.value);
                         if (found) setRegCountry(found);
                       }}
-                      className="bg-slate-950/80 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer shrink-0"
+                      className="min-h-[42px] bg-slate-50 dark:bg-slate-950/80 border border-slate-300 dark:border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer shrink-0"
                     >
                       {SUPPORTED_COUNTRIES.map((c) => (
-                        <option key={c.code} value={c.code} className="bg-slate-900 text-white">
-                           {c.flag} {c.dialCode}
+                        <option key={c.code} value={c.code} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                          {c.flag} {c.dialCode}
                         </option>
                       ))}
                     </select>
                     <div className="relative flex-1">
-                      <Smartphone className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                      <Smartphone className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-3" />
                       <input
                         type="tel"
                         required
                         value={regPhone}
                         onChange={(e) => setRegPhone(e.target.value)}
                         placeholder={regCountry.samplePlaceholder}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                        className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                       />
                     </div>
                   </div>
@@ -660,11 +660,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 {/* FAN & FIN */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      {t('auth.fayda_id')} <span className="text-rose-400">*</span>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      {t('auth.fayda_id')} <span className="text-rose-500 dark:text-rose-400">*</span>
                     </label>
                     <div className="relative">
-                      <CreditCard className="w-3.5 h-3.5 text-sky-400 absolute left-2.5 top-2.5" />
+                      <CreditCard className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 absolute left-2.5 top-3" />
                       <input
                         type="text"
                         required
@@ -672,17 +672,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         value={regFan}
                         onChange={(e) => setRegFan(e.target.value.replace(/\D/g, ''))}
                         placeholder={t('auth.placeholder_fan', '16 numeric digits')}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-2 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                        className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-8 pr-2 py-1.5 text-xs font-mono text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-sky-500"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      {t('auth.fin_number')} <span className="text-rose-400">*</span>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      {t('auth.fin_number')} <span className="text-rose-500 dark:text-rose-400">*</span>
                     </label>
                     <div className="relative">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 absolute left-2.5 top-2.5" />
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 absolute left-2.5 top-3" />
                       <input
                         type="text"
                         required
@@ -690,7 +690,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         value={regFin}
                         onChange={(e) => setRegFin(e.target.value.replace(/\D/g, ''))}
                         placeholder={t('auth.placeholder_fin', '12 numeric digits')}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-2 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                        className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-8 pr-2 py-1.5 text-xs font-mono text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
@@ -698,13 +698,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                 {/* Operating Role (No Super-Admin) */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    {t('auth.assigned_role')} <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('auth.assigned_role')} <span className="text-rose-500 dark:text-rose-400">*</span>
                   </label>
                   <select
                     value={regRole}
                     onChange={(e) => setRegRole(e.target.value as UserRole)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
+                    className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
                   >
                     <option value="BUSINESS_OWNER">{t('role.business_owner')}</option>
                     <option value="SENDER">{t('role.sender')}</option>
@@ -714,18 +714,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                 {/* Company Name */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    {t('auth.business_name')} <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('auth.business_name')} <span className="text-rose-500 dark:text-rose-400">*</span>
                   </label>
                   <div className="relative">
-                    <Building className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                    <Building className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-3" />
                     <input
                       type="text"
                       required
                       value={regBusiness}
                       onChange={(e) => setRegBusiness(e.target.value)}
                       placeholder={t('auth.placeholder_biz_name', 'e.g. Apex Supply Freight Ltd')}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
@@ -733,37 +733,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 {/* Password & Confirm */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">{t('auth.password')}</label>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('auth.password')}</label>
                     <input
                       type={showRegPassword ? 'text' : 'password'}
                       required
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+                      className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">{t('auth.confirm_password')}</label>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('auth.confirm_password')}</label>
                     <input
                       type="password"
                       required
                       value={regConfirmPassword}
                       onChange={(e) => setRegConfirmPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+                      className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
 
                 {/* Consent */}
-                <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400">
+                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400">
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={regConsent}
                       onChange={(e) => setRegConsent(e.target.checked)}
-                      className="mt-0.5 rounded border-slate-700 bg-slate-800 text-indigo-600"
+                      className="mt-0.5 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-indigo-600"
                     />
                     <span>
                       {t('auth.consent_terms')}
@@ -774,7 +774,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   type="submit"
                   disabled={isLoading || !regConsent}
-                  className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full min-h-[44px] py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-400 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/25 dark:shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   {isLoading ? t('auth.submitting') : t('auth.request_otp_challenge')}
                   <ArrowRight className="w-4 h-4" />
@@ -783,19 +783,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             ) : (
               /* Registration Step 2: OTP Verification */
               <form onSubmit={handleCompleteRegister} className="space-y-4">
-                <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">{t('auth.mobile_phone')}:</span>
-                    <span className="font-mono text-white font-semibold">{regMaskedPhone}</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t('auth.mobile_phone')}:</span>
+                    <span className="font-mono text-slate-900 dark:text-white font-semibold tabular-nums">{regMaskedPhone}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">{t('auth.fayda_id')}:</span>
-                    <span className="font-mono text-sky-300 font-semibold">{regMaskedFan}</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t('auth.fayda_id')}:</span>
+                    <span className="font-mono text-sky-700 dark:text-sky-300 font-semibold tabular-nums">{regMaskedFan}</span>
                   </div>
                   {regSimulatedCode && (
-                    <div className="p-2 rounded bg-sky-950/80 border border-sky-800/60 flex items-center justify-between">
-                      <span className="text-[11px] text-sky-300">{t('auth.simulated_sms_code', { code: '' })}</span>
-                      <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700">
+                    <div className="p-2 rounded bg-sky-50 dark:bg-sky-950/80 border border-sky-200 dark:border-sky-800/60 flex items-center justify-between">
+                      <span className="text-[11px] text-sky-800 dark:text-sky-300">{t('auth.simulated_sms_code', { code: '' })}</span>
+                      <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-700">
                         {regSimulatedCode}
                       </span>
                     </div>
@@ -803,7 +803,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1 text-center">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 text-center">
                     {t('auth.enter_otp')}
                   </label>
                   <input
@@ -813,7 +813,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={regOtpCode}
                     onChange={(e) => setRegOtpCode(e.target.value.replace(/\D/g, ''))}
                     placeholder="123456"
-                    className="w-full tracking-widest text-center text-xl font-mono bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full min-h-[44px] tracking-widest text-center text-xl font-mono bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                   />
                 </div>
 
@@ -821,14 +821,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRegStep('FORM')}
-                    className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl cursor-pointer"
+                    className="flex-1 min-h-[44px] py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-300 text-xs font-semibold rounded-xl cursor-pointer"
                   >
                     {t('auth.back_to_form')}
                   </button>
                   <button
                     type="submit"
                     disabled={isLoading || regOtpCode.length < 6}
-                    className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl cursor-pointer disabled:opacity-50"
+                    className="flex-1 min-h-[44px] py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl cursor-pointer disabled:opacity-50"
                   >
                     {isLoading ? t('auth.submitting') : t('auth.complete_enrollment')}
                   </button>
@@ -841,19 +841,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* FORGOT PASSWORD WITH FAYDA + OTP */}
         {mode === 'forgot' && (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <KeyRound className="w-5 h-5 text-indigo-400" />
-              <h3 className="text-sm font-bold text-white">{t('auth.forgot_password_btn')}</h3>
+            <div className="flex items-center gap-2 mb-2 pr-8">
+              <KeyRound className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">{t('auth.forgot_password_btn')}</h3>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               {t('auth.enter_credentials_desc')}
             </p>
 
             {forgotStep === 'IDENTITY' ? (
               <form onSubmit={handleInitiateForgot} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    {t('auth.mobile_phone')} <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('auth.mobile_phone')} <span className="text-rose-500 dark:text-rose-400">*</span>
                   </label>
                   <div className="flex gap-2">
                     <select
@@ -863,10 +863,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         const found = SUPPORTED_COUNTRIES.find((c) => c.code === e.target.value);
                         if (found) setForgotCountry(found);
                       }}
-                      className="bg-slate-950/80 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer shrink-0"
+                      className="min-h-[42px] bg-slate-50 dark:bg-slate-950/80 border border-slate-300 dark:border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer shrink-0"
                     >
                       {SUPPORTED_COUNTRIES.map((c) => (
-                        <option key={c.code} value={c.code} className="bg-slate-900 text-white">
+                        <option key={c.code} value={c.code} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                           {c.flag} {c.dialCode}
                         </option>
                       ))}
@@ -877,14 +877,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       value={forgotPhone}
                       onChange={(e) => setForgotPhone(e.target.value)}
                       placeholder={forgotCountry.samplePlaceholder}
-                      className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      className="flex-1 min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    {t('auth.fayda_id')} <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('auth.fayda_id')} <span className="text-rose-500 dark:text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -893,13 +893,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={forgotFan}
                     onChange={(e) => setForgotFan(e.target.value.replace(/\D/g, ''))}
                     placeholder={t('auth.placeholder_fan', '16 numeric digits')}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    {t('auth.fin_number')} <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('auth.fin_number')} <span className="text-rose-500 dark:text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -908,14 +908,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={forgotFin}
                     onChange={(e) => setForgotFin(e.target.value.replace(/\D/g, ''))}
                     placeholder={t('auth.placeholder_fin', '12 numeric digits')}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition cursor-pointer"
+                  className="w-full min-h-[44px] py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition cursor-pointer"
                 >
                   {isLoading ? t('auth.submitting') : t('auth.request_otp_challenge')}
                 </button>
@@ -927,22 +927,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     setErrorMessage(null);
                     setSuccessMessage(null);
                   }}
-                  className="text-xs text-slate-400 hover:text-white underline block text-center mt-2 cursor-pointer"
+                  className="w-full min-h-[40px] text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline block text-center mt-2 cursor-pointer"
                 >
                   {t('auth.back_to_signin')}
                 </button>
               </form>
             ) : (
               <form onSubmit={handleCompleteForgot} className="space-y-3">
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1.5">
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs space-y-1.5">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">{t('auth.mobile_phone')}:</span>
-                    <span className="font-mono text-white">{forgotMaskedPhone}</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t('auth.mobile_phone')}:</span>
+                    <span className="font-mono font-semibold text-slate-900 dark:text-white tabular-nums">{forgotMaskedPhone}</span>
                   </div>
                   {forgotSimulatedCode && (
-                    <div className="p-2 rounded bg-sky-950/80 border border-sky-800/60 flex items-center justify-between">
-                      <span className="text-[11px] text-sky-300">{t('auth.simulated_sms_code', { code: '' })}</span>
-                      <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700">
+                    <div className="p-2 rounded bg-sky-50 dark:bg-sky-950/80 border border-sky-200 dark:border-sky-800/60 flex items-center justify-between">
+                      <span className="text-[11px] text-sky-800 dark:text-sky-300">{t('auth.simulated_sms_code', { code: '' })}</span>
+                      <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-700">
                         {forgotSimulatedCode}
                       </span>
                     </div>
@@ -950,7 +950,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">{t('auth.enter_otp')}</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('auth.enter_otp')}</label>
                   <input
                     type="text"
                     required
@@ -958,12 +958,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={forgotOtpCode}
                     onChange={(e) => setForgotOtpCode(e.target.value.replace(/\D/g, ''))}
                     placeholder="123456"
-                    className="w-full tracking-widest text-center text-lg font-mono bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full min-h-[44px] tracking-widest text-center text-lg font-mono bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">{t('auth.new_password')}</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('auth.new_password')}</label>
                   <input
                     type="password"
                     required
@@ -971,12 +971,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={forgotNewPassword}
                     onChange={(e) => setForgotNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">{t('auth.confirm_password')}</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('auth.confirm_password')}</label>
                   <input
                     type="password"
                     required
@@ -984,7 +984,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     value={forgotConfirmPassword}
                     onChange={(e) => setForgotConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full min-h-[42px] bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
@@ -992,14 +992,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setForgotStep('IDENTITY')}
-                    className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl cursor-pointer"
+                    className="flex-1 min-h-[44px] py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-300 text-xs font-semibold rounded-xl cursor-pointer"
                   >
                     {t('auth.back_to_form')}
                   </button>
                   <button
                     type="submit"
                     disabled={isLoading || forgotOtpCode.length < 6 || forgotNewPassword.length < 8}
-                    className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl cursor-pointer disabled:opacity-50"
+                    className="flex-1 min-h-[44px] py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl cursor-pointer disabled:opacity-50"
                   >
                     {isLoading ? t('auth.submitting') : t('auth.complete_reset')}
                   </button>
@@ -1012,16 +1012,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* PHONE VERIFICATION MODAL / FORM */}
         {mode === 'verifyPhone' && (
           <form onSubmit={handleVerifyPhoneLegacy} className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <ShieldCheck className="w-5 h-5 text-emerald-400" />
-              <h3 className="text-sm font-bold text-white">{t('auth.otp_verification')}</h3>
+            <div className="flex items-center gap-2 mb-2 pr-8">
+              <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">{t('auth.otp_verification')}</h3>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               {t('auth.enter_otp')}
             </p>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">{t('auth.enter_otp')}</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('auth.enter_otp')}</label>
               <input
                 type="text"
                 required
@@ -1029,14 +1029,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={phoneCode}
                 onChange={(e) => setPhoneCode(e.target.value)}
                 placeholder="123456"
-                className="w-full tracking-widest text-center text-lg font-mono bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+                className="w-full min-h-[44px] tracking-widest text-center text-lg font-mono bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading || phoneCode.length < 6}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white text-sm font-semibold rounded-xl transition-all cursor-pointer"
+              className="w-full min-h-[44px] py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-400 text-white text-sm font-semibold rounded-xl transition-all cursor-pointer"
             >
               {isLoading ? t('auth.submitting') : t('auth.verify_complete')}
             </button>
@@ -1044,7 +1044,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="text-xs text-slate-400 hover:text-white underline block text-center mt-2 cursor-pointer"
+              className="w-full min-h-[40px] text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline block text-center mt-2 cursor-pointer"
             >
               {t('auth.skip_verification')}
             </button>

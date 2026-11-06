@@ -1,81 +1,123 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import {
+  ThemeMode,
+  EffectiveTheme,
+  THEME_STORAGE_KEY,
+  isThemeMode,
+  resolveEffectiveTheme,
+  getNextThemeMode,
+  readStoredThemeMode,
+} from '../utils/themeUtils.js';
 
-export type ThemeMode = 'dark' | 'light' | 'system';
+export type { ThemeMode, EffectiveTheme };
 
 interface ThemeContextType {
   themeMode: ThemeMode;
-  effectiveTheme: 'dark' | 'light';
+  effectiveTheme: EffectiveTheme;
   setThemeMode: (mode: ThemeMode) => void;
   toggleTheme: () => void;
+  cycleThemeMode: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'dispatchbridge_theme';
+function getSystemPrefersDark(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return true;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function applyDocumentTheme(resolved: EffectiveTheme) {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  if (resolved === 'dark') {
+    root.classList.remove('light');
+    root.classList.add('dark');
+    root.setAttribute('data-theme', 'dark');
+    root.style.colorScheme = 'dark';
+  } else {
+    root.classList.remove('dark');
+    root.classList.add('light');
+    root.setAttribute('data-theme', 'light');
+    root.style.colorScheme = 'light';
+  }
+
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute('content', resolved === 'dark' ? '#020617' : '#f8fafc');
+  }
+}
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
-    if (saved && ['dark', 'light', 'system'].includes(saved)) {
-      return saved;
-    }
-    return 'dark'; // Default to dark enterprise palette
-  });
+  const [themeMode, setThemeModeState] = useState<ThemeMode>(() =>
+    readStoredThemeMode(typeof window !== 'undefined' ? window.localStorage : null)
+  );
 
-  const [effectiveTheme, setEffectiveTheme] = useState<'dark' | 'light'>('dark');
+  const [effectiveTheme, setEffectiveTheme] = useState<EffectiveTheme>(() =>
+    resolveEffectiveTheme(
+      readStoredThemeMode(typeof window !== 'undefined' ? window.localStorage : null),
+      getSystemPrefersDark()
+    )
+  );
 
-  const applyTheme = (mode: ThemeMode) => {
-    let resolved: 'dark' | 'light' = 'dark';
-    if (mode === 'system') {
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      resolved = prefersDark ? 'dark' : 'light';
-    } else {
-      resolved = mode;
-    }
-
+  const syncTheme = useCallback((mode: ThemeMode) => {
+    const resolved = resolveEffectiveTheme(mode, getSystemPrefersDark());
     setEffectiveTheme(resolved);
+    applyDocumentTheme(resolved);
+  }, []);
 
-    const root = document.documentElement;
-    if (resolved === 'dark') {
-      root.classList.remove('light');
-      root.classList.add('dark');
-      root.setAttribute('data-theme', 'dark');
-      root.style.colorScheme = 'dark';
-    } else {
-      root.classList.remove('dark');
-      root.classList.add('light');
-      root.setAttribute('data-theme', 'light');
-      root.style.colorScheme = 'light';
-    }
+  const setThemeMode = useCallback(
+    (mode: ThemeMode) => {
+      setThemeModeState(mode);
+      try {
+        window.localStorage.setItem(THEME_STORAGE_KEY, mode);
+      } catch {
+        // Ignore storage write errors
+      }
+      syncTheme(mode);
+    },
+    [syncTheme]
+  );
 
-    // Update meta theme-color if present
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', resolved === 'dark' ? '#020617' : '#f8fafc');
-    }
-  };
-
-  const setThemeMode = (mode: ThemeMode) => {
-    setThemeModeState(mode);
-    localStorage.setItem(STORAGE_KEY, mode);
-    applyTheme(mode);
-  };
-
-  const toggleTheme = () => {
-    const nextMode = effectiveTheme === 'dark' ? 'light' : 'dark';
+  const toggleTheme = useCallback(() => {
+    const nextMode: ThemeMode = effectiveTheme === 'dark' ? 'light' : 'dark';
     setThemeMode(nextMode);
-  };
+  }, [effectiveTheme, setThemeMode]);
+
+  const cycleThemeMode = useCallback(() => {
+    setThemeMode(getNextThemeMode(themeMode));
+  }, [themeMode, setThemeMode]);
 
   useEffect(() => {
-    applyTheme(themeMode);
+    syncTheme(themeMode);
 
-    if (themeMode === 'system') {
+    if (typeof window !== 'undefined' && window.matchMedia) {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = () => applyTheme('system');
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
+      const handleChange = () => {
+        if (themeMode === 'system') {
+          syncTheme('system');
+        }
+      };
+
+      if (typeof mediaQuery.addEventListener === 'function') {
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+      } else if (typeof mediaQuery.addListener === 'function') {
+        mediaQuery.addListener(handleChange);
+        return () => mediaQuery.removeListener(handleChange);
+      }
     }
-  }, [themeMode]);
+  }, [themeMode, syncTheme]);
+
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === THEME_STORAGE_KEY && isThemeMode(event.newValue)) {
+        setThemeModeState(event.newValue);
+        syncTheme(event.newValue);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [syncTheme]);
 
   return (
     <ThemeContext.Provider
@@ -84,6 +126,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         effectiveTheme,
         setThemeMode,
         toggleTheme,
+        cycleThemeMode,
       }}
     >
       {children}

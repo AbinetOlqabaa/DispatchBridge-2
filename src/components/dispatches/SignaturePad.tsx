@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { PenTool, RotateCcw, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { useTranslation } from '../../context/LanguageContext.js';
+import { useTheme } from '../../context/ThemeContext.js';
 
 interface SignaturePadProps {
   onSignatureChange: (signatureDataUrl: string | null) => void;
@@ -10,10 +11,11 @@ interface SignaturePadProps {
 
 export const SignaturePad: React.FC<SignaturePadProps> = ({
   onSignatureChange,
-  signerName = 'Receiving Supervisor',
   initialSignature,
 }) => {
   const { t } = useTranslation();
+  const { effectiveTheme } = useTheme();
+  const inkStroke = effectiveTheme === 'dark' ? '#38bdf8' : '#0369a1';
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
@@ -33,7 +35,6 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
       }
     }
 
-    // High DPI scaling with orientation awareness
     const ratio = Math.max(window.devicePixelRatio || 1, 1);
     const rect = canvas.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
@@ -42,7 +43,7 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
     canvas.height = rect.height * ratio;
     ctx.scale(ratio, ratio);
 
-    ctx.strokeStyle = '#38bdf8'; // Sky blue ink
+    ctx.strokeStyle = inkStroke;
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -57,6 +58,10 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
       img.src = sourceImage;
     }
   };
+
+  useEffect(() => {
+    initCanvas(true);
+  }, [effectiveTheme]);
 
   useEffect(() => {
     initCanvas(false);
@@ -105,6 +110,7 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
     if (!ctx) return;
 
     const { x, y } = getCoordinates(e);
+    ctx.strokeStyle = inkStroke;
     ctx.beginPath();
     ctx.moveTo(x, y);
     setIsDrawing(true);
@@ -152,10 +158,9 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
     if (!ctx) return;
 
     clearSignature();
-    ctx.strokeStyle = '#38bdf8';
+    ctx.strokeStyle = inkStroke;
     ctx.lineWidth = 2.5;
 
-    // Draw stylized signature waveform
     ctx.beginPath();
     ctx.moveTo(30, 70);
     ctx.bezierCurveTo(60, 20, 90, 110, 130, 45);
@@ -163,7 +168,6 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
     ctx.bezierCurveTo(240, 90, 270, 70, 310, 60);
     ctx.stroke();
 
-    // Flourish line
     ctx.beginPath();
     ctx.moveTo(40, 95);
     ctx.lineTo(320, 90);
@@ -177,22 +181,22 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-xs">
-        <label className="font-semibold text-slate-300 flex items-center gap-1.5">
-          <PenTool className="w-3.5 h-3.5 text-sky-400" />
+        <label className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+          <PenTool className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
           <span>{t('signature.title', 'Receiver Digital Dock Sign-off (Canvas Capture)')}</span>
         </label>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={generatePresetSignature}
-            className="text-[11px] text-sky-400 hover:text-sky-300 font-medium cursor-pointer"
+            className="text-[11px] text-sky-700 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300 font-semibold cursor-pointer"
           >
             {t('signature.quick_sign', 'Quick Sign')}
           </button>
           <button
             type="button"
             onClick={clearSignature}
-            className="text-[11px] text-slate-400 hover:text-rose-400 flex items-center gap-1 font-medium cursor-pointer"
+            className="text-[11px] text-slate-600 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 flex items-center gap-1 font-medium cursor-pointer"
           >
             <RotateCcw className="w-3 h-3" />
             <span>{t('signature.clear', 'Clear')}</span>
@@ -200,7 +204,7 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
         </div>
       </div>
 
-      <div className="relative border-2 border-dashed border-slate-700 bg-slate-950/80 rounded-xl overflow-hidden touch-none">
+      <div className="relative border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/80 rounded-xl overflow-hidden touch-none">
         <canvas
           ref={canvasRef}
           onMouseDown={startDrawing}
@@ -214,20 +218,20 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
         />
 
         {!hasDrawn && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-slate-500 text-xs gap-1">
-            <PenTool className="w-5 h-5 opacity-40 text-slate-400" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-slate-500 dark:text-slate-400 text-xs gap-1">
+            <PenTool className="w-5 h-5 opacity-50 text-slate-400" />
             <span>{t('signature.hint', 'Sign with finger, stylus, or cursor on glass')}</span>
           </div>
         )}
 
         <div className="absolute bottom-1 right-2 text-[10px] text-slate-500 flex items-center gap-1 pointer-events-none">
-          <ShieldCheck className="w-3 h-3 text-teal-500" />
+          <ShieldCheck className="w-3 h-3 text-teal-600 dark:text-teal-500" />
           <span>{t('signature.legal_note', 'Legally binding digital acceptance')}</span>
         </div>
       </div>
 
       {hasDrawn && (
-        <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
+        <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
           <CheckCircle2 className="w-3.5 h-3.5" />
           <span>{t('signature.recorded', 'Signature recorded & ready to lock into manifest record')}</span>
         </div>

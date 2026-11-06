@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, ArrowLeft, Truck, Check, AlertCircle, Building, MapPin, DollarSign, Package } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, Truck, Check, AlertCircle, Building, MapPin, DollarSign, Package, ScanBarcode } from 'lucide-react';
 import { Partner, DispatchItem } from '../../types';
 import { sandboxAdapter } from '../../services/local-adapter';
 import { validateDispatchServerSide } from '../../services/api-client';
 import { useAuth } from '../../context/AuthContext';
 import { calculateItemTotals } from '../../domain/dispatch-rules';
+import { BarcodeIntakeScanner } from './BarcodeIntakeScanner';
+import { ParsedIntakeItem } from '../../utils/barcodeParser';
+import { hapticFeedback } from '../../utils/haptics';
 
 interface CreateDispatchFormProps {
   onBack: () => void;
@@ -46,6 +49,7 @@ export const CreateDispatchForm: React.FC<CreateDispatchFormProps> = ({ onBack, 
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   useEffect(() => {
     async function loadPartners() {
@@ -92,6 +96,48 @@ export const CreateDispatchForm: React.FC<CreateDispatchFormProps> = ({ onBack, 
   const handleRemoveItem = (index: number) => {
     if (items.length <= 1) return;
     setItems(items.filter((_, idx) => idx !== index));
+  };
+
+  const handleItemsScanned = (scannedItems: ParsedIntakeItem[]) => {
+    let addedCount = 0;
+    let incrementedCount = 0;
+    let totalUnitsAdded = 0;
+
+    const nextItems = [...items];
+    for (const scanned of scannedItems) {
+      const existingIdx = nextItems.findIndex(
+        (it) => it.skuOrBatch.trim().toUpperCase() === scanned.sku.trim().toUpperCase()
+      );
+      if (existingIdx >= 0) {
+        nextItems[existingIdx] = {
+          ...nextItems[existingIdx],
+          quantity: Math.round((nextItems[existingIdx].quantity + scanned.quantitySent) * 1000) / 1000,
+        };
+        incrementedCount++;
+      } else {
+        if (nextItems.length === 1 && !nextItems[0].name.trim()) {
+          nextItems[0] = {
+            name: scanned.itemName,
+            skuOrBatch: scanned.sku,
+            quantity: scanned.quantitySent,
+            unit: scanned.unit || 'units',
+            unitPrice: scanned.unitPrice || 10,
+          };
+        } else {
+          nextItems.push({
+            name: scanned.itemName,
+            skuOrBatch: scanned.sku,
+            quantity: scanned.quantitySent,
+            unit: scanned.unit || 'units',
+            unitPrice: scanned.unitPrice || 10,
+          });
+        }
+        addedCount++;
+      }
+      totalUnitsAdded += scanned.quantitySent;
+    }
+    setItems(nextItems);
+    return { addedCount, incrementedCount, totalUnitsAdded };
   };
 
   const { totalQuantity, totalValue } = calculateItemTotals(
@@ -145,8 +191,10 @@ export const CreateDispatchForm: React.FC<CreateDispatchFormProps> = ({ onBack, 
         items
       });
 
+      hapticFeedback.dispatchCreated();
       onSuccess(newDispatch.id);
     } catch (err: unknown) {
+      hapticFeedback.errorAlert();
       setError(err instanceof Error ? err.message : 'Failed to register dispatch');
     } finally {
       setIsSubmitting(false);
@@ -259,15 +307,39 @@ export const CreateDispatchForm: React.FC<CreateDispatchFormProps> = ({ onBack, 
                 </h3>
                 <span className="text-xs text-slate-400">Specify item names, batches, and unit values.</span>
               </div>
-              <button
-                type="button"
-                onClick={handleAddItem}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 text-xs font-medium border border-slate-700 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Item</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  data-testid="toggle-barcode-intake-form-btn"
+                  onClick={() => setIsScannerOpen(!isScannerOpen)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer min-h-[36px] ${
+                    isScannerOpen
+                      ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50 hover:bg-indigo-600/30'
+                      : 'bg-slate-800 hover:bg-slate-700 text-sky-300 border-slate-700'
+                  }`}
+                >
+                  <ScanBarcode className="w-3.5 h-3.5" />
+                  <span>{isScannerOpen ? 'Hide Scanner' : 'Scan Barcode / QR'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddItem}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 text-xs font-medium border border-slate-700 transition cursor-pointer min-h-[36px]"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Item</span>
+                </button>
+              </div>
             </div>
+
+            {isScannerOpen && (
+              <div className="mb-4">
+                <BarcodeIntakeScanner
+                  onItemsScanned={handleItemsScanned}
+                  onClose={() => setIsScannerOpen(false)}
+                />
+              </div>
+            )}
 
             <div className="space-y-3">
               {items.map((item, idx) => (

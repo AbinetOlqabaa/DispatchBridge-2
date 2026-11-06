@@ -175,15 +175,15 @@ export function TeamPage() {
   const getRoleBadge = (role: UserRole) => {
     switch (role) {
       case 'SUPER_ADMIN':
-        return 'bg-purple-900/40 text-purple-300 border-purple-700/60';
+        return 'bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700/60';
       case 'BUSINESS_OWNER':
-        return 'bg-indigo-900/40 text-indigo-300 border-indigo-700/60';
+        return 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300 dark:border-indigo-700/60';
       case 'SENDER':
-        return 'bg-blue-900/40 text-blue-300 border-blue-700/60';
+        return 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700/60';
       case 'RECEIVER':
-        return 'bg-emerald-900/40 text-emerald-300 border-emerald-700/60';
+        return 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700/60';
       default:
-        return 'bg-slate-800 text-slate-300 border-slate-700';
+        return 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
     }
   };
 
@@ -205,17 +205,17 @@ export function TeamPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl backdrop-blur-md shadow-sm">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-400">
+            <div className="p-2 bg-indigo-50 border border-indigo-200 text-indigo-600 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400 rounded-xl">
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">
+              <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
                 {t('nav.team', 'Team & Members')}
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 {t(user?.businessName || '')} • {t('team.subtitle')}
               </p>
             </div>
@@ -225,15 +225,15 @@ export function TeamPage() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={() => setIsAcceptModalOpen(true)}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl flex items-center gap-2 transition cursor-pointer"
+            className="px-3.5 py-2 min-h-[44px] bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700 text-xs font-semibold rounded-xl flex items-center gap-2 transition cursor-pointer"
           >
-            <KeyRound className="w-3.5 h-3.5 text-indigo-400" />
+            <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             {t('action.accept_token', 'Accept Token')}
           </button>
           {canManage && (
             <button
               onClick={() => setIsInviteModalOpen(true)}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition cursor-pointer"
+              className="px-4 py-2 min-h-[44px] bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center gap-2 shadow-sm transition cursor-pointer"
             >
               <UserPlus className="w-4 h-4" />
               {t('action.invite_member', 'Invite Member')}
@@ -242,7 +242,8 @@ export function TeamPage() {
           <button
             onClick={loadData}
             title={t('action.refresh')}
-            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl transition cursor-pointer"
+            aria-label={t('action.refresh', 'Refresh')}
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-slate-700 rounded-xl transition cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -250,50 +251,50 @@ export function TeamPage() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <p className="text-xs text-slate-400 font-medium">{t('metric.total_members', 'Total Members')}</p>
-          <p className="text-2xl font-bold text-white mt-1">{members.length}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 tabular-nums">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl shadow-xs">
+          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">{t('metric.total_members', 'Total Members')}</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{members.length}</p>
         </div>
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <p className="text-xs text-slate-400 font-medium">{t('role.sender', 'Senders / Dispatchers')}</p>
-          <p className="text-2xl font-bold text-blue-400 mt-1">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl shadow-xs">
+          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">{t('role.sender', 'Senders / Dispatchers')}</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
             {members.filter((m) => m.membershipRole === 'SENDER').length}
           </p>
         </div>
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <p className="text-xs text-slate-400 font-medium">{t('role.receiver', 'Receiving Leads')}</p>
-          <p className="text-2xl font-bold text-emerald-400 mt-1">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl shadow-xs">
+          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">{t('role.receiver', 'Receiving Leads')}</p>
+          <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
             {members.filter((m) => m.membershipRole === 'RECEIVER').length}
           </p>
         </div>
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <p className="text-xs text-slate-400 font-medium">{t('metric.pending_invitations', 'Pending Invitations')}</p>
-          <p className="text-2xl font-bold text-amber-400 mt-1">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl shadow-xs">
+          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">{t('metric.pending_invitations', 'Pending Invitations')}</p>
+          <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">
             {invitations.filter((i) => i.status === 'PENDING').length}
           </p>
         </div>
       </div>
 
       {/* Navigation Tabs & Search */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab('members')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition ${
+            className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-semibold cursor-pointer transition ${
               activeTab === 'members'
                 ? 'bg-indigo-600 text-white'
-                : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                : 'bg-white text-slate-700 hover:text-slate-900 border border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:text-slate-200 dark:border-slate-800'
             }`}
           >
             {t('team.active_members_tab', { count: members.length })}
           </button>
           <button
             onClick={() => setActiveTab('invitations')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition flex items-center gap-1.5 ${
+            className={`px-4 py-2 min-h-[44px] rounded-xl text-xs font-semibold cursor-pointer transition flex items-center gap-1.5 ${
               activeTab === 'invitations'
                 ? 'bg-indigo-600 text-white'
-                : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                : 'bg-white text-slate-700 hover:text-slate-900 border border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:text-slate-200 dark:border-slate-800'
             }`}
           >
             {t('team.pending_invites_tab', { count: invitations.length })}
@@ -304,13 +305,13 @@ export function TeamPage() {
         </div>
 
         <div className="relative max-w-xs w-full">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-2.5" />
           <input
             type="text"
             placeholder={t('team.search_placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
           />
         </div>
       </div>
@@ -321,26 +322,26 @@ export function TeamPage() {
           <LoadingSpinner text={t('msg.loading')} />
         </div>
       ) : error ? (
-        <div className="p-4 bg-red-900/20 border border-red-800/40 text-red-300 rounded-xl text-xs flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+        <div className="p-4 bg-rose-50 dark:bg-red-900/20 border border-rose-200 dark:border-red-800/40 text-rose-800 dark:text-red-300 rounded-xl text-xs flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600 dark:text-red-400" />
           <span>{error}</span>
         </div>
       ) : activeTab === 'members' ? (
         /* Members Table */
         filteredMembers.length === 0 ? (
-          <div className="py-12 text-center bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
-            <Users className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-sm font-semibold text-slate-300">{t('empty.no_dispatches_match')}</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+          <div className="py-12 text-center bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+            <Users className="w-10 h-10 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300">{t('empty.no_dispatches_match')}</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-500 mt-1 max-w-sm mx-auto">
               {t('empty.no_dispatches_desc')}
             </p>
           </div>
         ) : (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto scrollbar-thin">
               <table className="w-full text-left border-collapse text-xs min-w-full sm:min-w-[620px]">
                 <thead>
-                  <tr className="bg-slate-950/70 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
+                  <tr className="bg-slate-50 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[10px]">
                     <th className="py-3 px-3 sm:px-4 font-semibold">{t('table.member', 'Member')}</th>
                     <th className="py-3 px-3 sm:px-4 font-semibold">{t('auth.assigned_role', 'Assigned Role')}</th>
                     <th className="py-3 px-3 sm:px-4 font-semibold">{t('table.contact', 'Contact Details')}</th>
@@ -348,18 +349,18 @@ export function TeamPage() {
                     <th className="py-3 px-3 sm:px-4 font-semibold text-right">{t('table.actions', 'Actions')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
                   {filteredMembers.map((member) => (
-                    <tr key={member.id} className="hover:bg-slate-800/30 transition">
+                    <tr key={member.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
                       <td className="py-3.5 px-3 sm:px-4">
-                        <div className="font-semibold text-white flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-xs uppercase">
+                        <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-300 flex items-center justify-center font-bold text-xs uppercase shrink-0">
                             {member.name.charAt(0)}
                           </div>
                           <div>
                             <span>{t(member.name)}</span>
                             {member.id === user?.id && (
-                              <span className="ml-2 px-1.5 py-0.5 bg-slate-800 text-indigo-300 text-[10px] rounded border border-slate-700">
+                              <span className="ml-2 px-1.5 py-0.5 bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-slate-800 dark:text-indigo-300 dark:border-slate-700 text-[10px] rounded border">
                                 {t('team.you_badge')}
                               </span>
                             )}
@@ -371,23 +372,23 @@ export function TeamPage() {
                           {getLocalizedRole(member.membershipRole)}
                         </span>
                       </td>
-                      <td className="py-3.5 px-3 sm:px-4 text-slate-400">
+                      <td className="py-3.5 px-3 sm:px-4 text-slate-600 dark:text-slate-400">
                         <div className="space-y-0.5">
-                          <div className="flex items-center gap-1.5 text-slate-300">
-                            <Mail className="w-3 h-3 text-slate-500" />
+                          <div className="flex items-center gap-1.5 text-slate-800 dark:text-slate-300">
+                            <Mail className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                             <span>{member.email}</span>
                           </div>
                           {member.phoneNumber && (
-                            <div className="flex items-center gap-1.5 text-slate-400 text-[11px]">
-                              <Phone className="w-3 h-3 text-slate-500" />
+                            <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 text-[11px]">
+                              <Phone className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                               <span>{member.phoneNumber}</span>
                             </div>
                           )}
                         </div>
                       </td>
                       <td className="py-3.5 px-3 sm:px-4">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] bg-emerald-900/30 text-emerald-300 border border-emerald-800/40">
-                          <CheckCircle className="w-3 h-3 text-emerald-400" />
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800/40 border">
+                          <CheckCircle className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                           {t('status.active')}
                         </span>
                       </td>
@@ -397,7 +398,7 @@ export function TeamPage() {
                             <select
                               value={member.membershipRole}
                               onChange={(e) => handleRoleChange(member.id, e.target.value as UserRole)}
-                              className="bg-slate-800 border border-slate-700 text-slate-300 text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                              className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300 text-xs rounded-lg px-2 py-1.5 min-h-[40px] focus:outline-none focus:border-indigo-500 cursor-pointer"
                             >
                               <option value="BUSINESS_OWNER">{t('role.business_owner')}</option>
                               <option value="SENDER">{t('role.sender')}</option>
@@ -406,13 +407,14 @@ export function TeamPage() {
                             <button
                               onClick={() => handleRemoveMember(member.id)}
                               title={t('team.confirm_remove')}
-                              className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition cursor-pointer"
+                              aria-label={t('team.confirm_remove', 'Remove member')}
+                              className="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:text-slate-400 dark:hover:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition cursor-pointer"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         ) : (
-                          <span className="text-slate-500 text-[11px]">—</span>
+                          <span className="text-slate-400 dark:text-slate-500 text-[11px]">—</span>
                         )}
                       </td>
                     </tr>
@@ -425,19 +427,19 @@ export function TeamPage() {
       ) : (
         /* Invitations Table */
         filteredInvitations.length === 0 ? (
-          <div className="py-12 text-center bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
-            <Mail className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-sm font-semibold text-slate-300">{t('metric.pending_invitations')}</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+          <div className="py-12 text-center bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+            <Mail className="w-10 h-10 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-300">{t('metric.pending_invitations')}</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-500 mt-1 max-w-sm mx-auto">
               {t('empty.no_logs')}
             </p>
           </div>
         ) : (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
+          <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+            <div className="overflow-x-auto scrollbar-thin">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-950/70 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
+                  <tr className="bg-slate-50 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[10px]">
                     <th className="py-3 px-4 font-semibold">{t('team.invite_col_email')}</th>
                     <th className="py-3 px-4 font-semibold">{t('team.invite_col_role')}</th>
                     <th className="py-3 px-4 font-semibold">{t('team.invite_col_by')}</th>
@@ -446,16 +448,16 @@ export function TeamPage() {
                     <th className="py-3 px-4 font-semibold text-right">{t('table.actions')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
                   {filteredInvitations.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-slate-800/30 transition">
-                      <td className="py-3.5 px-4 font-semibold text-white">
+                    <tr key={inv.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition">
+                      <td className="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
                         <div className="flex items-center gap-1.5">
                           <Mail className="w-3.5 h-3.5 text-slate-400" />
                           <span>{inv.inviteeEmail}</span>
                         </div>
                         {inv.inviteePhone && (
-                          <div className="text-[11px] text-slate-400 mt-0.5 ml-5">
+                          <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 ml-5">
                             {inv.inviteePhone}
                           </div>
                         )}
@@ -465,7 +467,7 @@ export function TeamPage() {
                           {getLocalizedRole(inv.proposedRole)}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-400">
+                      <td className="py-3.5 px-4 text-slate-700 dark:text-slate-400">
                         {t(inv.invitedByName)}
                       </td>
                       <td className="py-3.5 px-4">
@@ -473,10 +475,10 @@ export function TeamPage() {
                           <span
                             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium border ${
                               inv.status === 'PENDING'
-                                ? 'bg-amber-900/30 text-amber-300 border-amber-800/40'
+                                ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/40'
                                 : inv.status === 'ACCEPTED'
-                                ? 'bg-emerald-900/30 text-emerald-300 border-emerald-800/40'
-                                : 'bg-slate-800 text-slate-400 border-slate-700'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800/40'
+                                : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
                             }`}
                           >
                             {inv.status === 'PENDING' ? t('status.pending') : inv.status}
@@ -491,12 +493,12 @@ export function TeamPage() {
                         {inv.status === 'PENDING' ? (
                           <button
                             onClick={() => handleCopyLink(inv.token, inv.id)}
-                            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition cursor-pointer"
+                            className="px-2.5 py-1.5 min-h-[36px] bg-slate-100 hover:bg-slate-200 text-indigo-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-indigo-300 dark:border-slate-700 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition cursor-pointer"
                           >
                             {copiedId === inv.id ? (
                               <>
-                                <Check className="w-3 h-3 text-emerald-400" />
-                                <span className="text-emerald-400">{t('action.copied')}</span>
+                                <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                <span className="text-emerald-700 dark:text-emerald-400">{t('action.copied')}</span>
                               </>
                             ) : (
                               <>
@@ -506,7 +508,7 @@ export function TeamPage() {
                             )}
                           </button>
                         ) : (
-                          <span className="text-slate-500 text-[11px]">—</span>
+                          <span className="text-slate-400 dark:text-slate-500 text-[11px]">—</span>
                         )}
                       </td>
                       <td className="py-3.5 px-4 text-right">
@@ -514,12 +516,12 @@ export function TeamPage() {
                           <button
                             onClick={() => handleRevokeInvitation(inv.id)}
                             title={t('team.revoke_btn')}
-                            className="px-2.5 py-1 text-red-400 hover:bg-red-500/10 border border-red-500/20 rounded-lg text-xs transition cursor-pointer"
+                            className="px-3 py-1.5 min-h-[36px] text-rose-700 hover:bg-rose-50 border border-rose-200 dark:text-red-400 dark:hover:bg-red-500/10 dark:border-red-500/20 rounded-lg text-xs font-medium transition cursor-pointer"
                           >
                             {t('team.revoke_btn')}
                           </button>
                         ) : (
-                          <span className="text-slate-500 text-[11px]">—</span>
+                          <span className="text-slate-400 dark:text-slate-500 text-[11px]">—</span>
                         )}
                       </td>
                     </tr>
@@ -533,61 +535,61 @@ export function TeamPage() {
 
       {/* Invite Member Modal */}
       {isInviteModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-indigo-400" />
+                <UserPlus className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 <div>
-                  <h3 className="text-base font-bold text-white">{t('team.invite_modal_title')}</h3>
-                  <p className="text-[11px] text-slate-400">{t('team.invite_modal_desc')}</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('team.invite_modal_title')}</h3>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-400">{t('team.invite_modal_desc')}</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsInviteModalOpen(false)}
-                className="text-slate-400 hover:text-white text-xs cursor-pointer"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 text-xs cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {inviteError && (
-              <div className="p-3 bg-red-900/30 border border-red-800/40 text-red-300 rounded-xl text-xs flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+              <div className="p-3 bg-rose-50 dark:bg-red-900/30 border border-rose-200 dark:border-red-800/40 text-rose-800 dark:text-red-300 rounded-xl text-xs flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600 dark:text-red-400" />
                 <span>{inviteError}</span>
               </div>
             )}
 
             <form onSubmit={handleInviteSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">{t('team.work_email_label')}</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">{t('team.work_email_label')}</label>
                 <input
                   type="email"
                   required
                   placeholder={t('team.placeholder_email', 'colleague@yourcompany.com')}
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">{t('auth.mobile_phone')}</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">{t('auth.mobile_phone')}</label>
                 <input
                   type="tel"
                   placeholder="+1-555-019-0000"
                   value={invitePhone}
                   onChange={(e) => setInvitePhone(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">{t('team.assign_role_label')}</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">{t('team.assign_role_label')}</label>
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value as UserRole)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500 cursor-pointer"
                 >
                   <option value="SENDER">{t('role.sender')} — {t('auth.sender_role_desc')}</option>
                   <option value="RECEIVER">{t('role.receiver')} — {t('auth.receiver_role_desc')}</option>
@@ -599,14 +601,14 @@ export function TeamPage() {
                 <button
                   type="button"
                   onClick={() => setIsInviteModalOpen(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-medium cursor-pointer"
+                  className="px-4 py-2 min-h-[44px] bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-xl font-medium cursor-pointer"
                 >
                   {t('action.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={inviteSubmitting}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                  className="px-5 py-2 min-h-[44px] bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                 >
                   {inviteSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
                   {inviteSubmitting ? t('team.sending_btn') : t('team.send_invite_btn')}
@@ -619,39 +621,39 @@ export function TeamPage() {
 
       {/* Accept Invitation Token Modal */}
       {isAcceptModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <KeyRound className="w-5 h-5 text-indigo-400" />
-                <h3 className="text-base font-bold text-white">{t('team.accept_modal_title')}</h3>
+                <KeyRound className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">{t('team.accept_modal_title')}</h3>
               </div>
               <button
                 onClick={() => setIsAcceptModalOpen(false)}
-                className="text-slate-400 hover:text-white text-xs cursor-pointer"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 text-xs cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {acceptMessage && (
-              <div className="p-3 bg-indigo-900/30 border border-indigo-800/40 text-indigo-200 rounded-xl text-xs">
+              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800/40 text-indigo-900 dark:text-indigo-200 rounded-xl text-xs">
                 {acceptMessage}
               </div>
             )}
 
             <form onSubmit={handleAcceptSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">{t('team.token_label')}</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">{t('team.token_label')}</label>
                 <input
                   type="text"
                   required
                   placeholder={t('team.placeholder_token', 'inv_tok_...')}
                   value={acceptToken}
                   onChange={(e) => setAcceptToken(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 font-mono placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                 />
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-[11px] text-slate-600 dark:text-slate-500 mt-1">
                   {t('team.accept_modal_desc')}
                 </p>
               </div>
@@ -660,14 +662,14 @@ export function TeamPage() {
                 <button
                   type="button"
                   onClick={() => setIsAcceptModalOpen(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-medium cursor-pointer"
+                  className="px-4 py-2 min-h-[44px] bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 rounded-xl font-medium cursor-pointer"
                 >
                   {t('action.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={acceptSubmitting}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2 min-h-[44px] bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold disabled:opacity-50 cursor-pointer"
                 >
                   {acceptSubmitting ? t('team.joining_btn') : t('team.join_btn')}
                 </button>

@@ -110,8 +110,11 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
   if (error) {
     return (
       <div className="p-8 text-center">
-        <p className="text-rose-400 mb-3">{error}</p>
-        <button onClick={loadData} className="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm">
+        <p className="text-rose-600 dark:text-rose-400 mb-3">{error}</p>
+        <button
+          onClick={loadData}
+          className="px-4 py-2 min-h-[44px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-lg text-sm cursor-pointer"
+        >
           {t('action.retry')}
         </button>
       </div>
@@ -143,36 +146,36 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
       <ProfileSummaryCard onOpenProfile={onOpenProfile} />
 
       {/* Executive Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm">
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
+            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
               {t('role.business_owner')}
             </span>
-            <span className="text-xs text-slate-400">{t('biz.company_id', { id: user?.businessId || '' })}</span>
+            <span className="text-xs text-slate-600 dark:text-slate-400">{t('biz.company_id', { id: user?.businessId || '' })}</span>
           </div>
 
           <div className="flex items-center gap-2.5 mt-1">
             <button
               onClick={() => setShowBusinessDropdown(!showBusinessDropdown)}
-              className="flex items-center gap-2 text-left group cursor-pointer focus:outline-none"
+              className="min-h-[44px] flex items-center gap-2 text-left group cursor-pointer focus:outline-none"
               title={t('action.switch_entity')}
               aria-label={t('action.switch_entity')}
             >
-              <Building2 className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
-              <h1 className="text-2xl font-bold text-white tracking-tight group-hover:text-indigo-200 transition-colors">
+              <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-500 dark:group-hover:text-indigo-300 transition-colors" />
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-700 dark:group-hover:text-indigo-200 transition-colors">
                 {t(user?.businessName || '')}
               </h1>
-              <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-white transition-transform ${showBusinessDropdown ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-4 h-4 text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-transform ${showBusinessDropdown ? 'rotate-180' : ''}`} />
             </button>
 
             {user?.memberships && user.memberships.length > 1 && (
-              <span className="text-[11px] font-semibold text-indigo-300 bg-indigo-950/80 border border-indigo-800/60 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800/60 px-2 py-0.5 rounded-full">
                 {t('biz.entities_count', { count: user.memberships.length })}
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
             {t('app.enterprise')}
           </p>
 
@@ -180,12 +183,12 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
           {showBusinessDropdown && (
             <>
               <div className="fixed inset-0 z-20" onClick={() => setShowBusinessDropdown(false)} />
-              <div className="absolute left-0 top-full mt-2 w-80 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl p-2 z-30">
-                <div className="px-3 py-2 border-b border-slate-800 text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+              <div className="absolute left-0 top-full mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-2xl p-2 z-30">
+                <div className="px-3 py-2 border-b border-slate-200 dark:border-slate-800 text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center justify-between">
                   <span>{t('action.switch_entity', 'Switch Business Entity')}</span>
-                  {isSwitching && <Loader2 className="w-3.5 h-3.5 text-indigo-400 animate-spin" />}
+                  {isSwitching && <Loader2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 animate-spin" />}
                 </div>
-                <div className="py-1 max-h-56 overflow-y-auto divide-y divide-slate-800/40 scrollbar-thin">
+                <div className="py-1 max-h-56 overflow-y-auto divide-y divide-slate-200 dark:divide-slate-800/40 scrollbar-thin">
                   {user?.memberships?.map((m) => {
                     const isActive = m.businessId === user?.businessId;
                     return (
@@ -207,32 +210,32 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                             setIsSwitching(false);
                           }
                         }}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-colors cursor-pointer ${
+                        className={`w-full min-h-[44px] flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-colors cursor-pointer ${
                           isActive
-                            ? 'bg-indigo-950/60 text-indigo-200 border border-indigo-800/50'
-                            : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+                            ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800/50'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         <div className="truncate mr-2">
                           <div className="font-semibold truncate">{t(m.businessName)}</div>
-                          <div className="text-[10px] text-slate-400">
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400">
                             ID: {m.businessId} • {t('role.' + m.role.toLowerCase(), m.role)}
                           </div>
                         </div>
                         {isActive ? (
-                          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                         ) : null}
                       </button>
                     );
                   })}
                 </div>
-                <div className="pt-2 border-t border-slate-800">
+                <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
                   <button
                     onClick={() => {
                       setShowBusinessDropdown(false);
                       setShowCreateBizModal(true);
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-indigo-300 hover:text-white hover:bg-indigo-900/40 border border-indigo-900/60 transition-colors cursor-pointer"
+                    className="w-full min-h-[44px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-white bg-indigo-50/70 hover:bg-indigo-100 dark:bg-transparent dark:hover:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-900/60 transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>{t('action.register_new_entity', 'Register New Business Entity')}</span>
@@ -246,7 +249,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
         <div className="flex items-center gap-2.5">
           <button
             onClick={onCreateDispatch}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
+            className="min-h-[44px] flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
           >
             <Truck className="w-4 h-4" />
             <span>{t('action.create_dispatch')}</span>
@@ -256,40 +259,40 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm">
+          <div className="flex items-center justify-between text-slate-600 dark:text-slate-400 mb-2">
             <span className="text-xs font-medium">{t('metric.in_transit')}</span>
-            <Truck className="w-4 h-4 text-sky-400" />
+            <Truck className="w-4 h-4 text-sky-600 dark:text-sky-400" />
           </div>
-          <div className="text-2xl font-bold text-white">{activeDispatches}</div>
-          <div className="text-[11px] text-slate-500 mt-1">{t('metric.out_of_total', 'Out of {total} dispatches', { total: totalDispatches })}</div>
+          <div className="text-2xl font-bold tabular-nums text-slate-900 dark:text-white">{activeDispatches}</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">{t('metric.out_of_total', 'Out of {total} dispatches', { total: totalDispatches })}</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm">
+          <div className="flex items-center justify-between text-slate-600 dark:text-slate-400 mb-2">
             <span className="text-xs font-medium">{t('metric.units_dispatched')}</span>
-            <Package className="w-4 h-4 text-indigo-400" />
+            <Package className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           </div>
-          <div className="text-2xl font-bold text-white">{totalItemsSent.toLocaleString()}</div>
-          <div className="text-[11px] text-slate-500 mt-1">{t('metric.across_all_manifests', 'Across all manifests')}</div>
+          <div className="text-2xl font-bold tabular-nums text-slate-900 dark:text-white">{totalItemsSent.toLocaleString()}</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">{t('metric.across_all_manifests', 'Across all manifests')}</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm">
+          <div className="flex items-center justify-between text-slate-600 dark:text-slate-400 mb-2">
             <span className="text-xs font-medium">{t('metric.recorded_losses')}</span>
-            <AlertTriangle className="w-4 h-4 text-rose-400" />
+            <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
           </div>
-          <div className="text-2xl font-bold text-rose-400">{totalItemsLost.toLocaleString()}</div>
-          <div className="text-[11px] text-rose-400/80 mt-1">{t('metric.requiring_audit', 'Requiring credit notes / audit')}</div>
+          <div className="text-2xl font-bold tabular-nums text-rose-600 dark:text-rose-400">{totalItemsLost.toLocaleString()}</div>
+          <div className="text-[11px] text-rose-700/90 dark:text-rose-400/80 mt-1">{t('metric.requiring_audit', 'Requiring credit notes / audit')}</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm">
+          <div className="flex items-center justify-between text-slate-600 dark:text-slate-400 mb-2">
             <span className="text-xs font-medium">{t('metric.reconciliation_rate')}</span>
-            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div className="text-2xl font-bold text-emerald-400">{reconciliationRate}%</div>
-          <div className="text-[11px] text-emerald-400/80 mt-1">{t('metric.fulfilled_to_partner', 'Fulfilled to receiving partner')}</div>
+          <div className="text-2xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">{reconciliationRate}%</div>
+          <div className="text-[11px] text-emerald-700/90 dark:text-emerald-400/80 mt-1">{t('metric.fulfilled_to_partner', 'Fulfilled to receiving partner')}</div>
         </div>
       </div>
 
@@ -299,19 +302,19 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
       {/* Middle Section: Loss Breakdown & Partner Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Loss Analysis */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-rose-400" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400" />
               {t('metric.loss_categorization', 'Loss Categorization')}
             </h2>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-600 dark:text-slate-400 tabular-nums">
               {t('table.units_lost', { count: totalItemsLost })}
             </span>
           </div>
 
           {Object.keys(lossReasonBreakdown).length === 0 ? (
-            <div className="p-6 text-center text-slate-500 text-xs">
+            <div className="p-6 text-center text-slate-500 dark:text-slate-400 text-xs">
               {t('analytics.zero_incidents', 'No cargo losses or transit damages reported. Clean reconciliation record!')}
             </div>
           ) : (
@@ -321,14 +324,14 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                 return (
                   <div key={reason} className="space-y-1">
                     <div className="flex justify-between text-xs">
-                      <span className="text-slate-300 font-medium">
+                      <span className="text-slate-700 dark:text-slate-300 font-medium">
                         {t('discrepancy.' + reason.toLowerCase(), reason.replace(/_/g, ' '))}
                       </span>
-                      <span className="text-slate-400 font-mono">
+                      <span className="text-slate-600 dark:text-slate-400 font-mono tabular-nums">
                         {count} {t('unit.units', 'units')} ({percentage}%)
                       </span>
                     </div>
-                    <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                       <div
                         className="bg-rose-500 h-1.5 rounded-full"
                         style={{ width: `${Math.min(100, percentage)}%` }}
@@ -342,40 +345,40 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
         </div>
 
         {/* Partner Directory Summary */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl lg:col-span-2">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl lg:col-span-2 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <Users className="w-4 h-4 text-sky-400" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Users className="w-4 h-4 text-sky-600 dark:text-sky-400" />
               {t('metric.registered_partners', 'Registered Receiving Partners')} ({partners.length})
             </h2>
             <button
               onClick={() => onNavigateTab('partners')}
-              className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
+              className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer min-h-[36px]"
             >
               {t('nav.partners', 'Manage Partners')} <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="divide-y divide-slate-800/80">
+          <div className="divide-y divide-slate-200 dark:divide-slate-800/80">
             {partners.slice(0, 4).map((p) => {
               const partnerDispatches = dispatches.filter((d) => d.partnerId === p.id);
               const partnerLosses = partnerDispatches.reduce((s, d) => s + (d.totalQuantityLost || 0), 0);
               return (
                 <div key={p.id} className="py-3 flex items-center justify-between text-xs">
                   <div>
-                    <div className="font-semibold text-white">{t(p.name)}</div>
-                    <div className="text-slate-400 text-[11px]">{t(p.contactPerson)} • {p.phone}</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">{t(p.name)}</div>
+                    <div className="text-slate-600 dark:text-slate-400 text-[11px]">{t(p.contactPerson)} • {p.phone}</div>
                   </div>
                   <div className="text-right">
-                    <span className="font-mono text-slate-300">
+                    <span className="font-mono tabular-nums text-slate-700 dark:text-slate-300">
                       {t('metric.dispatches_count', { count: partnerDispatches.length })}
                     </span>
                     {partnerLosses > 0 ? (
-                      <span className="block text-[10px] text-rose-400 font-semibold">
+                      <span className="block text-[10px] text-rose-600 dark:text-rose-400 font-semibold">
                         {t('table.units_lost', { count: partnerLosses })}
                       </span>
                     ) : (
-                      <span className="block text-[10px] text-emerald-400">{t('table.intact', '100% Intact')}</span>
+                      <span className="block text-[10px] text-emerald-700 dark:text-emerald-400">{t('table.intact', '100% Intact')}</span>
                     )}
                   </div>
                 </div>
@@ -386,23 +389,23 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
       </div>
 
       {/* Dispatches Awaiting Action / Recent Dispatches */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <Package className="w-4 h-4 text-indigo-400" />
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Package className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             {t('metric.recent_dispatches', 'Recent Outbound Dispatches')}
           </h2>
           <button
             onClick={() => onNavigateTab('dispatches')}
-            className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
+            className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer min-h-[36px]"
           >
             {t('action.view_all_dispatches', 'View All Dispatches')} <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/80 scrollbar-thin">
           <table className="w-full text-left text-xs min-w-[700px] sm:min-w-[740px] lg:min-w-full">
-            <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/40 border-b border-slate-800">
+            <thead className="text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/40 border-b border-slate-200 dark:border-slate-800">
               <tr>
                 <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.dispatch_number', 'Dispatch Number')}</th>
                 <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.destination_partner', 'Partner Destination')}</th>
@@ -412,50 +415,50 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                 <th className="px-2.5 sm:px-3.5 py-3 font-semibold text-right whitespace-nowrap">{t('table.action', 'Action')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
               {dispatches.slice(0, 5).map((d) => (
-                <tr key={d.id} className="hover:bg-slate-800/40 transition-colors">
-                  <td className="px-2.5 sm:px-3 py-3 font-mono font-semibold text-indigo-300 whitespace-nowrap">
+                <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                  <td className="px-2.5 sm:px-3 py-3 font-mono font-semibold text-indigo-600 dark:text-indigo-300 whitespace-nowrap">
                     <button
                       onClick={() => onSelectDispatch(d.id)}
-                      className="hover:underline text-indigo-300 hover:text-indigo-200 cursor-pointer text-left"
+                      className="hover:underline text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 dark:hover:text-indigo-200 cursor-pointer text-left min-h-[36px] inline-flex items-center"
                       title={t('action.details', 'View dispatch details')}
                     >
                       {d.dispatchNumber}
                     </button>
                   </td>
-                  <td className="px-2.5 sm:px-3 py-3 text-slate-200">
-                    <div className="font-medium">{t(d.partnerName)}</div>
-                    <div className="text-[11px] text-slate-500 truncate max-w-xs">{t(d.destinationSnapshot.address)}</div>
+                  <td className="px-2.5 sm:px-3 py-3 text-slate-800 dark:text-slate-200">
+                    <div className="font-medium text-slate-900 dark:text-white">{t(d.partnerName)}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-xs">{t(d.destinationSnapshot.address)}</div>
                   </td>
                   <td className="px-2.5 sm:px-3 py-3 whitespace-nowrap">
                     <StatusBadge status={d.status} size="sm" />
                   </td>
-                  <td className="px-2.5 sm:px-3 py-3 text-slate-300 whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3 py-3 text-slate-700 dark:text-slate-300 tabular-nums whitespace-nowrap">
                     {d.totalQuantityDispatched}{' '}
                     {d.lines[0]?.unit ? t('unit.' + d.lines[0].unit.toLowerCase(), d.lines[0].unit) : t('unit.units', 'units')}
                   </td>
                   <td className="px-2.5 sm:px-3 py-3 whitespace-nowrap">
                     {d.totalQuantityLost !== undefined ? (
                       d.totalQuantityLost > 0 ? (
-                        <span className="text-rose-400 font-semibold flex items-center gap-1">
+                        <span className="text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-1">
                           <AlertTriangle className="w-3.5 h-3.5" />
                           {t('table.shortfall_units', { count: d.totalQuantityLost })}
                         </span>
                       ) : (
-                        <span className="text-emerald-400 font-medium flex items-center gap-1">
+                        <span className="text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           {t('recon.reconciled_100', 'Reconciled (100%)')}
                         </span>
                       )
                     ) : (
-                      <span className="text-slate-500">{t('status.pending_receipt', 'Pending Receipt')}</span>
+                      <span className="text-slate-500 dark:text-slate-400">{t('status.pending_receipt', 'Pending Receipt')}</span>
                     )}
                   </td>
                   <td className="px-2.5 sm:px-3 py-3 text-right whitespace-nowrap">
                     <button
                       onClick={() => onSelectDispatch(d.id)}
-                      className="px-3 py-2 min-h-[40px] rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium cursor-pointer inline-flex items-center justify-center"
+                      className="px-3.5 py-2 min-h-[44px] rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-medium cursor-pointer inline-flex items-center justify-center"
                     >
                       {t('action.details', 'Details')}
                     </button>
@@ -469,11 +472,11 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
 
       {/* Register New Business Entity Modal */}
       {showCreateBizModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto scrollbar-thin">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto scrollbar-thin">
             <button
               onClick={() => setShowCreateBizModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              className="absolute top-4 right-4 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               title={t('action.close', 'Close')}
               aria-label={t('action.close', 'Close')}
             >
@@ -481,26 +484,26 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
             </button>
 
             <div className="flex items-center gap-3 mb-5">
-              <div className="p-2.5 rounded-xl bg-indigo-950/70 border border-indigo-800/60 text-indigo-400">
+              <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800/60 text-indigo-600 dark:text-indigo-400">
                 <Building2 className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">{t('auth.register_title', 'Register New Business Entity')}</h3>
-                <p className="text-xs text-slate-400">{t('auth.add_entity_desc', 'Add an operating entity under your multi-tenant account')}</p>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('auth.register_title', 'Register New Business Entity')}</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400">{t('auth.add_entity_desc', 'Add an operating entity under your multi-tenant account')}</p>
               </div>
             </div>
 
             {bizModalError && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-950/50 border border-rose-800/60 text-rose-300 text-xs flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
                 <span>{bizModalError}</span>
               </div>
             )}
 
             <form onSubmit={handleCreateBusinessSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  {t('auth.biz_legal_name', 'Business Legal Name')} <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  {t('auth.biz_legal_name', 'Business Legal Name')} <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -508,13 +511,13 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                   placeholder={t('biz.placeholder_name', 'e.g. Great Lakes Cold Freight Ltd.')}
                   value={bizForm.name}
                   onChange={(e) => setBizForm({ ...bizForm, name: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full min-h-[44px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     {t('auth.tax_id', 'Registration / Tax ID')}
                   </label>
                   <input
@@ -522,18 +525,18 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                     placeholder={t('biz.placeholder_tax_id', 'e.g. REG-88421-US')}
                     value={bizForm.registrationNumber}
                     onChange={(e) => setBizForm({ ...bizForm, registrationNumber: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                    className="w-full min-h-[44px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     {t('auth.country_code', 'Country Code')}
                   </label>
                   <input
                     type="text"
                     value={bizForm.countryCode}
                     onChange={(e) => setBizForm({ ...bizForm, countryCode: e.target.value.toUpperCase() })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors uppercase font-mono"
+                    className="w-full min-h-[44px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors uppercase font-mono"
                     maxLength={2}
                   />
                 </div>
@@ -541,8 +544,8 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    {t('auth.email_address', 'Contact Email')} <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('auth.email_address', 'Contact Email')} <span className="text-rose-600 dark:text-rose-400">*</span>
                   </label>
                   <input
                     type="email"
@@ -550,12 +553,12 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                     placeholder={t('biz.placeholder_email', 'ops@company.com')}
                     value={bizForm.contactEmail}
                     onChange={(e) => setBizForm({ ...bizForm, contactEmail: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                    className="w-full min-h-[44px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    {t('auth.mobile_phone', 'Dispatch Phone')} <span className="text-rose-400">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {t('auth.mobile_phone', 'Dispatch Phone')} <span className="text-rose-600 dark:text-rose-400">*</span>
                   </label>
                   <input
                     type="tel"
@@ -563,14 +566,14 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                     placeholder={t('biz.placeholder_phone', '+1-555-019-0000')}
                     value={bizForm.contactPhone}
                     onChange={(e) => setBizForm({ ...bizForm, contactPhone: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                    className="w-full min-h-[44px] bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  {t('table.address', 'Operating Headquarters Address')} <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  {t('table.address', 'Operating Headquarters Address')} <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
                 <textarea
                   required
@@ -578,7 +581,7 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                   placeholder={t('biz.placeholder_address', 'e.g. 500 Industrial Parkway, Dock 1, Milwaukee, WI 53202')}
                   value={bizForm.address}
                   onChange={(e) => setBizForm({ ...bizForm, address: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
                 />
               </div>
 
@@ -586,14 +589,14 @@ export const BusinessOwnerDashboard: React.FC<BusinessOwnerDashboardProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowCreateBizModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   {t('action.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={submittingBiz}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 transition-colors cursor-pointer disabled:opacity-50"
+                  className="min-h-[44px] flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {submittingBiz ? (
                     <>

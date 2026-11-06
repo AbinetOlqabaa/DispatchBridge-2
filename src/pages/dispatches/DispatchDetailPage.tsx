@@ -118,7 +118,13 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
         )
       );
     } else {
-      setActionSuccess(`Transit status updated to ${updated.status.replace(/_/g, ' ')} via driver QR verification.`);
+      const translatedStatus = t(
+        'status.' + updated.status.toLowerCase(),
+        updated.status.replace(/_/g, ' ')
+      );
+      setActionSuccess(
+        `${t('table.status', 'Status')}: ${translatedStatus} (${t('dispatch.scan_verified_qr', 'QR Verified')})`
+      );
     }
     setTimeout(() => setActionSuccess(null), 4500);
   };
@@ -239,10 +245,15 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
           )
         );
       } else {
-        setActionSuccess('Delivery receipt verified and reconciliation recorded with digital signature & evidence.');
+        setActionSuccess(
+          t(
+            'manifest.submit_success_msg',
+            'Delivery receipt verified and reconciliation recorded with digital signature & evidence.'
+          )
+        );
       }
     } catch (err: any) {
-      setActionError(err.message || 'Failed to record reconciliation.');
+      setActionError(err.message || t('manifest.submit_error_msg', 'Failed to record reconciliation.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -294,11 +305,11 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
   if (loading) return <LoadingSpinner label={t('dispatch.loading_manifest')} />;
   if (error || !dispatch) {
     return (
-      <div className="p-8 text-center bg-slate-900 border border-slate-800 rounded-2xl">
-        <p className="text-rose-400 mb-4">{error || 'Dispatch not found.'}</p>
+      <div className="p-8 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
+        <p className="text-rose-700 dark:text-rose-400 font-medium mb-4">{error || t('dispatch.not_found', 'Dispatch not found.')}</p>
         <button
           onClick={onBack}
-          className="px-4 py-2.5 min-h-[44px] bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold cursor-pointer"
+          className="px-4 py-2.5 min-h-[44px] bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
         >
           {t('table.return_to_list', 'Return to Dispatch List')}
         </button>
@@ -325,7 +336,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white cursor-pointer transition-colors min-h-[44px] px-2 rounded-xl"
+          className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white cursor-pointer transition-colors min-h-[44px] px-2 rounded-xl"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{t('nav.dispatches')}</span>
@@ -335,10 +346,10 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
           {/* Driver QR Scanner Button */}
           <button
             onClick={() => setIsQrScannerOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors min-h-[44px]"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-sky-800 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-sky-300 dark:border-slate-700 text-xs font-semibold cursor-pointer transition-colors min-h-[44px] shadow-xs"
             title={t('dispatch.scan_qr_tooltip', 'Scan QR barcode to verify transit checkpoints')}
           >
-            <QrCode className="w-4 h-4" />
+            <QrCode className="w-4 h-4 text-sky-600 dark:text-sky-400" />
             <span>{t('action.scan_qr', 'Scan QR / Transit')}</span>
           </button>
 
@@ -346,18 +357,18 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
           <button
             onClick={handleExportPdf}
             disabled={isExportingPdf}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 text-xs font-semibold cursor-pointer transition-colors min-h-[44px]"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-emerald-800 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-emerald-300 dark:border-slate-700 text-xs font-semibold cursor-pointer transition-colors min-h-[44px] shadow-xs"
             title={t('dispatch.export_pdf_tooltip', 'Export official manifest to PDF for offline records')}
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>{isExportingPdf ? t('export.exporting') : t('action.export_pdf', 'Export PDF Manifest')}</span>
           </button>
 
           <button
             onClick={() => onOpenPublicLink(dispatch.shareToken)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 text-xs font-semibold cursor-pointer min-h-[44px]"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/80 dark:hover:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-800/60 text-xs font-semibold cursor-pointer min-h-[44px] shadow-xs"
           >
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             <span>{t('table.view_tracking')}</span>
           </button>
         </div>
@@ -365,23 +376,23 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
 
       {/* Guest Mode Notice */}
       {!user && (
-        <div className="bg-indigo-950/60 border border-indigo-800/40 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/40 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
-            <span className="text-slate-300">
+            <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-sky-400 shrink-0" />
+            <span className="text-slate-800 dark:text-slate-300 font-medium">
               {t('banner.guest_manifest_desc')}
             </span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => quickLoginDemoRole('RECEIVER')}
-              className="px-3.5 py-2 bg-amber-900/60 hover:bg-amber-800 text-amber-300 border border-amber-700/50 rounded-xl text-xs font-semibold cursor-pointer transition-colors min-h-[44px] flex items-center"
+              className="px-3.5 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 dark:bg-amber-900/60 dark:hover:bg-amber-800 dark:text-amber-300 dark:border-amber-700/50 rounded-xl text-xs font-semibold cursor-pointer transition-colors min-h-[44px] flex items-center shadow-xs"
             >
               {t('table.sign_in_receiver', 'Sign In as Receiver')}
             </button>
             <button
               onClick={() => quickLoginDemoRole('BUSINESS_OWNER')}
-              className="px-3.5 py-2 bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 border border-emerald-700/50 rounded-xl text-xs font-semibold cursor-pointer transition-colors min-h-[44px] flex items-center"
+              className="px-3.5 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-850 border border-emerald-300 dark:bg-emerald-900/60 dark:hover:bg-emerald-800 dark:text-emerald-300 dark:border-emerald-700/50 rounded-xl text-xs font-semibold cursor-pointer transition-colors min-h-[44px] flex items-center shadow-xs"
             >
               {t('table.sign_in_owner', 'Sign In as Owner')}
             </button>
@@ -390,27 +401,27 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
       )}
 
       {/* Manifest Header */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
           <div>
             <div className="flex flex-wrap items-center gap-2.5 mb-1">
-              <span className="font-mono text-xl font-bold text-white">{dispatch.dispatchNumber}</span>
+              <span className="font-mono text-xl font-bold text-slate-900 dark:text-white">{dispatch.dispatchNumber}</span>
               <StatusBadge status={dispatch.status} />
               {pendingDispatchIds.has(dispatch.id) && (
                 <span
                   data-testid="pending-indexeddb-sync-badge"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-950/90 text-amber-200 border border-amber-700/80"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/90 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-700/80"
                 >
                   {isSyncing ? (
-                    <RefreshCw className="w-3 h-3 text-amber-400 animate-spin" />
+                    <RefreshCw className="w-3 h-3 text-amber-600 dark:text-amber-400 animate-spin" />
                   ) : (
-                    <Database className="w-3 h-3 text-amber-400" />
+                    <Database className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                   )}
                   <span>{t('offline_sync.pending_badge', 'Saved Locally in IndexedDB • Pending Auto-Sync')}</span>
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               {t('dispatch.dispatched_on_by', {
                 date: new Date(dispatch.dispatchedAt).toLocaleString(),
                 sender: t(dispatch.senderName),
@@ -421,88 +432,88 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
 
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <div className="text-xs font-medium text-slate-400">{t('dispatch.total_cargo_qty', 'Total Cargo Quantity')}</div>
-              <div className="text-lg font-bold text-white font-mono">{dispatch.totalQuantityDispatched} {t('unit.units', 'units')}</div>
+              <div className="text-xs font-medium text-slate-500 dark:text-slate-400">{t('dispatch.total_cargo_qty', 'Total Cargo Quantity')}</div>
+              <div className="text-lg font-bold text-slate-900 dark:text-white font-mono">{dispatch.totalQuantityDispatched} {t('unit.units', 'units')}</div>
             </div>
           </div>
         </div>
 
         {/* Origin & Destination Snapshots */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-          <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
-            <div className="text-slate-400 mb-1 flex items-center gap-1.5 font-semibold">
-              <Warehouse className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div className="text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5 font-semibold">
+              <Warehouse className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               <span>{t('dispatch.origin_terminal', 'Origin Loading Terminal')}</span>
             </div>
-            <div className="font-semibold text-white text-sm">{t(dispatch.originLocationSnapshot.label)}</div>
-            <div className="text-slate-400 text-[11px] mt-0.5">{t(dispatch.originLocationSnapshot.address)}</div>
+            <div className="font-semibold text-slate-900 dark:text-white text-sm">{t(dispatch.originLocationSnapshot.label)}</div>
+            <div className="text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">{t(dispatch.originLocationSnapshot.address)}</div>
           </div>
 
-          <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
-            <div className="text-slate-400 mb-1 flex items-center gap-1.5 font-semibold">
-              <Building className="w-3.5 h-3.5 text-sky-400" />
+          <div className="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div className="text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5 font-semibold">
+              <Building className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
               <span>{t('dispatch.partner_dest', 'Receiving Partner Destination')}</span>
             </div>
-            <div className="font-semibold text-white text-sm">{t(dispatch.destinationSnapshot.partnerName)}</div>
-            <div className="text-slate-400 text-[11px] mt-0.5">{t(dispatch.destinationSnapshot.address)}</div>
+            <div className="font-semibold text-slate-900 dark:text-white text-sm">{t(dispatch.destinationSnapshot.partnerName)}</div>
+            <div className="text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">{t(dispatch.destinationSnapshot.address)}</div>
             <div className="text-slate-500 text-[10px] mt-0.5">
               {t('table.contact')}: {t(dispatch.destinationSnapshot.contactPerson)} • {dispatch.destinationSnapshot.phone}
             </div>
           </div>
 
-          <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800 sm:col-span-2 lg:col-span-1">
-            <div className="text-slate-400 mb-1 flex items-center gap-1.5 font-semibold">
-              <Truck className="w-3.5 h-3.5 text-blue-400" />
+          <div className="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 sm:col-span-2 lg:col-span-1">
+            <div className="text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5 font-semibold">
+              <Truck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>{t('dispatch.carrier_driver', 'Carrier & Driver')}</span>
             </div>
-            <div className="font-semibold text-white text-sm">{dispatch.driverName ? t(dispatch.driverName) : t('dispatch.standard_freight', 'Standard Freight')}</div>
-            <div className="text-slate-400 text-[11px] mt-0.5">
+            <div className="font-semibold text-slate-900 dark:text-white text-sm">{dispatch.driverName ? t(dispatch.driverName) : t('dispatch.standard_freight', 'Standard Freight')}</div>
+            <div className="text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">
               {dispatch.vehicleReg ? `${t('dispatch.truck_plate')}: ${dispatch.vehicleReg}` : ''} {dispatch.driverPhone ? `• ${dispatch.driverPhone}` : ''}
             </div>
           </div>
         </div>
 
         {/* View Receipt Verification Box */}
-        <div className="bg-slate-950/80 border border-slate-800 p-3.5 rounded-xl text-xs space-y-2">
+        <div className="bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 p-3.5 rounded-xl text-xs space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Eye className="w-4 h-4 text-indigo-400" />
-              <span className="font-bold text-white">{t('recon.first_viewed_audit', 'Recipient View Receipt Audit')}</span>
+              <Eye className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span className="font-bold text-slate-900 dark:text-white">{t('recon.first_viewed_audit', 'Recipient View Receipt Audit')}</span>
             </div>
             {dispatch.firstViewedAt ? (
-              <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+              <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-100 border border-emerald-300 dark:text-emerald-400 dark:bg-emerald-950 dark:border-emerald-800 px-2 py-0.5 rounded">
                 {t('recon.verified_partner_view', 'Verified Partner View Recorded')}
               </span>
             ) : (
-              <span className="text-[11px] text-slate-500">{t('status.unviewed', 'Unviewed by Recipient')}</span>
+              <span className="text-[11px] text-slate-600 dark:text-slate-500 bg-slate-200/60 dark:bg-slate-800 px-2 py-0.5 rounded">{t('status.unviewed', 'Unviewed by Recipient')}</span>
             )}
           </div>
 
           {dispatch.firstViewedAt ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-slate-300 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-slate-700 dark:text-slate-300 pt-1">
               <div>
                 <span className="text-slate-500">{t('dispatch.first_opened', 'First Opened:')}</span>{' '}
-                <span className="font-mono text-white">{new Date(dispatch.firstViewedAt).toLocaleString()}</span>
+                <span className="font-mono text-slate-900 dark:text-white font-semibold">{new Date(dispatch.firstViewedAt).toLocaleString()}</span>
               </div>
               <div>
-                <span className="font-mono text-white">{t('recon.view_count', 'Total Views: {count} times', { count: dispatch.viewReceipt?.viewCount || 1 })}</span>
+                <span className="font-mono text-slate-900 dark:text-white font-semibold">{t('recon.view_count', 'Total Views: {count} times', { count: dispatch.viewReceipt?.viewCount || 1 })}</span>
               </div>
               <div>
                 <span className="text-slate-500">{t('dispatch.viewer', 'Viewer:')}</span>{' '}
-                <span className="text-indigo-300 font-medium">{t(dispatch.viewReceipt?.viewerName || dispatch.partnerName)}</span>
+                <span className="text-indigo-700 dark:text-indigo-300 font-semibold">{t(dispatch.viewReceipt?.viewerName || dispatch.partnerName)}</span>
               </div>
             </div>
           ) : (
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-600 dark:text-slate-400">
               {t('dispatch.unopened_desc', 'The recipient has not accessed or opened this delivery list. A view timestamp will be recorded the moment an authenticated partner opens this manifest.')}
             </p>
           )}
 
-          <div className="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span className="text-[11px] text-slate-400 truncate select-all font-mono">{shareUrl}</span>
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span className="text-[11px] text-slate-600 dark:text-slate-400 truncate select-all font-mono">{shareUrl}</span>
             <button
               onClick={handleCopyLink}
-              className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold cursor-pointer shrink-0 flex items-center gap-1.5"
+              className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold cursor-pointer shrink-0 flex items-center gap-1.5 shadow-xs"
             >
               {copied ? <CheckCircle className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? t('action.copied', 'Copied') : t('action.copy_link', 'Copy Link')}</span>
@@ -511,8 +522,8 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
         </div>
 
         {dispatch.notes && (
-          <div className="text-xs bg-slate-800/30 p-3 rounded-xl text-slate-300 border border-slate-800">
-            <span className="font-semibold text-slate-400 block mb-0.5">{t('dispatch.instructions_notes', 'Instructions & Notes:')}</span>
+          <div className="text-xs bg-slate-100 dark:bg-slate-800/30 p-3 rounded-xl text-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
+            <span className="font-semibold text-slate-600 dark:text-slate-400 block mb-0.5">{t('dispatch.instructions_notes', 'Instructions & Notes:')}</span>
             <p className="whitespace-pre-line">{t(dispatch.notes)}</p>
           </div>
         )}
@@ -525,24 +536,24 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
       />
 
       {actionSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2 shadow-xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span>{actionSuccess}</span>
         </div>
       )}
       {actionError && (
-        <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 shrink-0" />
+        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2 shadow-xs">
+          <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
           <span>{actionError}</span>
         </div>
       )}
 
       {/* Discrepancy Cases (if any exist) */}
       {dispatch.discrepancyCases && dispatch.discrepancyCases.length > 0 && (
-        <div className="bg-slate-900 border border-rose-900/60 rounded-2xl p-5 space-y-4">
+        <div className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 rounded-2xl p-5 space-y-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-rose-400" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400" />
               {t('recon.active_cases', 'Active Discrepancy Cases ({count})', { count: dispatch.discrepancyCases.length })}
             </h2>
           </div>
@@ -551,21 +562,21 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
             {dispatch.discrepancyCases.map((c) => (
               <div
                 key={c.id}
-                className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-xs space-y-2.5"
+                className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-xs space-y-2.5 shadow-xs"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-bold text-white text-sm mr-2">{t(c.itemName || '')}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-800 uppercase">
+                    <span className="font-bold text-slate-900 dark:text-white text-sm mr-2">{t(c.itemName || '')}</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800 uppercase">
                       {t('discrepancy.' + c.type.toLowerCase(), c.type)}
                     </span>
                   </div>
-                  <span className="font-semibold text-xs text-amber-400 bg-amber-950 px-2 py-0.5 rounded border border-amber-800">
+                  <span className="font-semibold text-xs text-amber-800 bg-amber-50 border border-amber-200 dark:text-amber-400 dark:bg-amber-950 dark:border-amber-800 px-2 py-0.5 rounded">
                     {t('recon.status_label', 'Status:')} {t('status.' + c.status.toLowerCase(), c.status)}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-300">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-700 dark:text-slate-300">
                   <div>
                     <span className="text-slate-500">{t('recon.sent_qty', 'Sent Qty:')}</span> {c.expectedQuantity}
                   </div>
@@ -574,7 +585,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                   </div>
                   <div>
                     <span className="text-slate-500">{t('recon.shortfall_loss', 'Shortfall / Loss:')}</span>{' '}
-                    <span className="text-rose-400 font-bold">{c.shortfallQuantity}</span>
+                    <span className="text-rose-600 dark:text-rose-400 font-bold">{c.shortfallQuantity}</span>
                   </div>
                   <div>
                     <span className="text-slate-500">{t('recon.flagged_by', 'Flagged By:')}</span> {t(c.openedByName)}
@@ -582,37 +593,37 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                 </div>
 
                 {c.notes && (
-                  <div className="text-[11px] text-slate-400 bg-slate-900/80 p-2 rounded">
-                    <strong>{t('recon.receiver_note', 'Receiver Note:')}</strong> {t(c.notes)}
+                  <div className="text-[11px] text-slate-700 dark:text-slate-400 bg-slate-100 dark:bg-slate-900/80 p-2 rounded border border-slate-200/60 dark:border-transparent">
+                    <strong className="text-slate-900 dark:text-slate-200">{t('recon.receiver_note', 'Receiver Note:')}</strong> {t(c.notes)}
                   </div>
                 )}
 
                 {c.senderResponseNotes && (
-                  <div className="text-[11px] text-blue-300 bg-blue-950/40 border border-blue-900/40 p-2 rounded">
-                    <strong>{t('recon.sender_response_label', 'Sender Response:')}</strong> {t(c.senderResponseNotes)}
+                  <div className="text-[11px] text-blue-900 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/40 p-2 rounded">
+                    <strong className="text-blue-950 dark:text-blue-200">{t('recon.sender_response_label', 'Sender Response:')}</strong> {t(c.senderResponseNotes)}
                   </div>
                 )}
 
                 {c.resolution && (
-                  <div className="text-[11px] text-emerald-300 bg-emerald-950/40 border border-emerald-900/40 p-2 rounded">
-                    <strong>{t('recon.final_resolution_label', 'Final Resolution:')}</strong> {t(c.resolution)} ({t(c.resolvedByName || '')})
+                  <div className="text-[11px] text-emerald-900 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 p-2 rounded">
+                    <strong className="text-emerald-950 dark:text-emerald-200">{t('recon.final_resolution_label', 'Final Resolution:')}</strong> {t(c.resolution)} ({t(c.resolvedByName || '')})
                   </div>
                 )}
 
                 {/* Evidence Attachments */}
                 {c.evidence && c.evidence.length > 0 && (
                   <div className="space-y-1.5 pt-1">
-                    <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
-                      <Camera className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                       <span>{t('recon.cargo_evidence_title', 'Tamper-Evident Cargo Evidence ({count} photos)', { count: c.evidence.length })}</span>
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {c.evidence.map((ev) => (
-                        <div key={ev.id} className="bg-slate-900 rounded-lg border border-slate-700 overflow-hidden">
+                        <div key={ev.id} className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-xs">
                           <img src={ev.dataUrl} alt={ev.fileName} className="h-20 w-full object-cover" />
-                          <div className="p-1 text-[9px] text-slate-400 truncate">
-                            <span className="text-slate-200 font-semibold">{ev.fileName}</span>
-                            <div className="font-mono text-[8px] text-emerald-400">SHA: {ev.sha256Hash?.substring(0, 10)}...</div>
+                          <div className="p-1 text-[9px] text-slate-600 dark:text-slate-400 truncate">
+                            <span className="text-slate-900 dark:text-slate-200 font-semibold">{ev.fileName}</span>
+                            <div className="font-mono text-[8px] text-emerald-600 dark:text-emerald-400 font-medium">SHA: {ev.sha256Hash?.substring(0, 10)}...</div>
                           </div>
                         </div>
                       ))}
@@ -633,10 +644,10 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                 )}
 
                 {respondingCaseId === c.id && (
-                  <form onSubmit={handleRespondToDiscrepancy} className="p-3 bg-slate-900 rounded-xl border border-slate-700 space-y-2 mt-2">
-                    <div className="font-semibold text-white">{t('recon.submit_response', 'Submit Sender Response')}</div>
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-1.5 cursor-pointer text-slate-300">
+                  <form onSubmit={handleRespondToDiscrepancy} className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2.5 mt-2 shadow-xs">
+                    <div className="font-semibold text-slate-900 dark:text-white">{t('recon.submit_response', 'Submit Sender Response')}</div>
+                    <div className="flex flex-wrap gap-4">
+                      <label className="flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-slate-300 min-h-[36px]">
                         <input
                           type="radio"
                           name="respStatus"
@@ -646,7 +657,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                         />
                         <span>{t('recon.acknowledge_loss', 'Acknowledge Shortage / Damage')}</span>
                       </label>
-                      <label className="flex items-center gap-1.5 cursor-pointer text-slate-300">
+                      <label className="flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-slate-300 min-h-[36px]">
                         <input
                           type="radio"
                           name="respStatus"
@@ -663,20 +674,20 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                       value={discrepancyResponseNotes}
                       onChange={(e) => setDiscrepancyResponseNotes(e.target.value)}
                       placeholder={t('dispatch.placeholder_discrepancy_explanation', 'Explain packaging check, carrier inquiry, or shortage reason...')}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-white"
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                     />
                     <div className="flex justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => setRespondingCaseId(null)}
-                        className="px-3 py-1 text-slate-400 hover:text-white"
+                        className="px-3 py-1.5 min-h-[40px] text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white cursor-pointer"
                       >
                         {t('action.cancel', 'Cancel')}
                       </button>
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold"
+                        className="px-4 py-1.5 min-h-[40px] bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold cursor-pointer"
                       >
                         {t('recon.submit_response', 'Submit Response')}
                       </button>
@@ -689,7 +700,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                   <div className="pt-1 flex gap-2">
                     <button
                       onClick={() => setResolvingCaseId(c.id)}
-                      className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold cursor-pointer"
+                      className="px-3.5 py-2 min-h-[40px] bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold cursor-pointer"
                     >
                       {t('recon.resolve_close', 'Issue Formal Resolution & Close Case')}
                     </button>
@@ -697,28 +708,28 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                 )}
 
                 {resolvingCaseId === c.id && (
-                  <form onSubmit={handleResolveDiscrepancy} className="p-3 bg-slate-900 rounded-xl border border-purple-800 space-y-2 mt-2">
-                    <div className="font-semibold text-white">{t('recon.final_resolution', 'Record Final Business Resolution')}</div>
+                  <form onSubmit={handleResolveDiscrepancy} className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-purple-200 dark:border-purple-800 space-y-2.5 mt-2 shadow-xs">
+                    <div className="font-semibold text-slate-900 dark:text-white">{t('recon.final_resolution', 'Record Final Business Resolution')}</div>
                     <textarea
                       required
                       rows={2}
                       value={resolutionText}
                       onChange={(e) => setResolutionText(e.target.value)}
                       placeholder={t('recon.resolution_placeholder', 'e.g. Credit Note #CN-9921 issued for 4 damaged units. Freight claim filed.')}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-white"
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                     />
                     <div className="flex justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => setResolvingCaseId(null)}
-                        className="px-3 py-1 text-slate-400 hover:text-white"
+                        className="px-3 py-1.5 min-h-[40px] text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white cursor-pointer"
                       >
                         {t('action.cancel', 'Cancel')}
                       </button>
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-semibold"
+                        className="px-4 py-1.5 min-h-[40px] bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-semibold cursor-pointer"
                       >
                         {t('recon.resolve_close', 'Resolve & Close Case')}
                       </button>
@@ -732,10 +743,10 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
       )}
 
       {/* Item Manifest Lines Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <Package className="w-4 h-4 text-indigo-400" />
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Package className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             {t('table.items', 'Itemized Manifest Lines')} ({dispatch.lines.length})
           </h2>
           {canReconcile && !isReconciling && (
@@ -753,9 +764,9 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
           )}
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-800/80 scrollbar-thin">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/80 scrollbar-thin">
           <table className="w-full text-left text-xs min-w-[680px] sm:min-w-[720px] lg:min-w-full">
-            <thead className="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/40 border-b border-slate-800">
+            <thead className="text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/40 border-b border-slate-200 dark:border-slate-800">
               <tr>
                 <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.sku', 'SKU')}</th>
                 <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.item_description', 'Item Description')}</th>
@@ -767,30 +778,30 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                 <th className="px-2.5 sm:px-3.5 py-3 font-semibold whitespace-nowrap">{t('table.notes', 'Notes')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 font-mono">
               {dispatch.lines.map((line) => (
-                <tr key={line.id} className="hover:bg-slate-800/30">
-                  <td className="px-2.5 sm:px-3.5 py-3 text-slate-400 whitespace-nowrap">{line.sku}</td>
-                  <td className="px-2.5 sm:px-3.5 py-3 font-sans font-medium text-slate-200">{t(line.itemName)}</td>
-                  <td className="px-2.5 sm:px-3.5 py-3 text-right text-slate-200 font-bold whitespace-nowrap">
+                <tr key={line.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                  <td className="px-2.5 sm:px-3.5 py-3 text-slate-500 dark:text-slate-400 whitespace-nowrap">{line.sku}</td>
+                  <td className="px-2.5 sm:px-3.5 py-3 font-sans font-medium text-slate-800 dark:text-slate-200">{t(line.itemName)}</td>
+                  <td className="px-2.5 sm:px-3.5 py-3 text-right text-slate-900 dark:text-slate-200 font-bold whitespace-nowrap">
                     {line.quantitySent} {t('unit.' + line.unit.toLowerCase(), line.unit)}
                   </td>
-                  <td className="px-2.5 sm:px-3.5 py-3 text-right font-bold text-emerald-400 whitespace-nowrap">
+                  <td className="px-2.5 sm:px-3.5 py-3 text-right font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
                     {line.quantityReceived !== undefined ? `${line.quantityReceived} ${t('unit.' + line.unit.toLowerCase(), line.unit)}` : '—'}
                   </td>
                   <td className="px-2.5 sm:px-3.5 py-3 text-right font-bold whitespace-nowrap">
                     {line.lossQty && line.lossQty > 0 ? (
-                      <span className="text-rose-400">-{line.lossQty} {t('unit.' + line.unit.toLowerCase(), line.unit)}</span>
+                      <span className="text-rose-600 dark:text-rose-400">-{line.lossQty} {t('unit.' + line.unit.toLowerCase(), line.unit)}</span>
                     ) : (
-                      <span className="text-slate-500">0</span>
+                      <span className="text-slate-400 dark:text-slate-500">0</span>
                     )}
                   </td>
                   <td className="px-2.5 sm:px-3.5 py-3 font-sans whitespace-nowrap">
                     {line.condition ? (
                       <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
                         line.condition === 'DAMAGED'
-                          ? 'bg-rose-950 text-rose-300 border border-rose-800'
-                          : 'bg-slate-800 text-slate-300'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800'
+                          : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                       }`}>
                         {t('condition.' + line.condition.toLowerCase(), line.condition)}
                       </span>
@@ -800,14 +811,14 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                   </td>
                   <td className="px-2.5 sm:px-3.5 py-3 font-sans whitespace-nowrap">
                     {line.discrepancyType && line.discrepancyType !== 'NONE' ? (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-950 text-rose-300 border border-rose-800">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800">
                         {t('discrepancy.' + line.discrepancyType.toLowerCase(), line.discrepancyType)}
                       </span>
                     ) : (
-                      <span className="text-slate-500">—</span>
+                      <span className="text-slate-400 dark:text-slate-500">—</span>
                     )}
                   </td>
-                  <td className="px-2.5 sm:px-3.5 py-3 font-sans text-slate-400 text-[11px]">{line.notes ? t(line.notes) : '—'}</td>
+                  <td className="px-2.5 sm:px-3.5 py-3 font-sans text-slate-600 dark:text-slate-400 text-[11px]">{line.notes ? t(line.notes) : '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -817,35 +828,35 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
 
       {/* Receiver Sign-Off Certificate Card */}
       {dispatch.receiverSignoff && (
-        <div className="bg-slate-900 border border-emerald-900/60 rounded-2xl p-5 space-y-2">
+        <div className="bg-emerald-50/70 dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900/60 rounded-2xl p-5 space-y-2 shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-            <h3 className="text-sm font-bold text-white">{t('recon.certificate_title', 'Verified Delivery Sign-Off Certificate')}</h3>
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">{t('recon.certificate_title', 'Verified Delivery Sign-Off Certificate')}</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-2">
             <div>
               <span className="text-slate-500">{t('recon.signed_by', 'Signed By:')}</span>
-              <div className="font-semibold text-slate-200">{t(dispatch.receiverSignoff.signerName)}</div>
-              <div className="text-[11px] text-slate-400">{t(dispatch.receiverSignoff.signerRole)}</div>
+              <div className="font-semibold text-slate-900 dark:text-slate-200">{t(dispatch.receiverSignoff.signerName)}</div>
+              <div className="text-[11px] text-slate-600 dark:text-slate-400">{t(dispatch.receiverSignoff.signerRole)}</div>
             </div>
             <div>
               <span className="text-slate-500">{t('recon.verification_timestamp', 'Verification Timestamp:')}</span>
-              <div className="font-semibold text-slate-200">
+              <div className="font-semibold text-slate-900 dark:text-slate-200">
                 {new Date(dispatch.receiverSignoff.signedAt).toLocaleString()}
               </div>
             </div>
             <div>
               <span className="text-slate-500">{t('recon.receiver_comments', 'Receiver Comments:')}</span>
-              <div className="text-slate-300">{dispatch.receiverSignoff.comments ? t(dispatch.receiverSignoff.comments) : t('recon.no_remarks', 'No remarks provided.')}</div>
+              <div className="text-slate-700 dark:text-slate-300">{dispatch.receiverSignoff.comments ? t(dispatch.receiverSignoff.comments) : t('recon.no_remarks', 'No remarks provided.')}</div>
             </div>
 
             {dispatch.receiverSignoff.signatureSvgOrBase64 && (
-              <div className="sm:col-span-3 pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="sm:col-span-3 pt-3 border-t border-emerald-200/60 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                  <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">
+                  <span className="text-[11px] text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider block">
                     {t('recon.verified_signature', 'Verified Digital Signature')}
                   </span>
-                  <div className="mt-1 bg-slate-950 p-2 rounded-xl border border-slate-800 inline-block">
+                  <div className="mt-1 bg-white dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 inline-block shadow-xs">
                     <img
                       src={dispatch.receiverSignoff.signatureSvgOrBase64}
                       alt={t('dispatch.receiver_signature_alt', 'Receiver Signature')}
@@ -853,8 +864,8 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                     />
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl">
-                  <ShieldCheck className="w-4 h-4 shrink-0" />
+                <div className="flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-100 border border-emerald-300 dark:text-emerald-400 dark:bg-emerald-950/60 dark:border-emerald-800 px-3 py-1.5 rounded-xl shadow-xs">
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
                   <span>{t('recon.glass_signoff_locked', 'Legally Enforceable Glass Sign-Off Locked')}</span>
                 </div>
               </div>
@@ -865,22 +876,22 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
 
       {/* Form: Record Dock Receipt (if opened by user) */}
       {isReconciling && canReconcile && (
-        <div id="reconciliation-form-section" className="bg-slate-900 border border-amber-800/80 rounded-2xl p-6 shadow-xl space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div id="reconciliation-form-section" className="bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-800/80 rounded-2xl p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
             <div className="flex items-center gap-2">
-              <FileCheck className="w-5 h-5 text-amber-400" />
-              <h3 className="text-sm font-bold text-white">{t('recon.record_receipt', 'Record Dock Receipt & Physical Count')}</h3>
+              <FileCheck className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">{t('recon.record_receipt', 'Record Dock Receipt & Physical Count')}</h3>
             </div>
             <button
               onClick={() => setIsReconciling(false)}
-              className="text-xs text-slate-400 hover:text-white cursor-pointer"
+              className="text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white cursor-pointer"
             >
               {t('action.cancel', 'Cancel')}
             </button>
           </div>
 
           <form onSubmit={handleSubmitReconciliation} className="space-y-4">
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               {t('recon.record_receipt_desc', 'Input the physical count received per line on the dock. If damage or shortage occurred, categorize the discrepancy accordingly.')}
             </p>
 
@@ -888,18 +899,18 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
               {dispatch.lines.map((line, idx) => (
                 <div
                   key={line.id}
-                  className="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/80 space-y-2 text-xs"
+                  className="bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 space-y-2 text-xs shadow-xs"
                 >
                   <div className="flex items-center justify-between font-semibold">
-                    <span className="text-white">
+                    <span className="text-slate-900 dark:text-white">
                       {line.sku} - {t(line.itemName)}
                     </span>
-                    <span className="text-slate-400 font-mono">{t('table.dispatched', 'Dispatched')}: {line.quantitySent} {t('unit.' + line.unit.toLowerCase(), line.unit)}</span>
+                    <span className="text-slate-600 dark:text-slate-400 font-mono">{t('table.dispatched', 'Dispatched')}: {line.quantitySent} {t('unit.' + line.unit.toLowerCase(), line.unit)}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-300 mb-1">
+                      <label className="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">
                         {t('table.received', 'Received Count')} ({t('unit.' + line.unit.toLowerCase(), line.unit)}) *
                       </label>
                       <input
@@ -908,18 +919,18 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                         step="any"
                         value={lineReceipts[idx]?.quantityReceived || 0}
                         onChange={(e) => handleLineReceiptChange(idx, 'quantityReceived', e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white font-mono"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-300 mb-1">
+                      <label className="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">
                         {t('table.condition', 'Condition')}
                       </label>
                       <select
                         value={lineReceipts[idx]?.condition || 'GOOD'}
                         onChange={(e) => handleLineReceiptChange(idx, 'condition', e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
                       >
                         <option value="GOOD">{t('condition.good_intact', 'Good / Intact')}</option>
                         <option value="DAMAGED">{t('condition.damaged', 'Damaged')}</option>
@@ -929,13 +940,13 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-300 mb-1">
+                      <label className="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">
                         {t('table.discrepancy_category', 'Discrepancy Category')}
                       </label>
                       <select
                         value={lineReceipts[idx]?.discrepancyType || 'NONE'}
                         onChange={(e) => handleLineReceiptChange(idx, 'discrepancyType', e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white"
                       >
                         <option value="NONE">{t('discrepancy.none', 'None (Full Count)')}</option>
                         <option value="SHORTAGE">{t('discrepancy.shortage', 'Shortage')}</option>
@@ -947,7 +958,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-medium text-slate-300 mb-1">
+                      <label className="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1">
                         {t('table.notes', 'Inspection Note')}
                       </label>
                       <input
@@ -955,7 +966,7 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
                         value={lineReceipts[idx]?.notes || ''}
                         onChange={(e) => handleLineReceiptChange(idx, 'notes', e.target.value)}
                         placeholder={t('dispatch.placeholder_discrepancy_reason', 'e.g. Pallet seal broken')}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                       />
                     </div>
                   </div>
@@ -975,37 +986,37 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
             {/* Sign-off inputs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('recon.signer_name_field', 'Receiver Signer Name')} *</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('recon.signer_name_field', 'Receiver Signer Name')} *</label>
                 <input
                   type="text"
                   required
                   value={signerName}
                   onChange={(e) => setSignerName(e.target.value)}
                   placeholder={t('dispatch.placeholder_full_name', 'Your Full Name')}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">{t('recon.signer_role_field', 'Supervisor / Role Title')} *</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('recon.signer_role_field', 'Supervisor / Role Title')} *</label>
                 <input
                   type="text"
                   required
                   value={signerRole}
                   onChange={(e) => setSignerRole(e.target.value)}
                   placeholder={t('dispatch.placeholder_role_title', 'Receiving Dock Manager')}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">{t('recon.dock_notes_field', 'Dock Notes & Cargo Comments')}</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('recon.dock_notes_field', 'Dock Notes & Cargo Comments')}</label>
               <textarea
                 rows={2}
                 value={signoffComments}
                 onChange={(e) => setSignoffComments(e.target.value)}
                 placeholder={t('dispatch.placeholder_signoff_remarks', 'Optional carrier remarks, seals intact, driver signature notes...')}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
               />
             </div>
 
@@ -1017,18 +1028,18 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setIsReconciling(false)}
-                className="px-4 py-2 text-xs text-slate-400 hover:text-white"
+                className="px-4 py-2 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
               >
                 {t('action.cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 disabled:bg-slate-700 text-white text-xs font-semibold rounded-xl cursor-pointer shadow-lg shadow-amber-600/30"
+                className="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white text-xs font-semibold rounded-xl cursor-pointer shadow-lg shadow-amber-600/30"
               >
                 {isSubmitting ? t('auth.submitting', 'Recording receipt...') : t('recon.confirm_signoff_btn', 'Confirm Delivery & Submit Sign-Off')}
               </button>
