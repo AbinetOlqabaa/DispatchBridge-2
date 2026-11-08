@@ -3,12 +3,24 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-export const db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
-export const auth = getAuth(app);
+let app: any = null;
+let dbInstance: any = null;
+let authInstance: any = null;
+
+try {
+  app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  dbInstance = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
+  authInstance = getAuth(app);
+} catch (error: any) {
+  console.warn('Firebase initialization note:', error?.message);
+}
+
+export const db = dbInstance;
+export const auth = authInstance;
 
 // Connection test on boot
 export async function testFirestoreConnection(): Promise<boolean> {
+  if (!db) return false;
   try {
     await getDocFromServer(doc(db, 'system', 'connection_ping'));
     return true;
@@ -21,3 +33,4 @@ export async function testFirestoreConnection(): Promise<boolean> {
     return true;
   }
 }
+

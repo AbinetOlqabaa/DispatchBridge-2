@@ -878,6 +878,21 @@ class ApiService {
     return this.request('/api/system/staging-readiness');
   }
 
+  async getGatewayConfig(): Promise<{
+    twilioAccountSid?: string;
+    twilioFromNumber?: string;
+    isSmsConfigured: boolean;
+    whatsappPhoneNumberId?: string;
+    whatsappBusinessAccountId?: string;
+    whatsappDefaultPhoneNumber?: string;
+    isWhatsAppConfigured: boolean;
+    firestoreProjectId?: string;
+    firestoreDatabaseId?: string;
+    isFirestoreConfigured: boolean;
+  }> {
+    return this.request('/api/system/gateway-config');
+  }
+
   // Team & Membership Management
   async getMembersAndInvitations(): Promise<{ businessId: string; members: any[]; invitations: Invitation[] }> {
     return this.request('/api/memberships');

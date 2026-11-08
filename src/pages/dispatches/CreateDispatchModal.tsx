@@ -24,6 +24,7 @@ import { BarcodeIntakeScanner } from '../../components/dispatches/BarcodeIntakeS
 import { mergeScannedItemsIntoDispatchLines, ParsedIntakeItem } from '../../utils/barcodeParser.js';
 import { useOfflineSync } from '../../utils/offlineSync.js';
 import { hapticFeedback } from '../../utils/haptics.js';
+import { syncDispatchToFirestore } from '../../services/firestoreSync.js';
 
 interface CreateDispatchModalProps {
   isOpen: boolean;
@@ -245,6 +246,7 @@ export const CreateDispatchModal: React.FC<CreateDispatchModalProps> = ({
       };
 
       const created = await api.createDispatch(payload);
+      syncDispatchToFirestore(created).catch(() => {});
       hapticFeedback.dispatchCreated();
       onSuccess(created.id);
       onClose();

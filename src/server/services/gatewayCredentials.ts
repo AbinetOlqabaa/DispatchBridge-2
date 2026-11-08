@@ -14,6 +14,7 @@ export interface ExternalGatewayConfig {
   whatsappApiToken?: string;
   whatsappPhoneNumberId?: string;
   whatsappBusinessAccountId?: string;
+  whatsappDefaultPhoneNumber?: string;
   isWhatsAppConfigured: boolean;
 
   // Persistent Database Configuration
@@ -30,6 +31,7 @@ export function getGatewayCredentials(): ExternalGatewayConfig {
   const waToken = process.env.WHATSAPP_API_TOKEN || '';
   const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
   const waAccountId = process.env.WHATSAPP_BUSINESS_ACCOUNT_ID || '';
+  const waDefaultPhone = process.env.WHATSAPP_DEFAULT_PHONE_NUMBER || '+251987344787';
 
   return {
     twilioAccountSid: twilioSid ? `${twilioSid.slice(0, 6)}••••••••${twilioSid.slice(-4)}` : undefined,
@@ -38,6 +40,7 @@ export function getGatewayCredentials(): ExternalGatewayConfig {
 
     whatsappPhoneNumberId: waPhoneId ? `${waPhoneId.slice(0, 4)}••••` : undefined,
     whatsappBusinessAccountId: waAccountId ? `${waAccountId.slice(0, 4)}••••` : undefined,
+    whatsappDefaultPhoneNumber: waDefaultPhone,
     isWhatsAppConfigured: Boolean(waToken && waPhoneId),
 
     firestoreProjectId: process.env.FIREBASE_PROJECT_ID || 'molten-cyclist-sc70r',
@@ -58,6 +61,15 @@ export async function dispatchExternalSms(
   const from = process.env.TWILIO_FROM_NUMBER;
 
   if (sid && token && from) {
+    if (sid.startsWith('AC_mock_') || token.startsWith('mock_')) {
+      console.log(`[SMS GATEWAY DISPATCH (MOCK CREDENTIALS)] To: ${to} | Body: ${body}`);
+      return {
+        success: true,
+        providerMessageId: `sms_mock_${Date.now()}`,
+        isLive: false,
+      };
+    }
+
     try {
       const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
       const authHeader = 'Basic ' + Buffer.from(`${sid}:${token}`).toString('base64');
@@ -104,6 +116,15 @@ export async function dispatchExternalWhatsApp(
   const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
   if (token && phoneId) {
+    if (token.startsWith('mock_') || phoneId.startsWith('mock_')) {
+      console.log(`[WHATSAPP GATEWAY DISPATCH (MOCK CREDENTIALS)] To: ${to} | Message: ${message}`);
+      return {
+        success: true,
+        providerMessageId: `wa_mock_${Date.now()}`,
+        isLive: false,
+      };
+    }
+
     try {
       const url = `https://graph.facebook.com/v18.0/${phoneId}/messages`;
       const cleanPhone = to.replace(/[^0-9]/g, '');

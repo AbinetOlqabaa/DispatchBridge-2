@@ -36,9 +36,17 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
   const [isSending, setIsSending] = useState(false);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
 
+  const [gatewayConfig, setGatewayConfig] = useState<{ whatsappDefaultPhoneNumber?: string; isWhatsAppConfigured?: boolean } | null>(null);
+
   useEffect(() => {
     if (isOpen) {
       loadOutbox();
+      api.getGatewayConfig().then(cfg => {
+        setGatewayConfig(cfg);
+        if (testChannel === 'WHATSAPP' && cfg.whatsappDefaultPhoneNumber) {
+          setTestRecipient(cfg.whatsappDefaultPhoneNumber);
+        }
+      }).catch(() => {});
     }
   }, [isOpen]);
 
@@ -153,7 +161,8 @@ export const OutboxManagerModal: React.FC<OutboxManagerModalProps> = ({ isOpen, 
                   onChange={(e) => {
                     const c = e.target.value as any;
                     setTestChannel(c);
-                    if (c === 'SMS' || c === 'WHATSAPP') setTestRecipient('+1-555-014-4411');
+                    if (c === 'WHATSAPP') setTestRecipient(gatewayConfig?.whatsappDefaultPhoneNumber || '+251987344787');
+                    else if (c === 'SMS') setTestRecipient('+1-555-014-4411');
                     else if (c === 'EMAIL') setTestRecipient('ops@metroretail.com');
                     else if (c === 'WEBHOOK') setTestRecipient('https://api.partner.internal/webhook');
                   }}

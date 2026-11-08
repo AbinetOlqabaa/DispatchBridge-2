@@ -12,7 +12,7 @@ export default defineConfig(() => {
       },
     },
     optimizeDeps: {
-      include: ['eventemitter3', 'recharts'],
+      include: ['eventemitter3', 'recharts', 'firebase/app', 'firebase/firestore', 'firebase/auth'],
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.

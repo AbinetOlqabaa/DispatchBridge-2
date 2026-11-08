@@ -33,4 +33,15 @@ router.get('/businesses', async (_req, res) => {
   }
 });
 
+// External Gateway & WhatsApp Target Configuration
+router.get('/gateway-config', async (_req, res) => {
+  try {
+    const { getGatewayCredentials } = await import('../services/gatewayCredentials.js');
+    const creds = getGatewayCredentials();
+    res.json(creds);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

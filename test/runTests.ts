@@ -732,10 +732,23 @@ async function runTestSuite() {
     assertEqual(smsNotice.channel, 'SMS', 'Channel matches SMS');
     assertEqual(smsNotice.providerDeliveryStatus, 'DELIVERED', 'Status marked DELIVERED');
 
+    // Test dispatching an outbound WhatsApp alert to assigned user phone +251987344787
+    const waNotice = await sandboxStore.sendOutboundNotification({
+      channel: 'WHATSAPP',
+      recipient: '+251987344787',
+      title: 'Dispatch Manifest Notice',
+      message: 'Manifest DSP-2026-8829 dispatched to your dock.',
+    });
+    assert(Boolean(waNotice.id), 'Outbound WhatsApp notification generated');
+    assertEqual(waNotice.channel, 'WHATSAPP', 'Channel matches WHATSAPP');
+    assertEqual(waNotice.providerDeliveryStatus, 'DELIVERED', 'WhatsApp status marked DELIVERED');
+    assert(Boolean(waNotice.providerInfo?.includes('+251987344787')), 'Provider info contains user WhatsApp recipient');
+
     // Retrieve from outbox
     const outbox = await sandboxStore.getOutboxNotifications();
     assert(outbox.length > 0, 'Outbox notifications retrieved');
-    assert(outbox.some((n) => n.id === smsNotice.id), 'Created notification exists in outbox');
+    assert(outbox.some((n) => n.id === smsNotice.id), 'Created SMS notification exists in outbox');
+    assert(outbox.some((n) => n.id === waNotice.id), 'Created WhatsApp notification exists in outbox');
 
     // Test delivery retry
     const retried = await sandboxStore.retryNotificationDelivery(smsNotice.id);

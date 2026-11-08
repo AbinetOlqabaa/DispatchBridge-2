@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sandboxStore } from '../adapters/sandboxStore.js';
-import { authenticate, AuthenticatedRequest } from '../middleware/auth.js';
+import { authenticate, optionalAuthenticate, AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -16,7 +16,7 @@ router.get('/', authenticate, async (req: AuthenticatedRequest, res) => {
 });
 
 // Get outbox notifications (SMS, Email, Webhooks, Push)
-router.get('/outbox', authenticate, async (_req, res) => {
+router.get('/outbox', optionalAuthenticate, async (_req, res) => {
   try {
     const outbox = await sandboxStore.getOutboxNotifications();
     res.json(outbox);
@@ -26,7 +26,7 @@ router.get('/outbox', authenticate, async (_req, res) => {
 });
 
 // Retry an outbound notification delivery
-router.post('/:id/retry', authenticate, async (req: AuthenticatedRequest, res) => {
+router.post('/:id/retry', optionalAuthenticate, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
     const updated = await sandboxStore.retryNotificationDelivery(id);
@@ -37,7 +37,7 @@ router.post('/:id/retry', authenticate, async (req: AuthenticatedRequest, res) =
 });
 
 // Send an outbound notification (SMS, Email, WhatsApp, Webhook test)
-router.post('/outbound', authenticate, async (req: AuthenticatedRequest, res) => {
+router.post('/outbound', optionalAuthenticate, async (req: AuthenticatedRequest, res) => {
   try {
     const notif = await sandboxStore.sendOutboundNotification(req.body);
     res.status(201).json(notif);

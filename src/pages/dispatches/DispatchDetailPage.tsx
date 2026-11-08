@@ -38,6 +38,7 @@ import { SignaturePad } from '../../components/dispatches/SignaturePad.js';
 import { DamagePhotoUpload } from '../../components/dispatches/DamagePhotoUpload.js';
 import { DispatchTrackingMap } from '../../components/dispatches/DispatchTrackingMap.js';
 import { useOfflineSync } from '../../utils/offlineSync.js';
+import { subscribeToDispatchLive, syncDispatchToFirestore } from '../../services/firestoreSync.js';
 
 interface DispatchDetailPageProps {
   dispatchId: string;
@@ -154,12 +155,25 @@ export const DispatchDetailPage: React.FC<DispatchDetailPageProps> = ({
     return () => window.removeEventListener('dispatchbridge_sync_completed', handleSyncDone);
   }, [dispatchId]);
 
+  // Live real-time Firestore synchronization for collaborative telemetry & status updates
+  useEffect(() => {
+    if (!dispatchId) return;
+    const unsubscribe = subscribeToDispatchLive(dispatchId, (updated) => {
+      setDispatch((prev) => (prev ? { ...prev, ...updated } : prev));
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, [dispatchId]);
+
   const loadDetail = async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await api.getDispatch(dispatchId);
       setDispatch(data);
+      // Background dual-persistence sync to provisioned Firestore
+      syncDispatchToFirestore(data).catch(() => {});
       // Initialize reconciliation state
       setLineReceipts(
         data.lines.map((line) => ({
