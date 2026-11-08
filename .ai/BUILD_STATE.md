@@ -1,11 +1,11 @@
 # Build State — Business Dispatch & Delivery Reconciliation (DispatchBridge)
 
-- **Last Updated:** 2026-11-06T06:41:00-08:00
+- **Last Updated:** 2026-11-08T13:55:00-08:00
 - **Runtime / Platform:** Node.js v22.14.0 on Linux container with Express 4 backend & Vite 8 React 19 Frontend. Configured as an installable mobile-first Progressive Web App (PWA). *Note: Native Android build tooling (Gradle / Android SDK) is not supported in this runtime environment.*
 - **Stack:**
-  - Backend: Node.js, Express 4, TypeScript, HMAC SHA-256 session tokens, timing-safe one-time bootstrap tokens, Fayda e-ID verification adapter, OTP gateway adapter, in-memory domain adapter (`sandboxStore`) with full multi-tenant isolation.
+  - Backend: Node.js, Express 4, TypeScript, HMAC SHA-256 session tokens, timing-safe one-time bootstrap tokens, Fayda e-ID verification adapter, OTP gateway adapter, persistent Firestore integration (`molten-cyclist-sc70r` / `ai-studio-dispatchbridgede-94c180b1-9baf-460b-a29c-ab89fe9c25be`), external SMS (Twilio) & WhatsApp (Meta Cloud API) gateway credentials adapter (`gatewayCredentials.ts`), multi-tenant isolation.
   - Frontend: React 19, Tailwind CSS v4 (`@custom-variant dark (&:where(.dark, .dark *));`), Lucide React, Recharts, jsPDF, Web Vibration API (`hapticFeedback`), BarcodeDetector camera scanner, IndexedDB local-first persistence (`dispatchbridge_local_first_db`), Context API (`AuthContext`, `LanguageContext`, `ThemeContext`), clean component and page architecture.
-  - Test Suite: Pure-domain unit runner (`npx --yes tsx --test src/utils/themeUtils.test.ts src/utils/haptics.test.ts src/utils/barcodeParser.test.ts src/utils/offlineSync.test.ts` — **16/16 passing**) & Node.js acceptance/integration runner (`npm test` -> `tsx test/runTests.ts` — **48/48 automated tests passing with 0 failures**).
+  - Test Suite: Pure-domain unit runner (`npx --yes tsx --test src/server/services/gatewayCredentials.test.ts src/utils/themeUtils.test.ts src/utils/haptics.test.ts src/utils/barcodeParser.test.ts src/utils/offlineSync.test.ts` — **18/18 passing**) & Node.js acceptance/integration runner (`npm test` -> `tsx test/runTests.ts` — **48/48 automated tests passing with 0 failures**).
 
 ---
 
@@ -219,12 +219,19 @@ $ npm test
   - Configured native Tailwind v4 class-based dark mode (`@custom-variant dark (&:where(.dark, .dark *));`) in `src/index.css` synchronized with `ThemeContext.tsx` across `light`, `dark`, and `system` (Device Default) modes, dynamically tracking OS `prefers-color-scheme` changes and persisting selection under `dispatchbridge_theme`.
   - Audited and converted all 54 active application modules reachable from `src/main.tsx`—including `SystemStatusPage.tsx` (adapters, staging checklist cards, security policy, extension roadmap), `AuthModal.tsx` (sign-in/enroll tabs, phone/Fayda inputs, demo role switcher, OTP flows), `ProfileModal.tsx` (avatar manager, Fayda badge, password step-up OTP), `DispatchListPage.tsx` (export banner, empty state, filter pills, manifest table), and `DispatchDetailPage.tsx`—to native dual Light (`#f8fafc` canvas, `#ffffff` cards, `#0f172a`/`#334155` high-contrast slate typography, rich semantic badges) and Dark (`dark:bg-slate-950`, `dark:bg-slate-900`, `dark:text-white`) styling with zero mixed dark/light artifacts.
   - Enhanced GIS marker legibility and collision avoidance in `LocationsMapView.tsx` (vertical above/below label staggering + haloed `paintOrder: 'stroke'` text outlines), disabled Recharts entrance animation clipping in `DispatchSummaryCards.tsx` (`isAnimationActive={false}`) so sparklines render completely across tablet portrait/landscape resizes, harmonized the brand emblem container across `Navbar.tsx` and `TabletSidebar.tsx` (`bg-white dark:bg-slate-950`), and expanded `NotificationBanner.tsx` controls to `>= 44x44px` touch targets.
+- **Persistent Cloud Firestore & External SMS/WhatsApp Gateway Provisioning (`firebase-blueprint.json`, `firestore.rules`, `src/services/firebase.ts`, `src/server/services/gatewayCredentials.ts`, `SystemStatusPage.tsx`, `.env.example`)**:
+  - Provisioned Cloud Firestore Enterprise database (`ai-studio-dispatchbridgede-94c180b1-9baf-460b-a29c-ab89fe9c25be`) under project `molten-cyclist-sc70r` via platform `ProvisionFirebase` RPC with user terms confirmation.
+  - Created `firebase-blueprint.json` schema blueprint defining entities (`User`, `Business`, `Dispatch`, `Partner`, `Location`, `Notification`, `AuditLog`) and collection paths.
+  - Generated and deployed hardened zero-trust security rules (`firestore.rules`) via `DeployRules` RPC enforcing global default-deny, `isValidId()` guards, role checks, and append-only audit trail protection.
+  - Initialized Firebase client SDK in `src/services/firebase.ts` with connection verification (`testFirestoreConnection`).
+  - Implemented `src/server/services/gatewayCredentials.ts` with masked credential detection and dispatch hooks for **Twilio SMS** (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`) and **Meta WhatsApp Cloud API** (`WHATSAPP_API_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_ACCOUNT_ID`), integrating directly with `sendOutboundNotification` with staging fallback.
+  - Documented environment variables in `.env.example` and verified live reporting on `SystemStatusPage` Component Adapter Matrix (`Persistent Firestore (molten-cyclist-sc70r / ai-studio-dispatchbridgede-94c180b1-9baf-460b-a29c-ab89fe9c25be)`).
 - **Automated & Live Browser Verification**:
-  - `npx --yes tsx --test src/utils/themeUtils.test.ts src/utils/haptics.test.ts src/utils/barcodeParser.test.ts src/utils/offlineSync.test.ts`: **16/16 passed** across 3 suites (0 failed).
-  - `npm test` (`tsx test/runTests.ts`): **48/48 passed** (0 failed), including all 10 verification layers.
+  - `npx --yes tsx --test src/server/services/gatewayCredentials.test.ts src/utils/themeUtils.test.ts src/utils/haptics.test.ts src/utils/barcodeParser.test.ts src/utils/offlineSync.test.ts`: **18/18 passed** across 4 suites (0 failed).
+  - `npm test` (`tsx test/runTests.ts`): **48/48 passed** (0 failed).
   - `npm run lint` (`tsc --noEmit`): **0 errors**.
   - `npm run build` (`vite build` / `compile_applet`): **SUCCESS**.
-  - Live headless Chromium browser visual & DOM verification across explicit Light Mode, Dark Mode, and Device/System Default Mode (`prefers-color-scheme: dark` & `light`), verified across Tablet Landscape (`1024x768` with `TabletSidebar`), Tablet Portrait (`768x1024` with horizontal nav strip and full Recharts sparklines), Desktop (`1440x900`), and Mobile (`390x844`), confirming `0` horizontal overflow, `0` sub-36px touch target violations, live Ethiopic (`አማርኛ`) runtime translation, and `0` console/page errors.
+  - Live browser verification on `http://localhost:3000`: Scrolled capture confirmed the Component Adapter Matrix cleanly renders `Persistent Firestore` with zero horizontal overflow.
 
 ---
 

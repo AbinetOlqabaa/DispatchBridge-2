@@ -1,0 +1,156 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account and credentials",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 120 },
+        "phoneNumber": { "type": "string", "maxLength": 30 },
+        "role": { "type": "string", "enum": ["SUPER_ADMIN", "BUSINESS_OWNER", "SENDER", "RECEIVER"] },
+        "businessId": { "type": "string", "maxLength": 64 },
+        "businessName": { "type": "string", "maxLength": 120 },
+        "status": { "type": "string", "enum": ["ACTIVE", "SUSPENDED", "PENDING_VERIFICATION"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "email", "role", "status", "createdAt"]
+    },
+    "Business": {
+      "title": "Business",
+      "description": "Tenant enterprise entity",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 120 },
+        "registrationNumber": { "type": "string", "maxLength": 64 },
+        "countryCode": { "type": "string", "maxLength": 10 },
+        "contactEmail": { "type": "string", "maxLength": 120 },
+        "contactPhone": { "type": "string", "maxLength": 30 },
+        "address": { "type": "string", "maxLength": 200 },
+        "status": { "type": "string", "enum": ["ACTIVE", "SUSPENDED"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "status", "createdAt"]
+    },
+    "Dispatch": {
+      "title": "Dispatch",
+      "description": "B2B shipment manifest with delivery reconciliation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "dispatchNumber": { "type": "string", "maxLength": 64 },
+        "businessId": { "type": "string", "maxLength": 64 },
+        "partnerId": { "type": "string", "maxLength": 64 },
+        "originLocationId": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "enum": ["DRAFT", "SUBMITTED", "DISPATCHED", "VIEWED", "IN_TRANSIT", "PARTIALLY_RECEIVED", "RECEIVED", "DISCREPANCY_REVIEW", "RECONCILED", "CANCELLED"] },
+        "totalQuantityDispatched": { "type": "number" },
+        "totalQuantityReceived": { "type": "number" },
+        "totalQuantityLost": { "type": "number" },
+        "shareToken": { "type": "string", "maxLength": 128 },
+        "dispatchedAt": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "dispatchNumber", "businessId", "status", "totalQuantityDispatched", "shareToken", "createdAt"]
+    },
+    "Partner": {
+      "title": "Partner",
+      "description": "Receiving customer or delivery partner",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string", "maxLength": 64 },
+        "name": { "type": "string", "maxLength": 120 },
+        "contactPerson": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "deliveryAddress": { "type": "string", "maxLength": 250 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "deliveryAddress", "createdAt"]
+    },
+    "Location": {
+      "title": "Location",
+      "description": "Warehouse or terminal dock location",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string", "maxLength": 64 },
+        "label": { "type": "string", "maxLength": 120 },
+        "addressLines": { "type": "string", "maxLength": 200 },
+        "city": { "type": "string", "maxLength": 80 },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "label", "city", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Outbox alert and recipient delivery item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "businessId": { "type": "string", "maxLength": 64 },
+        "recipientUserId": { "type": "string", "maxLength": 128 },
+        "eventType": { "type": "string" },
+        "title": { "type": "string", "maxLength": 160 },
+        "message": { "type": "string", "maxLength": 500 },
+        "channel": { "type": "string", "enum": ["IN_APP", "EMAIL", "SMS", "WHATSAPP", "WEBHOOK"] },
+        "status": { "type": "string", "enum": ["QUEUED", "SENT", "DELIVERED", "FAILED", "READ"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "title", "channel", "status", "createdAt"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Tamper-resistant operational audit entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "actorId": { "type": "string", "maxLength": 64 },
+        "actorName": { "type": "string", "maxLength": 100 },
+        "actorRole": { "type": "string" },
+        "businessId": { "type": "string", "maxLength": 64 },
+        "action": { "type": "string", "maxLength": 64 },
+        "entityType": { "type": "string", "maxLength": 64 },
+        "entityId": { "type": "string", "maxLength": 64 },
+        "details": { "type": "string", "maxLength": 500 },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "actorId", "action", "entityType", "entityId", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/businesses/{businessId}": {
+      "schema": "Business",
+      "description": "Tenant enterprise document"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and credentials"
+    },
+    "/dispatches/{dispatchId}": {
+      "schema": "Dispatch",
+      "description": "Shipment manifests with lines and delivery receipts"
+    },
+    "/partners/{partnerId}": {
+      "schema": "Partner",
+      "description": "Registered partner locations"
+    },
+    "/locations/{locationId}": {
+      "schema": "Location",
+      "description": "Origin and dock terminals"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "In-app and outbound notification queue"
+    },
+    "/auditLogs/{auditId}": {
+      "schema": "AuditLog",
+      "description": "Immutable operational audit trails"
+    }
+  }
+}

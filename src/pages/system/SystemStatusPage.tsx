@@ -247,7 +247,7 @@ export const SystemStatusPage: React.FC = () => {
                 {t('system.staging_ready', 'Staging Ready')}
               </span>
             </div>
-            <div className="text-slate-900 dark:text-white font-medium">{t('system.db_provider_name', status?.databaseProvider || 'In-Memory Sandbox Store')}</div>
+            <div className="text-slate-900 dark:text-white font-medium">{status?.databaseProvider || t('system.db_provider_name')}</div>
             <div className="text-[11px] text-slate-600 dark:text-slate-400 space-y-1 tabular-nums">
               <div>• {t('system.total_dispatches', { count: status?.totalDispatches ?? 0 })}</div>
               <div>• {t('system.total_partners', { count: status?.totalPartners ?? 0 })}</div>

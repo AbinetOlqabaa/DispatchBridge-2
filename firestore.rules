@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Businesses
+    match /businesses/{businessId} {
+      allow read: if isSignedIn() && isValidId(businessId);
+      allow write: if isAdmin();
+    }
+
+    // Users
+    match /users/{userId} {
+      allow read: if isSignedIn() && isValidId(userId) && (request.auth.uid == userId || isAdmin());
+      allow write: if isSignedIn() && isValidId(userId) && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Dispatches
+    match /dispatches/{dispatchId} {
+      allow read: if isValidId(dispatchId); // Public delivery share tokens read or signed-in users
+      allow create, update: if isSignedIn() && isValidId(dispatchId);
+      allow delete: if isAdmin() && isValidId(dispatchId);
+    }
+
+    // Partners
+    match /partners/{partnerId} {
+      allow read: if isSignedIn() && isValidId(partnerId);
+      allow write: if isSignedIn() && isValidId(partnerId);
+    }
+
+    // Locations
+    match /locations/{locationId} {
+      allow read: if isValidId(locationId);
+      allow write: if isSignedIn() && isValidId(locationId);
+    }
+
+    // Notifications
+    match /notifications/{notificationId} {
+      allow read, write: if isSignedIn() && isValidId(notificationId);
+    }
+
+    // Audit Logs (Append-only by authenticated actors, never deletable)
+    match /auditLogs/{auditId} {
+      allow read: if isSignedIn() && isValidId(auditId);
+      allow create: if isSignedIn() && isValidId(auditId);
+      allow update, delete: if false;
+    }
+  }
+}

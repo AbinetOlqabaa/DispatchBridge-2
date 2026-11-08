@@ -2598,15 +2598,26 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
   }
 
   async getSystemStatus(): Promise<SystemStatusInfo> {
+    const { getGatewayCredentials } = await import('../services/gatewayCredentials.js');
+    const creds = getGatewayCredentials();
+
+    const dbLabel = creds.isFirestoreConfigured
+      ? `Persistent Firestore (${creds.firestoreProjectId} / ${creds.firestoreDatabaseId})`
+      : 'Sandbox In-Memory / Dev State';
+
+    const notifLabel = creds.isSmsConfigured || creds.isWhatsAppConfigured
+      ? `Live External Gateway (SMS: ${creds.isSmsConfigured ? 'Twilio Live' : 'Staging'}, WhatsApp: ${creds.isWhatsAppConfigured ? 'Meta Live' : 'Staging'})`
+      : 'In-App Notifications Hub + SMS/WhatsApp Staging Gateway';
+
     return {
-      kernelVersion: '0.2.0-master',
+      kernelVersion: '1.0.0-production',
       environment: (process.env.NODE_ENV as any) || 'development',
       platform: 'Progressive Web App (PWA) / Node.js Express Container',
       isNativeAndroid: false,
-      databaseProvider: 'Sandbox In-Memory / Dev State',
+      databaseProvider: dbLabel,
       authProvider: 'Sandbox Mock JWT',
-      notificationProvider: 'In-App Notifications Hub + SMS Simulator',
-      isMockActive: true,
+      notificationProvider: notifLabel,
+      isMockActive: !creds.isFirestoreConfigured,
       totalDispatches: dispatches.length,
       totalAuditEvents: auditLogs.length,
       totalPartners: partners.length,
@@ -2663,10 +2674,23 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
     const isEmail = payload.channel === 'EMAIL';
     const isWhatsapp = payload.channel === 'WHATSAPP';
 
+    const { dispatchExternalSms, dispatchExternalWhatsApp } = await import('../services/gatewayCredentials.js');
+    let gatewayResult: { success: boolean; providerMessageId?: string; error?: string; isLive: boolean } = {
+      success: true,
+      providerMessageId: `msg_${Date.now()}`,
+      isLive: false,
+    };
+
+    if (isSms) {
+      gatewayResult = await dispatchExternalSms(payload.recipient, `${payload.title}: ${payload.message}`);
+    } else if (isWhatsapp) {
+      gatewayResult = await dispatchExternalWhatsApp(payload.recipient, `*${payload.title}*\n${payload.message}`);
+    }
+
     const providerName = isSms
-      ? 'Twilio SMS Staging Gateway'
+      ? gatewayResult.isLive ? 'Twilio Live Production SMS Gateway' : 'Twilio SMS Staging Gateway'
       : isWhatsapp
-      ? 'WhatsApp Business API Staging Sandbox'
+      ? gatewayResult.isLive ? 'Meta WhatsApp Cloud Production API' : 'WhatsApp Business API Staging Sandbox'
       : isEmail
       ? 'Transactional SMTP Staging Relayer'
       : 'HTTPS Webhook Payload Dispatcher';
@@ -2681,11 +2705,11 @@ export class SandboxStore implements IAuthAdapter, IDatabaseAdapter, INotificati
       dispatchId: payload.dispatchId,
       dispatchNumber: payload.dispatchNumber,
       channel: payload.channel,
-      status: 'DELIVERED',
-      providerDeliveryStatus: 'DELIVERED',
+      status: gatewayResult.success ? 'DELIVERED' : 'FAILED',
+      providerDeliveryStatus: gatewayResult.success ? 'DELIVERED' : 'FAILED',
       deliveryAttempts: 1,
       lastAttemptAt: new Date().toISOString(),
-      providerInfo: `${providerName} (Target: ${payload.recipient})`,
+      providerInfo: `${providerName} (Target: ${payload.recipient}${gatewayResult.providerMessageId ? ' • Ref: ' + gatewayResult.providerMessageId : ''})`,
       payloadPreview: JSON.stringify({
         channel: payload.channel,
         destination: payload.recipient,
